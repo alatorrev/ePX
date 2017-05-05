@@ -1,0 +1,73 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pu="http://primefaces.org/ultima">
+    <h:head>
+        <h:head>
+            <title>ePX</title>
+        </h:head>
+    </h:head>
+    <h:form id="menuform"> 
+
+        <div class="layout-menu #{guestPreferences.menuClass}">
+            <div class="nano">
+                <div class="nano-content menu-scroll-content">
+                    <ui:fragment rendered="true">
+                        <div class="profile">
+                            <div id="profileImage" ></div>
+                            <a id="profile-options" href="#">
+                                <span id="spanid" class="profile-name">#{loginBean.sessionUsuario.nombres} #{loginBean.sessionUsuario.apellidos}</span>
+                                <i class="material-icons">&#xE313;</i>
+                            </a>
+                            <h:inputHidden value="#{loginBean.sessionUsuario.nombres}" id="hiddennombre" />
+                            <h:inputHidden value="#{loginBean.sessionUsuario.apellidos}" id="hiddenapellidos" />
+                        </div>
+
+                        <ul id="profile-menu" class="ultima-menu">
+
+                            <li role="menuitem">
+                                <a href="#" class="ripplelink">
+                                    <i class="material-icons">&#xE8AC;</i>
+                                    <span>Logout</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </ui:fragment>
+
+                    <!--
+                    <pu:menu widgetVar="me">
+                        <p:submenu id="um_default" label="Template Pages" icon="&#xE884;">
+                            <p:menuitem id="um_empty" value="Empty Page" icon="&#xE88B;" outcome="/empty" />
+                            <p:menuitem id="um_login" value="Login Page" icon="&#xE8E8;" outcome="/login" />
+                            <p:menuitem id="um_404" value="404 Page" icon="&#xE001;" outcome="/404" />
+                        </p:submenu>
+                    </pu:menu>
+                    
+                    -->
+                    <pu:menu widgetVar="me" model="#{loginBean.modelMenu}"/>
+                </div>
+            </div>
+        </div>
+        <script>
+            var nombre = document.getElementById("menuform:hiddennombre").value;
+            var apellido = document.getElementById("menuform:hiddenapellidos").value;
+            document.getElementById("profileImage").innerHTML = nombre.charAt(0) + apellido.charAt(0);
+        </script>
+        <style>
+            #profileImage {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 5px auto;
+                border-radius: 50%;
+                background: #009688;
+                font-size: 35px;
+                color: #fff;
+                text-align: center;
+                line-height: 1.7;
+            }
+        </style>
+    </h:form>
+</ui:composition>
