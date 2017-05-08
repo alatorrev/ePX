@@ -7,6 +7,7 @@ package com.epx.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -24,6 +25,7 @@ public class Usuario implements Serializable {
     int idRol;
     String descripcionRol;
     int activo;
+    List<Recurso> listaVista;
 
     public String getCorreo() {
         return correo;
@@ -103,6 +105,14 @@ public class Usuario implements Serializable {
 
     public void setActivo(int activo) {
         this.activo = activo;
+    }
+
+    public List<Recurso> getListaVista() {
+        return listaVista;
+    }
+
+    public void setListaVista(List<Recurso> listaVista) {
+        this.listaVista = listaVista;
     }
 
 }

@@ -108,6 +108,8 @@ public class LoginBean implements Serializable {
                 }
             }
         }
+        listaRecursos.add(new Recurso(urlBase));
+        getSessionUsuario().setListaVista(listaRecursos);
     }
 
     public boolean subMenuExists(String subItem) {

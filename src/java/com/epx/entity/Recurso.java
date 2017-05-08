@@ -6,6 +6,7 @@
 package com.epx.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -21,6 +22,39 @@ public class Recurso implements Serializable {
     String itemIcon;
     String subItemIcon;
 
+    public Recurso() {
+    }
+
+    public Recurso(String ruta) {
+        this.ruta = ruta;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Recurso other = (Recurso) obj;
+        if (!Objects.equals(this.ruta, other.ruta)) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
     public int getIdRecurso() {
         return idRecurso;
     }
