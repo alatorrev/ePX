@@ -27,12 +27,11 @@
                         </div>
 
                         <ul id="profile-menu" class="ultima-menu">
-
                             <li role="menuitem">
-                                <a href="#" class="ripplelink">
-                                    <i class="material-icons">&#xE8AC;</i>
-                                    <span>Logout</span>
-                                </a>
+                                <p:commandLink  action="#{cerrarSesionBean.logout()}"> 
+                                        <i class="material-icons">&#xE8AC;</i>
+                                        <span>Logout</span>
+                                    </p:commandLink>
                             </li>
                         </ul>
                     </ui:fragment>

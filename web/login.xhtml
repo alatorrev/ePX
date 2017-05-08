@@ -19,11 +19,13 @@
     </h:head>
 
     <h:body styleClass="login-body">
-        <h:form>
+        <h:form id="frmlog">
+            <p:growl id="messages" showDetail="true" />
             <div class="card login-panel ui-fluid">
                 <div class="ui-g">
                     <div class="ui-g-12">
                         <p:graphicImage name="images/logo.svg" library="ultima-layout" />
+                        
                     </div>
                     <div class="ui-g-12">
                         <h:panelGroup styleClass="md-inputfield">

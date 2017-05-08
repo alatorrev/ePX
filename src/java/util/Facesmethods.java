@@ -45,6 +45,7 @@ public class Facesmethods {
     }
 
     public void permissionChecker(List<Recurso> listaRecursosUsuarios) {
+        completeUrls(listaRecursosUsuarios);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         Recurso recurso = new Recurso(request.getRequestURL().toString());
         if (!listaRecursosUsuarios.contains(recurso)) {
@@ -54,6 +55,13 @@ public class Facesmethods {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    public void completeUrls(List<Recurso> listaRecursosUsuarios) {
+        for (int i = 0; i < listaRecursosUsuarios.size() - 1; i++) {
+            Recurso r = listaRecursosUsuarios.get(i);
+            listaRecursosUsuarios.get(i).setRuta(getApplicationUri() + r.getRuta());
         }
     }
 
