@@ -15,17 +15,17 @@ import java.util.List;
  */
 public class Usuario implements Serializable {
 
-    String nombres;
-    String apellidos;
-    String loginname;
-    String password;
-    String correo;
-    Date fecha_crea;
-    Date fecha_modif;
-    int idRol;
-    String descripcionRol;
-    int activo;
-    List<Recurso> listaVista;
+    private String nombres;
+    private String apellidos;
+    private String loginname;
+    private String password;
+    private String correo;
+    private Date fecha_crea;
+    private Date fecha_modif;
+    private int idRol;
+    private String descripcionRol;
+    private int activo;
+    private List<Recurso> listaVista;
 
     public String getCorreo() {
         return correo;

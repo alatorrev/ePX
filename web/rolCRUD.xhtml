@@ -21,7 +21,8 @@
                         <p:growl id="growl" showDetail="true"/>
                         <!-- <div class="FontBold Fs18 hardblue" style="margin: 15px 10px">Listado Usuarios</div>-->
                         <div class="Separator">
-                            <p:commandLink  value="Agregar Rol" oncomplete="PF('wdlgCrearRol').show();" style="font-size: 20px; "  styleClass="icon-plus-circled"/>
+                            <p:commandButton value="Agregar Rol" oncomplete="PF('wdlgCrearRol').show();" style="font-size: 20px; width: 30%"  styleClass="icon-plus-circled"/>
+                            
                         </div>
                         <p:spacer height="10"/>
                         <p:dataTable id="uTable" value="#{rolBean.listadoRoles}" var="rol" widgetVar="userTable" paginator="true" rows="10"
@@ -39,6 +40,27 @@
                                     </table>
                                 </p:outputPanel>
                             </f:facet>
+                            <p:column  style="text-align: center" width="10%">
+                                <p:commandLink id="editarr" actionListener="#{rolBean.showEditDialog(rol)}" 
+                                               oncomplete="PF('wdlgDatos').show();" update="dlgDatos">
+                                    <i class="material-icons" style="color: #559688">create</i>
+                                    <p:tooltip id="editarr-message" for="editarr" value="Editar"
+                                           showEffect="clip" hideEffect="explode" />
+                                </p:commandLink>
+                                <p:commandLink id="eliminarr" actionListener="#{rolBean.eliminar(rol)}"  update=":frm:uTable" >
+                                    <i class="material-icons" style="color: #559688">delete</i>
+                                    <p:tooltip id="eliminarr-message" for="eliminarr" value="Eliminar"
+                                           showEffect="clip" hideEffect="explode" />
+                                    <p:confirm header="Confirmación" message="Está seguro de eliminar el registro" icon="ui-icon-alert" />
+                                </p:commandLink>
+                                <p:commandLink id="permisos" actionListener="#{rolBean.showPermissionDialog(rol)}"  
+                                               oncomplete="PF('wdlgPermisos').show();" update="dlgPermisos">
+                                    <p:tooltip id="permisos-message" for="permisos" value="Editar permisos para el rol"
+                                           showEffect="clip" hideEffect="explode" />
+                                    <i class="material-icons" style="color: #559688">people_outline</i>
+                                </p:commandLink>
+                            </p:column>
+
                             <p:column headerText="Id" filterBy="#{rol.idrol}" filterStyle="display:none" filterMatchMode="contains" style="text-align: center">
                                 <h:outputText value="#{rol.idrol}"/>
                             </p:column>
@@ -49,22 +71,7 @@
 
                             <!--############################################################################################ -->
                             <!--############################################################################################ -->
-                            <p:column  style="text-align: center">
-                                <i class="icon-edit">
-                                    <p:commandLink value="editar" actionListener="#{rolBean.showEditDialog(rol)}" 
-                                                   oncomplete="PF('wdlgDatos').show();" update="dlgDatos"/>
-                                </i>   
-                                <i class="icon-trash-2">
-                                    <p:commandLink value="desactivar" actionListener="#{rolBean.eliminar(rol)}"  update=":frm:uTable" >
-                                        <p:confirm header="Confirmación" message="Está seguro de eliminar el registro" icon="ui-icon-alert" />
-                                    </p:commandLink>
-                                    <!-- <p:graphicImage name="images/ui-icon-trash.png" library="sentinel-layout"/>-->
-                                </i>
-                                <i class="icon-wrench">
-                                    <p:commandLink value="permisos" actionListener="#{rolBean.showPermissionDialog(rol)}"  
-                                                   oncomplete="PF('wdlgPermisos').show();" update="dlgPermisos" />
-                                </i>
-                            </p:column>
+
                         </p:dataTable>
                     </h:form>
 
@@ -85,22 +92,12 @@
                     <!--############################################################################################ -->
                     <!--############################################################################################ -->
                     <p:dialog id="dlgPermisos" header="Permisos Rol: #{rolBean.rol.descripcion}" widgetVar="wdlgPermisos" modal="true" 
-                              closable="false" closeOnEscape="false" style="width:600px;height: 300px">
+                              closable="false" closeOnEscape="false" style="height: 300px">
                         <h:form id="frmDlgPermiso">
                             <p:dataTable id="resourceTable" value="#{rolBean.listadoPermisos}" var="recurso" widgetVar="recursoTable" rows="10" paginator="true"
                                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-                                         paginatorPosition="bottom" rowsPerPageTemplate="5,10,15" filteredValue="#{rolBean.filteredAccess}" lazy="false">
-                                <!-- <f:facet name="header">
-                                     <p:outputPanel style="text-align: right;">
-                                         <table>
-                                             <tr>
-                                                 <td class="FontBold Fs18 hardwhite" style="border: none; text-align: left"><h:outputText value="Asignar Recursos" style="color: #ffffff" /></td>
-                                                 <td style="border: none; text-align: right"><h:outputText value="Buscar: " style="text-align: right; color: #ffffff"/>
-                                                     <p:inputText id="globalFilter" onkeyup="PF('recursoTable').filter()" style="width:150px" placeholder="Enter keyword"/></td>
-                                             </tr>
-                                         </table>
-                                     </p:outputPanel>
-                                 </f:facet> -->
+                                         paginatorPosition="bottom" rowsPerPageTemplate="5,10,15" filteredValue="#{rolBean.filteredAccess}" lazy="false"
+                                         style="width:350px">
                                 <p:column headerText="Recurso" filterBy="#{recurso.descripcionRecurso}" filterStyle="display:none" filterMatchMode="contains">
                                     <p:outputLabel value="#{recurso.descripcionRecurso}"/>
                                 </p:column>
@@ -110,7 +107,7 @@
                             </p:dataTable>
                             <p:commandButton ajax="true" update=":frmDlgPermiso:resourceTable" 
                                              value="Guardar" actionListener="#{rolBean.commitPermission()}"
-                                             oncomplete="PF('recursoTable').clearFilters();">
+                                             oncomplete="PF('wdlgPermisos').hide();">
                                 <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                             </p:commandButton>
                             <p:commandButton value="Cancelar" actionListener="#{rolBean.onCancelPermissionDialog()}"

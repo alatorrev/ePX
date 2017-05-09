@@ -79,12 +79,13 @@ public class RolDAO implements Serializable{
         Conexion con = new Conexion();
         con.getConnection().setAutoCommit(false);
         PreparedStatement pst;
-        String query = "update rol set estado = 0, fechamod=CURRENT_TIMESTAMP, usumod=?"
+        String query = "update rol set estado=?, fechamod=CURRENT_TIMESTAMP, usumod=? "
                 + "where idrol=?";
         pst = con.getConnection().prepareStatement(query);
         try {
-            pst.setInt(1, rol.getIdrol());
+            pst.setInt(1, 0);
             pst.setString(2, u.getLoginname());
+            pst.setInt(3, rol.getIdrol());
             pst.executeUpdate();
             con.getConnection().commit();
             done=true;

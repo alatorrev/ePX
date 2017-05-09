@@ -14,13 +14,13 @@ import java.util.Objects;
  */
 public class Recurso implements Serializable {
 
-    int idRecurso;
-    int idRol;
-    String itemLabel;
-    String subItemLabel;
-    String ruta;
-    String itemIcon;
-    String subItemIcon;
+    private int idRecurso;
+    private int idRol;
+    private String itemLabel;
+    private String subItemLabel;
+    private String ruta;
+    private String itemIcon;
+    private String subItemIcon;
 
     public Recurso() {
     }

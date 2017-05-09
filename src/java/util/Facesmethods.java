@@ -10,6 +10,7 @@ import com.epx.entity.Usuario;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.faces.FacesException;
 import javax.faces.context.ExternalContext;
@@ -45,10 +46,10 @@ public class Facesmethods {
     }
 
     public void permissionChecker(List<Recurso> listaRecursosUsuarios) {
-        completeUrls(listaRecursosUsuarios);
+        List<Recurso> lista = completeUrls(listaRecursosUsuarios);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         Recurso recurso = new Recurso(request.getRequestURL().toString());
-        if (!listaRecursosUsuarios.contains(recurso)) {
+        if (!lista.contains(recurso)) {
             try {
                 HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
                 response.sendError(403);
@@ -56,13 +57,23 @@ public class Facesmethods {
                 System.out.println(e.getMessage());
             }
         }
+        lista=null;
     }
 
-    public void completeUrls(List<Recurso> listaRecursosUsuarios) {
-        for (int i = 0; i < listaRecursosUsuarios.size() - 1; i++) {
-            Recurso r = listaRecursosUsuarios.get(i);
-            listaRecursosUsuarios.get(i).setRuta(getApplicationUri() + r.getRuta());
+    public List<Recurso> completeUrls(List<Recurso> listaRecurso) {
+        List<Recurso> pathRecursos = new ArrayList<>();
+        for (Recurso recurso : listaRecurso) {
+            Recurso r = new Recurso();
+            r.setIdRecurso(recurso.getIdRecurso());
+            r.setIdRol(recurso.getIdRol());
+            r.setItemIcon(recurso.getItemIcon());
+            r.setItemLabel(recurso.getItemLabel());
+            r.setRuta(getApplicationUri()+recurso.getRuta());
+            r.setSubItemIcon(recurso.getSubItemIcon());
+            r.setSubItemLabel(recurso.getSubItemLabel());
+            pathRecursos.add(r);
         }
+        return pathRecursos;
     }
 
 }

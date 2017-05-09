@@ -13,9 +13,9 @@ import java.util.Date;
  * @author Bottago SA
  */
 public class Rol implements Serializable{
-    int idrol;
-    String descripcion;
-    String usumod;
+    private int idrol;
+    private String descripcion;
+    private String usumod;
 
     public String getUsumod() {
         return usumod;
