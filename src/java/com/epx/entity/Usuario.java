@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class Usuario implements Serializable {
 
+    private int idusuario;
     private String nombres;
     private String apellidos;
     private String loginname;
@@ -26,7 +27,24 @@ public class Usuario implements Serializable {
     private String descripcionRol;
     private int activo;
     private List<Recurso> listaVista;
+    private int estadorol;
 
+    public int getIdusuario() {
+        return idusuario;
+    }
+
+    public void setIdusuario(int idusuario) {
+        this.idusuario = idusuario;
+    }
+
+    public int getEstadorol() {
+        return estadorol;
+    }
+
+    public void setEstadorol(int estadorol) {
+        this.estadorol = estadorol;
+    }
+    
     public String getCorreo() {
         return correo;
     }
