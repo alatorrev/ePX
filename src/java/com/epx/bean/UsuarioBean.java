@@ -60,7 +60,7 @@ public class UsuarioBean implements Serializable {
     public void showEditDialog(Usuario u) {
         usuario = u;
     }
-    
+
     public void showAsignaDialog(Usuario u) {
         usuario = u;
     }
@@ -73,18 +73,58 @@ public class UsuarioBean implements Serializable {
         setUsuario(new Usuario());
     }
 
-    public void commitCreate() throws SQLException {
-        boolean flag = daoUsuario.createUsuario(usuario, sessionUsuario);
-        if (flag) {
-            listadoUsuarios = daoUsuario.findAllUsuarios();
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Nuevo usuario añadido correctamente al sistema, favor asignarle un rol"));
-            RequestContext.getCurrentInstance().update("frm:growl");
+    public void validarUsuario() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("nombre asdasdaasdasd </br>");
+        sb.append("apellido asdasdaasdasd </br>");
+        sb.append("correo asdasdaasdasd </br>");
+
+        if (daoUsuario.verificarUsuario(usuario)) {
+            FacesMessage fm = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuario ya existe", sb.toString());
+            RequestContext.getCurrentInstance().showMessageInDialog(fm);
         } else {
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
-            RequestContext.getCurrentInstance().update("frm:growl");
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "aprobed", "aprobed"));
         }
+
+    }
+
+    public void commitCreate() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        if (usuario.getNombres() == null || usuario.getNombres().isEmpty()) {
+            sb.append("<ul> <li>Nombre no puede ser vacío </li> </ul>");
+        }
+        if (usuario.getApellidos() == null || usuario.getApellidos().isEmpty()) {
+            sb.append("<ul> <li> Apellido no puede ser vacío </li> </ul>");
+        }
+        if (usuario.getCorreo() == null || usuario.getCorreo().isEmpty()) {
+            sb.append("<ul> <li> Correo no puede ser vacío </li> </ul>");
+        }
+        if (usuario.getLoginname() == null || usuario.getLoginname().isEmpty()) {
+            sb.append("<ul> <li> Nombre de usuario no puede ser vacío </li> </ul>");
+        } else if (daoUsuario.verificarUsuario(usuario)) {
+            sb.append("<ul> <li> Nombre de usuario ya existe </li> </ul>");
+        }
+        if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {
+            sb.append("<ul> <li> La contraseña no puede ser vacía </li> </ul>");
+        }
+        if (sb.length() > 0) {
+            FacesMessage fm = new FacesMessage("¡Ocurrió un error!", sb.toString());
+            RequestContext.getCurrentInstance().showMessageInDialog(fm);
+        } else {
+            boolean flag = daoUsuario.createUsuario(usuario, sessionUsuario);
+            if (flag) {
+                listadoUsuarios = daoUsuario.findAllUsuarios();
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Nuevo usuario añadido correctamente al sistema, favor asignarle un rol"));
+                RequestContext.getCurrentInstance().update("frm:growl");
+            } else {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                RequestContext.getCurrentInstance().update("frm:growl");
+            }
+        }
+
     }
 
     public void commitEdit() throws SQLException {
@@ -100,7 +140,7 @@ public class UsuarioBean implements Serializable {
             RequestContext.getCurrentInstance().update("frm:growl");
         }
     }
-    
+
     public void eliminar(Usuario u) throws SQLException {
         boolean flag = daoUsuario.deleteUsuario(u, sessionUsuario);
         if (flag) {

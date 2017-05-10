@@ -149,6 +149,29 @@ public class UsuarioDAO implements Serializable {
         return done;
     }
 
+    public boolean verificarUsuario(Usuario us) throws SQLException {
+        boolean done = false;
+        Conexion con = new Conexion();
+        PreparedStatement pst;
+        String sql = "select loginname "
+                + "from usuario "
+                + "where loginname = ?";
+        pst = con.getConnection().prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+        try {
+            pst.setString(1, us.getLoginname());
+            ResultSet rs = pst.executeQuery();
+            rs.last();
+            int rows = rs.getRow();
+            done=rows>0;
+        } catch (Exception e) {
+            System.out.println("DAO VERIFICAR LOGIN: " + e.getMessage());
+            done = false;
+        } finally {
+            con.desconectar();
+        }
+        return done;
+    }
+
     public boolean editUsuario(Usuario us, Usuario session) throws SQLException {
         boolean done = false;
         Conexion con = new Conexion();
@@ -200,7 +223,7 @@ public class UsuarioDAO implements Serializable {
         }
         return done;
     }
-    
+
     public boolean AsignaRol(Usuario us, int RolIdSelected) throws SQLException {
         boolean done = false;
         Conexion con = new Conexion();

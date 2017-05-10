@@ -95,7 +95,7 @@
                         </h:form>
                     </p:dialog>
                     <p:dialog id="dlgCrearUsuario" header="Crear Usuario" widgetVar="wdlgCrearUsuario" modal="true" responsive="true">
-                        <h:form>
+                        <h:form id="frmCreaUsuario">
                             <h:panelGrid columns="2">
                                 <p:outputLabel value="Nombres"/>
                                 <p:inputText value="#{usuarioBean.usuario.nombres}"/>
@@ -104,13 +104,14 @@
                                 <p:outputLabel value="Email"/>
                                 <p:inputText value="#{usuarioBean.usuario.correo}"/>
                                 <p:outputLabel value="Login"/>
-                                <p:inputText value="#{usuarioBean.usuario.loginname}"/>
+                                <p:inputText id="loginn" value="#{usuarioBean.usuario.loginname}"  >
+                                </p:inputText>
                                 <p:outputLabel value="Password"/>
                                 <p:inputText value="#{usuarioBean.usuario.password}"/>
-
+                                
                                 <p:commandButton ajax="true" actionListener="#{usuarioBean.commitCreate()}" value="Crear" oncomplete="PF('wdlgCrearUsuario').hide();" update=":frm:uTable" >
                                     <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
-                                </p:commandButton>
+                                </p:commandButton> 
                                 <p:commandButton value="Cancelar" actionListener="#{usuarioBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgCrearUsuario').hide();"/>
                             </h:panelGrid>
                         </h:form>
