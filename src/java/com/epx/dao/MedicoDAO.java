@@ -65,7 +65,7 @@ public class MedicoDAO implements Serializable {
         PreparedStatement pst;
         String query = "insert into medico_bottago (idmedico, fuentemedico, nombres, apellidos, cedula, "
                 + "direccion, fechanacimiento, fechacreacion, usuariocreacion) "
-                + "values(1+(isnull(max(idmedico),0)), B, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
+                + "values((select (1 + isnull(max(idmedico),0)) from medico_bottago), 'B', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
         pst = con.getConnection().prepareStatement(query);
         try {
             pst.setString(1, med.getNombres().toUpperCase());
@@ -105,6 +105,7 @@ public class MedicoDAO implements Serializable {
             pst.setString(4, med.getDireccion());
             pst.setDate(5, java.sql.Date.valueOf(format.format(med.getFechaNacimiento())));
             pst.setString(6, u.getLoginname());
+            pst.setLong(7, med.getIdMedico());
             pst.executeUpdate();
             con.getConnection().commit();
             done = true;

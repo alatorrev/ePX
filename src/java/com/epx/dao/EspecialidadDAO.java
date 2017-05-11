@@ -6,6 +6,7 @@
 package com.epx.dao;
 
 import com.epx.entity.Especialidad;
+import com.epx.entity.Medico;
 import com.epx.conexion.Conexion;
 
 import java.io.Serializable;
@@ -21,7 +22,8 @@ import java.util.logging.Logger;
  *
  * @author Bottago SA
  */
-public class EspecialidadDAO implements Serializable{
+public class EspecialidadDAO implements Serializable {
+
     public List<Especialidad> findAllEspecialidades() {
         Conexion con = new Conexion();
         List<Especialidad> listadoEspecialidad = new ArrayList<>();
@@ -47,5 +49,31 @@ public class EspecialidadDAO implements Serializable{
             }
         }
         return listadoEspecialidad;
+    }
+
+    public boolean AsignarEspecialidad(int[] idespecialidad, Medico med) throws SQLException {
+        boolean done = false;
+        Conexion con = new Conexion();
+        PreparedStatement pst;
+        con.getConnection().setAutoCommit(false);
+        String query = "insert into med_espe(idmedico, idespecialidad) "
+                + "values(?,?)";
+        try {
+            pst = con.getConnection().prepareStatement(query);
+            for (int id : idespecialidad) {
+                pst.setLong(1, med.getIdMedico());
+                pst.setInt(2, id);
+                pst.executeUpdate();
+            }
+            con.getConnection().commit();
+            done = true;
+        } catch (Exception e) {
+            System.out.println("DAO ASIGNA ESPECIALIDAD: " + e.getMessage());
+            con.getConnection().rollback();
+            done = false;
+        } finally {
+            con.desconectar();
+        }
+        return done;
     }
 }

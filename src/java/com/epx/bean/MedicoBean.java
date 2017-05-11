@@ -40,7 +40,7 @@ public class MedicoBean implements Serializable {
     private EspecialidadDAO daoEspecialidad = new EspecialidadDAO();
     private Usuario sessionUsuario;
     private List<Especialidad> listaEspecialidades = daoEspecialidad.findAllEspecialidades();
-    private int EspeIdSelected;
+    private int[] EspeIdSelected;
     private String EspeTextSelected;
     private Facesmethods fcm = new Facesmethods();
 
@@ -107,6 +107,20 @@ public class MedicoBean implements Serializable {
             RequestContext.getCurrentInstance().update("frm:growl");
         }
     }
+    
+    public void asignaEspe() throws SQLException {
+        boolean flag = daoEspecialidad.AsignarEspecialidad(EspeIdSelected, med);
+        if (flag) {
+            listadoMedicos = daoMedico.findAllMedicos();
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Especialidad asignada correctamente"));
+            RequestContext.getCurrentInstance().update("frm:growl");
+        } else {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+            RequestContext.getCurrentInstance().update("frm:growl");
+        }
+    }
 
     public List<Medico> getListadoMedicos() {
         return listadoMedicos;
@@ -156,11 +170,11 @@ public class MedicoBean implements Serializable {
         this.listaEspecialidades = listaEspecialidades;
     }
 
-    public int getEspeIdSelected() {
+    public int[] getEspeIdSelected() {
         return EspeIdSelected;
     }
 
-    public void setEspeIdSelected(int EspeIdSelected) {
+    public void setEspeIdSelected(int[] EspeIdSelected) {
         this.EspeIdSelected = EspeIdSelected;
     }
 
@@ -171,4 +185,6 @@ public class MedicoBean implements Serializable {
     public void setEspeTextSelected(String EspeTextSelected) {
         this.EspeTextSelected = EspeTextSelected;
     }
+    
+    
 }
