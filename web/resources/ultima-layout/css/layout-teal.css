@@ -393,19 +393,19 @@
 .exception-body.error-page .exception-type {
     background-color: #e62a10; }
 .exception-body.error-page .exception-type img {
-    width: 100%; }
+    width: 60%; }
 .exception-body.error-page .exception-panel i {
     color: #f79a84; }
 .exception-body.notfound-page .exception-type {
     background-color: #00695c; }
 .exception-body.notfound-page .exception-type img {
-    width: 54%; }
+    width: 40%; }
 .exception-body.notfound-page .exception-panel i {
     color: #80cbc4; }
 .exception-body.accessdenied-page .exception-type {
     background-color: #e91e63; }
 .exception-body.accessdenied-page .exception-type img {
-    width: 50%; }
+    width: 35%; }
 .exception-body.accessdenied-page .exception-panel i {
     color: #f48fb1; }
 

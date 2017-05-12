@@ -3,7 +3,8 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <h:head>
         <f:facet name="first">
@@ -17,18 +18,18 @@
     </h:head>
 
     <h:body styleClass="exception-body accessdenied-page">
-    
-        <div class="exception-type">
-            <p:graphicImage name="images/401.svg" library="ultima-layout" />
-        </div>
-        
-        <div class="card exception-panel">
-            <i class="material-icons">&#xE32A;</i>
-            <h1>Access Denied</h1>
-            <div class="exception-detail">You are not authorized to access this resource.</div>
-            <p:button outcome="/empty" value="Homepage" styleClass="secondary"/>
-        </div>
-        
+        <h:form>
+            <div class="exception-type">
+                <p:graphicImage name="images/401.svg" library="ultima-layout" />
+            </div>
+
+            <div class="card exception-panel">
+                <i class="material-icons">&#xE32A;</i>
+                <h1>Acceso Denegado</h1>
+                <div class="exception-detail">Tu no estás autorizado a acceder a esta página.</div>
+                <p:commandButton value="Página de Inicio" action="#{cerrarSesionBean.logoutOnError()}" />
+            </div>
+        </h:form>
         <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
         <h:outputStylesheet name="css/layout-teal.css" library="ultima-layout" />
     </h:body>

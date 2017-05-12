@@ -3,6 +3,11 @@
     <welcome-file-list>
         <welcome-file>login.xhtml</welcome-file>
     </welcome-file-list>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
     <error-page>
         <!-- Missing resource -->
         <error-code>404</error-code>

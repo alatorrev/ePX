@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:outputStylesheet name="style.css" />
+        <f:metadata>
+            <f:viewAction action="#{pdvBean.checkAuthorizedViews()}"/>
+        </f:metadata>
+        <div class="Container100 ui-fluid">
+            <div class="ContainerIndent">
+                <p:panel>
+                    <h:form id="frm">
+                        <p:growl id="growl" showDetail="true"/>
+                        <p:dataTable id="uTable" value="#{pdvBean.listadoPdvs}" var="pdv" widgetVar="userTable" paginator="true" rows="10"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     paginatorPosition="bottom" filteredValue="#{pdvBean.filteredPdvs}"
+                                     rowsPerPageTemplate="5,10,15"  lazy="false">
+                            <f:facet name="header">
+                                <p:outputPanel style="text-align: right;">
+                                    <table>
+                                        <tr>
+                                            <td class="FontBold Fs18 hardwhite" style="border: none; text-align: left"><h:outputText value="Punto de Venta" style="color: #ffffff" /></td>
+                                            <td style="border: none; text-align: right"><h:outputText value="Buscar: " style="text-align: right; color: #ffffff"/>
+                                                <p:inputText id="globalFilter" onkeyup="PF('userTable').filter()" style="width:150px" placeholder="Enter keyword"/></td>
+                                        </tr>
+                                    </table>
+                                </p:outputPanel>
+                            </f:facet>
+                            <p:column  style="text-align: center" width="10%">
+                                <p:commandLink id="asigna" actionListener="#{pdvBean.showAsignaDialog(pdv)}" 
+                                               oncomplete="PF('wdlgDatos').show();" update="dlgDatos" disabled="#{pdv.loginname != null}">
+                                    <i class="material-icons" style="color: #559688">create</i>
+                                    <p:tooltip id="asigna-message" for="asigna" value="Asignar Usuario"
+                                               showEffect="clip" hideEffect="explode" />
+                                </p:commandLink>
+                                <p:commandLink id="edita" actionListener="#{pdvBean.showUpdateDialog(pdv)}"  
+                                               oncomplete="PF('wdlgUpdate').show();" update="dlgUpdate">
+                                    <i class="material-icons" style="color: #559688">system_update</i>
+                                    <p:tooltip id="edita-message" for="edita" value="Re-Asignar Usuario"
+                                               showEffect="clip" hideEffect="explode" />
+                                </p:commandLink>
+                            </p:column>
+                            <p:column headerText="Codigo PDV" style="width: 15%"
+                                      filterBy="#{pdv.codigopdv}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.codigopdv}"/>
+                            </p:column>
+                            <p:column headerText="Usuario" style="width: 20%"
+                                      filterBy="#{pdv.loginname}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.loginname}"/>
+                            </p:column>
+                            <p:column headerText="Grupo PDV" style="width: 20%"
+                                      filterBy="#{pdv.idgrupopdv}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.idgrupopdv}"/>
+                            </p:column>
+                            <p:column headerText="Parroquia" style="width: 10%"
+                                      filterBy="#{pdv.idparroquia}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.idparroquia}"/>
+                            </p:column>
+                            <p:column headerText="PDV" style="width: 10%"
+                                      filterBy="#{pdv.pdv}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.pdv}"/>
+                            </p:column>
+                            <p:column headerText="Coord X" style="width: 10%"
+                                      filterBy="#{pdv.coordx}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.coordx}"/>
+                            </p:column>
+                            <p:column headerText="Coord Y" style="width: 10%"
+                                      filterBy="#{pdv.coordy}" filterStyle="display:none" filterMatchMode="contains">
+                                <h:outputText value="#{pdv.coordy}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <p:dialog id="dlgDatos" header="Asignar Usuario" widgetVar="wdlgDatos" modal="true" responsive="true">
+                        <h:form>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Usuario: "/>
+                                <p:selectOneMenu id="usu" value="#{pdvBean.usuIdSelected}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
+                                    <f:selectItems value="#{pdvBean.listaUsuarios}" var="pdvu" 
+                                                   itemLabel="#{pdvu.nombres} #{pdvu.apellidos}" itemValue="#{pdvu.idusuario}" />
+                                </p:selectOneMenu>
+                                
+                                <p:commandButton ajax="true" value="Editar" actionListener="#{pdvBean.AsignaPdvAUsuario()}"  oncomplete="PF('wdlgDatos').hide();" update=":frm:uTable">
+                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar" actionListener="#{pdvBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgDatos').hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+                    <p:dialog id="dlgUpdate" header="Actualizar Asignacion" widgetVar="wdlgUpdate" modal="true" responsive="true">
+                        <h:form id="frmCreaUsuario">
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Usuario: "/>
+                                <p:selectOneMenu id="usu" value="#{pdvBean.usuIdSelected}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
+                                    <f:selectItems value="#{pdvBean.listaUsuarios}" var="pdvu" 
+                                                   itemLabel="#{pdvu.nombres} #{pdvu.apellidos}" itemValue="#{pdvu.idusuario}" />
+                                </p:selectOneMenu>
+                                
+                                <p:commandButton ajax="true" actionListener="#{pdvBean.ActualizaPdvAUsuario()}" value="Crear" oncomplete="PF('wdlgUpdate').hide();" update=":frm:uTable" >
+                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                                </p:commandButton> 
+                                <p:commandButton value="Cancelar" actionListener="#{pdvBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgUpdate').hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog> 
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check fa fa-check Fs14 white" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close fa fa-close Fs14 white" />
+                    </p:confirmDialog>
+
+                </p:panel>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

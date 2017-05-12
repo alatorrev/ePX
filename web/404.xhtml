@@ -13,23 +13,23 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
-        <title>PRETIC</title>
+        <title>ePX</title>
         <h:outputScript name="js/ripple.js" library="ultima-layout" />
     </h:head>
 
     <h:body styleClass="exception-body notfound-page">
-    
-        <div class="exception-type">
-            <p:graphicImage name="images/404.svg" library="ultima-layout" />
-        </div>
-        
-        <div class="card exception-panel">
-            <i class="material-icons">&#xE001;</i>
-            <h1>Página no encontrada</h1>
-            <div class="exception-detail">La vista que usted busca no existe.</div>
-            <p:button outcome="/empty" value="Homepage" styleClass="secondary"/>
-        </div>
-        
+        <h:form>
+            <div class="exception-type">
+                <p:graphicImage name="images/404.svg" library="ultima-layout" />
+            </div>
+
+            <div class="card exception-panel">
+                <i class="material-icons">&#xE001;</i>
+                <h1>Página no encontrada</h1>
+                <div class="exception-detail">La vista que usted busca no existe.</div>
+                <p:commandButton value="Página de Inicio" action="#{cerrarSesionBean.logoutOnError()}" />
+            </div>
+        </h:form>
         <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
         <h:outputStylesheet name="css/layout-teal.css" library="ultima-layout" />
     </h:body>

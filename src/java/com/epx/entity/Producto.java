@@ -6,6 +6,7 @@
 package com.epx.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  *

@@ -11,7 +11,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import org.primefaces.context.RequestContext;
 
 /**
  *
@@ -23,12 +22,29 @@ public class CerrarSesionBean implements Serializable {
     public void logout() throws IOException {
         ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
         ec.invalidateSession();
-//        ec.getSessionMap().put("Usuario", null);
-//        ec.getSessionMap().remove("Usuario");
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Has cerrado sesión", "Gracias por usar nuestro sistema"));
         ec.getFlash().setKeepMessages(true);
         ec.redirect(ec.getRequestContextPath() + "/");
+        System.out.println("sesión cerrada");
         
+    }
+    
+     public void logoutOnError() throws IOException {
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        ec.invalidateSession();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+                "¡Atención!", "Por seguridad hemos cerrado tu sesión"));
+        ec.getFlash().setKeepMessages(true);
+        ec.redirect(ec.getRequestContextPath() + "/");        
+    }
+     
+     public void logoutOnTimeExpired() throws IOException {
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        ec.invalidateSession();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "¡Atención!", "Tiempo de inactividad cumplido"));
+        ec.getFlash().setKeepMessages(true);
+        ec.redirect(ec.getRequestContextPath() + "/");        
     }
 }

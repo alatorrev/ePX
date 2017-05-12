@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:outputStylesheet name="style.css" />
+        <f:metadata>
+            <f:viewAction action="#{productoBean.checkAuthorizedViews()}"/>
+        </f:metadata>
+        <div class="Container100 ui-fluid">
+            <div class="ContainerIndent">
+                <p:panel>
+                    <h:form id="frm">
+                        <p:growl id="growl" showDetail="true"/>
+                        <div class="Separator">
+                            <p:commandButton value="Agregar Producto" oncomplete="PF('wdlgCrearProducto').show();" style="font-size: 20px; width: 30%"/>
+
+                        </div>
+                        <p:spacer height="10"/>
+                        <p:dataTable id="uTable" value="#{productoBean.listadoProductos}" var="pro" widgetVar="userTable" paginator="true" rows="10"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     paginatorPosition="bottom" filteredValue="#{productoBean.filteredProducto}"
+                                     rowsPerPageTemplate="5,10,15"  lazy="false">
+                            <f:facet name="header">
+                                <p:outputPanel style="text-align: right;">
+                                    <table>
+                                        <tr>
+                                            <td class="FontBold Fs18 hardwhite" style="border: none; text-align: left"><h:outputText value="Administrador de Productos" style="color: #ffffff" /></td>
+                                            <td style="border: none; text-align: right"><h:outputText value="Buscar: " style="text-align: right; color: #ffffff"/>
+                                                <p:inputText id="globalFilter" onkeyup="PF('userTable').filter()" style="width:150px" placeholder="Enter keyword"/></td>
+                                        </tr>
+                                    </table>
+                                </p:outputPanel>
+                            </f:facet>
+                            <p:column  style="text-align: center" width="10%">
+                                <p:commandLink id="editarr" actionListener="#{productoBean.showEditDialog(pro)}" 
+                                               oncomplete="PF('wdlgDatos').show();" update="dlgDatos">
+                                    <i class="material-icons" style="color: #559688">create</i>
+                                    <p:tooltip id="editarr-message" for="editarr" value="Editar"
+                                               showEffect="clip" hideEffect="explode" />
+                                </p:commandLink>
+                                <p:commandLink id="eliminarr" actionListener="#{productoBean.eliminar(pro)}"  update=":frm:uTable" >
+                                    <i class="material-icons" style="color: #559688">delete</i>
+                                    <p:tooltip id="eliminarr-message" for="eliminarr" value="Eliminar"
+                                               showEffect="clip" hideEffect="explode" />
+                                    <p:confirm header="Confirmación" message="Está seguro de eliminar el registro" icon="ui-icon-alert" />
+                                </p:commandLink>
+                            </p:column>
+
+                            <p:column headerText="Id" filterBy="#{pro.idProducto}" filterStyle="display:none" filterMatchMode="contains" style="text-align: center">
+                                <h:outputText value="#{pro.idProducto}"/>
+                            </p:column>
+
+                            <p:column headerText="Marca" filterBy="#{pro.marca}" filterStyle="display:none" filterMatchMode="contains" style="text-align: center">
+                                <h:outputText value="#{pro.marca}"/>
+                            </p:column>
+
+                            <p:column headerText="Sustituto" filterBy="#{pro.sustituto}" filterStyle="display:none" filterMatchMode="contains" style="text-align: center">
+                                <h:outputText value="#{pro.sustituto}"/>
+                            </p:column>
+
+                            <p:column headerText="Forma" filterBy="#{pro.forma}" filterStyle="display:none" filterMatchMode="contains" style="text-align: center">
+                                <h:outputText value="#{pro.forma}"/>
+                            </p:column>
+
+                            <p:column headerText="Concentracion" filterBy="#{pro.concentracion}" filterStyle="display:none" filterMatchMode="contains" style="text-align: center">
+                                <h:outputText value="#{pro.concentracion}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <!--############################################################################################ -->
+                    <!--############################################################################################ -->
+                    <p:dialog id="dlgDatos" header="Editar Producto" widgetVar="wdlgDatos" modal="true" responsive="true">
+                        <h:form>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Marca"/>
+                                <p:inputText value="#{productoBean.pro.marca}"/>
+                                <p:outputLabel value="Sustituto"/>
+                                <p:inputText value="#{productoBean.pro.sustituto}"/>
+                                <p:outputLabel value="Forma"/>
+                                <p:inputText value="#{productoBean.pro.forma}"/>
+                                <p:outputLabel value="Concentración"/>
+                                <p:inputText value="#{productoBean.pro.concentracion}"/>
+                                <p:commandButton ajax="true" value="Editar" actionListener="#{productoBean.commitEdit()}"  oncomplete="PF('wdlgDatos').hide();" update=":frm:uTable">
+                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar" actionListener="#{productoBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgDatos').hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+                    <!--############################################################################################ -->
+                    <!--############################################################################################ -->
+                    <p:dialog id="dlgCrearProducto" header="Crear Producto" resizable="false"  widgetVar="wdlgCrearProducto" modal="true" responsive="true">
+                        <h:form>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Marca"/>
+                                <p:inputText value="#{productoBean.pro.marca}"/>
+                                <p:outputLabel value="Sustituto"/>
+                                <p:inputText value="#{productoBean.pro.sustituto}"/>
+                                <p:outputLabel value="Forma"/>
+                                <p:inputText value="#{productoBean.pro.forma}"/>
+                                <p:outputLabel value="Concentración"/>
+                                <p:inputText value="#{productoBean.pro.concentracion}"/>
+                                <p:commandButton ajax="true" actionListener="#{productoBean.commitCreate()}" value="Crear" oncomplete="PF('wdlgCrearProducto').hide();" update=":frm:uTable" >
+                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar" actionListener="#{productoBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgCrearRol').hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <!--############################################################################################ -->
+                    <!--############################################################################################ -->
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check fa fa-check Fs14 white" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close fa fa-close Fs14 white" />
+                    </p:confirmDialog>
+
+                </p:panel>
+            </div>
+        </div>  
+    </ui:define>
+</ui:composition>
