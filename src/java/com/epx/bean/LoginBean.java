@@ -44,17 +44,15 @@ public class LoginBean implements Serializable {
         setSessionUsuario(usuarioDAO.loginAction(loginname, contrasena, sessionUsuario));
         if (sessionUsuario != null) {
             if (getSessionUsuario().getActivo()== 0) {
-                initMenu(getSessionUsuario());
-                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
+                //FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
                 return "nuevo";
-
             }
             if (getSessionUsuario().getActivo()== 1) {
                 initMenu(getSessionUsuario());
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
                 if (sessionUsuario.getDescripcionRol().equals("ADMINISTRADOR")) {
                     return "dashboard";
-                } else if (sessionUsuario.getDescripcionRol().equals("INDEXADORA")) {
+                } else if (sessionUsuario.getDescripcionRol().equals("DIGITADOR")) {
                     return "dashboard";
                 } else {
                     return "otros";

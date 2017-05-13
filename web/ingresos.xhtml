@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewAction action="#{ingresosBean.checkAuthorizedViews()}"/>
+        </f:metadata>
+        <h:form id="frm">
+            <div class="container">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card">
+                            <p:panel header="Datos" style="height:100%">
+                                <p:panelGrid style="width: 100%">
+                                    <p:columnGroup>
+                                        <p:row>
+                                            <p:column rowspan="2" style="width: 30%">
+                                                <p:commandLink oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor">
+                                                    <i class="material-icons" style="color: #559688">search</i>
+                                                    <span style="color: #559688" >#{ingresosBean.fileName}</span>
+                                                </p:commandLink>
+                                            </p:column>
+                                            <p:column>
+                                                <p:outputLabel value="#{ingresosBean.today}">
+                                                    <f:convertDateTime type="both" pattern="dd-MM-yyyy HH:mm:ss" timeZone="America/Guayaquil"/>
+                                                </p:outputLabel>
+                                            </p:column>
+                                        </p:row>
+                                        <p:row>
+                                            <p:column>
+                                                <p:outputLabel value="MEDICO"/>
+                                                <p:autoComplete value="#{ingresosBean.medico}" completeMethod="#{ingresosBean.completarMedico}" converter="medicoConverter"
+                                                                minQueryLength="3" maxResults="5" var="med" 
+                                                                itemValue="med" itemLabel="#{med.nombres} #{med.apellidos}">
+                                                    <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuario}"/>
+                                                </p:autoComplete>
+                                            </p:column>
+                                        </p:row>
+                                    </p:columnGroup> 
+                                </p:panelGrid>
+                            </p:panel>
+                            <p:spacer height="5"/>
+                            <p:dataTable id="listDetails" value="#{ingresosBean.listaDetalle}" var="detalle" reflow="true"
+                                         scrollable="true" scrollWidth="97%">
+                                <f:facet name="header">
+                                    Detalle de Recetas
+                                </f:facet>
+                                <p:column style="width: 10%">
+                                    <p:commandButton icon="ui-icon-clear" style="width: 30px" update="listDetails"
+                                                     actionListener="#{ingresosBean.removerDetalle(detalle)}" />
+                                </p:column>
+                                <p:column headerText="#" style="width: 10%">
+                                    <p:outputLabel value="#{detalle.idCabecera}"/>
+                                </p:column>
+                                <p:column headerText="Producto" style="width: 35%">
+                                    <p:autoComplete/>
+                                </p:column>
+                                <p:column headerText="Px" style="width: 10%">
+                                    <p:outputLabel value="1"/>
+                                </p:column>
+                                <p:column headerText="Cantidad" style="width: 35%">
+                                    <p:outputLabel value="#{detalle.cantidad}" style="width:100%" />
+                                </p:column>
+                            </p:dataTable>
+                            <br/>
+                            <h:panelGrid columns="2" style="height:100%">
+                                <p:commandButton value="PROCESAR" icon="ui-icon-save" >
+                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:commandButton value="DESECHAR" icon="ui-icon-trash" update="frm"
+                                                 actionListener="#{ingresosBean.nextPDF()}">
+                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
+                  header="#{ingresosBean.fileName}" modal="true" closable="true" closeOnEscape="true" >
+            <h:form id="frmVisor">
+                <div class="ui-g-12 ui-lg-6" >
+                    <div class="card card-w-title">
+                        <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
+                            <f:param name="ruta" value="#{ingresosBean.fileDisplay}" />
+                        </p:media>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-lg-6" >
+                    <div class="card ">
+                        <p:panel header="Indexación">
+                            <h:panelGrid columns="2" style="width: 100%">
+                                <p:outputLabel value="Producto"/>
+                                <p:autoComplete/>
+                                <p:outputLabel value="Cantidad"/>
+                                <p:inputText/>
+                                <p:commandButton value="Añadir" ajax="true"/>
+                            </h:panelGrid>
+                        </p:panel>
+                    </div>
+                </div>
+            </h:form>
+        </p:dialog>
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check fa fa-check Fs14 white" />
+            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close fa fa-close Fs14 white" />
+        </p:confirmDialog>
+    </ui:define>
+</ui:composition>

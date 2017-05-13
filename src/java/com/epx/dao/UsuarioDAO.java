@@ -120,6 +120,30 @@ public class UsuarioDAO implements Serializable {
         return listadoUsuarios;
     }
 
+    public List<String> findUserPDVS(Usuario us) {
+        List<String> pdvs = new ArrayList<>();
+        Conexion con = new Conexion();
+        PreparedStatement pst;
+        String sql = "select codigopdv from pdv,usuario where loginname=?";
+        try {
+            pst = con.getConnection().prepareStatement(sql);
+            pst.setString(1,us.getLoginname());
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                pdvs.add(rs.getString(1));
+            }
+        } catch (Exception e) {
+            System.out.println("DAO LISTADO PDVS PARA EL USUARIO: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return pdvs;
+    }
+
     public boolean createUsuario(Usuario us, Usuario session) throws SQLException {
         boolean done = false;
         Conexion con = new Conexion();
@@ -156,13 +180,13 @@ public class UsuarioDAO implements Serializable {
         String sql = "select loginname "
                 + "from usuario "
                 + "where loginname = ?";
-        pst = con.getConnection().prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+        pst = con.getConnection().prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         try {
             pst.setString(1, us.getLoginname());
             ResultSet rs = pst.executeQuery();
             rs.last();
             int rows = rs.getRow();
-            done=rows>0;
+            done = rows > 0;
         } catch (Exception e) {
             System.out.println("DAO VERIFICAR LOGIN: " + e.getMessage());
             done = false;
