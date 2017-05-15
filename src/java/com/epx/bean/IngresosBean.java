@@ -49,9 +49,14 @@ public final class IngresosBean implements Serializable {
         today = new Date();
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
         listaRecetas = listaRecetasOrdenadas();
-        Object[] temp = (java.lang.Object[]) listaRecetas.get(0);
-        fileDisplay = temp[1].toString();
-        fileName = new File(fileDisplay).getName();
+        if (!listaRecetas.isEmpty()) {
+            Object[] temp = (java.lang.Object[]) listaRecetas.get(0);
+            fileDisplay = temp[1].toString();
+            fileName = new File(fileDisplay).getName();
+        } else {
+            fileDisplay = null;
+            fileName = "NO EXISTEN RECETAS";
+        }
     }
 
     public void checkAuthorizedViews() {
@@ -87,8 +92,8 @@ public final class IngresosBean implements Serializable {
     }
 
     public void nextPDF() {
-        listaRecetas.remove(0);
         if (!listaRecetas.isEmpty()) {
+            listaRecetas.remove(0);
             Object[] temp = (java.lang.Object[]) listaRecetas.get(0);
             fileDisplay = temp[1].toString();
             fileName = new File(fileDisplay).getName();

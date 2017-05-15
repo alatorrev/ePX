@@ -17,20 +17,22 @@ import java.util.List;
  */
 public class SortFilesDate {
 
-    public static List<Object> archivosPDVS(String directorioBase,List<String> listaFarmacias) {
+    public static List<Object> archivosPDVS(String directorioBase, List<String> listaFarmacias) {
         List<Object> listaObj = new ArrayList<>();
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (String rutas : listaFarmacias) {
-                File[] files = new File(directorioBase+rutas).listFiles();
-                for (File receta : files) {
-                    Object[] objTemp = new Object[2];
-                    String fechaFile = receta.getName().split("-")[3];
-                    String horaFile = receta.getName().split("-")[4];
-                    objTemp[0] = sdf.parse(fechaFile.substring(0, 4) + "-" + fechaFile.substring(4, 6) + "-" + fechaFile.substring(6, 8) + " "
-                            + horaFile.substring(0, 2) + ":" + horaFile.substring(2, 4) + ":" + horaFile.substring(4, 6)).getTime();
-                    objTemp[1] = receta.getAbsolutePath();
-                    listaObj.add(objTemp);
+                File[] files = new File(directorioBase + rutas).listFiles();
+                if (files != null) {
+                    for (File receta : files) {
+                        Object[] objTemp = new Object[2];
+                        String fechaFile = receta.getName().split("-")[3];
+                        String horaFile = receta.getName().split("-")[4];
+                        objTemp[0] = sdf.parse(fechaFile.substring(0, 4) + "-" + fechaFile.substring(4, 6) + "-" + fechaFile.substring(6, 8) + " "
+                                + horaFile.substring(0, 2) + ":" + horaFile.substring(2, 4) + ":" + horaFile.substring(4, 6)).getTime();
+                        objTemp[1] = receta.getAbsolutePath();
+                        listaObj.add(objTemp);
+                    }
                 }
             }
         } catch (ParseException e) {
