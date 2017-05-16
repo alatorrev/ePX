@@ -9,6 +9,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,20 +18,22 @@ import java.util.List;
  */
 public class SortFilesDate {
 
-    public static List<Object> archivosPDVS(String directorioBase, List<String> listaFarmacias) {
-        List<Object> listaObj = new ArrayList<>();
+    public static List<Object[]> archivosPDVS(String directorioBase, List<String> listaFarmacias) {
+        List<Object[]> listaObj = new ArrayList<>();
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (String rutas : listaFarmacias) {
                 File[] files = new File(directorioBase + rutas).listFiles();
                 if (files != null) {
                     for (File receta : files) {
-                        Object[] objTemp = new Object[2];
+                        Object[] objTemp = new Object[4];
                         String fechaFile = receta.getName().split("-")[3];
                         String horaFile = receta.getName().split("-")[4];
                         objTemp[0] = sdf.parse(fechaFile.substring(0, 4) + "-" + fechaFile.substring(4, 6) + "-" + fechaFile.substring(6, 8) + " "
                                 + horaFile.substring(0, 2) + ":" + horaFile.substring(2, 4) + ":" + horaFile.substring(4, 6)).getTime();
                         objTemp[1] = receta.getAbsolutePath();
+                        objTemp[2] = receta.getName();
+                        objTemp[3] = sdf.format(new Date((Long)objTemp[0]));
                         listaObj.add(objTemp);
                     }
                 }
@@ -41,22 +44,18 @@ public class SortFilesDate {
         return listaObj;
     }
 
-    public static List<Object> ordenamientoAscendente(List<Object> listaObj) {
-        Object[] tempj, tempmin = null;
+    public static List<Object[]> ordenamientoAscendente(List<Object[]> listaObj) {
         for (int i = 0; i < listaObj.size(); i++) {
             int min = i;
             for (int j = i + 1; j < listaObj.size(); j++) {
-                tempj = (java.lang.Object[]) listaObj.get(j);
-                Long secj = (Long) tempj[0];
-                tempmin = (java.lang.Object[]) listaObj.get(min);
-                Long secmin = (Long) tempmin[0];
+                Long secj = (Long) listaObj.get(j)[0];
+                Long secmin = (Long) listaObj.get(min)[0];
                 if (secj < secmin) {
                     min = j;
                 }
             }
             if (i != min) {
-                Object[] tempaux = null;
-                tempaux = (java.lang.Object[]) listaObj.get(i);
+                Object[] tempaux = listaObj.get(i);
                 listaObj.set(i, listaObj.get(min));
                 listaObj.set(min, tempaux);
             }
@@ -64,22 +63,18 @@ public class SortFilesDate {
         return listaObj;
     }
 
-    public static List<Object> ordenamientoDescendente(List<Object> listaObj) {
-        Object[] tempj, tempmax = null;
+    public static List<Object[]> ordenamientoDescendente(List<Object[]> listaObj) {
         for (int i = 0; i < listaObj.size(); i++) {
             int max = i;
             for (int j = i + 1; j < listaObj.size(); j++) {
-                tempj = (java.lang.Object[]) listaObj.get(j);
-                Long secj = (Long) tempj[0];
-                tempmax = (java.lang.Object[]) listaObj.get(max);
-                Long secmax = (Long) tempmax[0];
+                Long secj = (Long) listaObj.get(j)[0];
+                Long secmax = (Long) listaObj.get(max)[0];
                 if (secj > secmax) {
                     max = j;
                 }
             }
             if (i != max) {
-                Object[] tempaux = null;
-                tempaux = (java.lang.Object[]) listaObj.get(i);
+                Object[] tempaux = listaObj.get(i);
                 listaObj.set(i, listaObj.get(max));
                 listaObj.set(max, tempaux);
             }

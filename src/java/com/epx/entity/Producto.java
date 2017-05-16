@@ -19,6 +19,17 @@ public class Producto implements Serializable {
     private String sustituto;
     private String forma;
     private String concentracion;
+    private String laboratorio;
+
+    public String getLaboratorio() {
+        return laboratorio;
+    }
+
+    public void setLaboratorio(String laboratorio) {
+        this.laboratorio = laboratorio;
+    }
+    
+    
 
     public Long getIdProducto() {
         return idProducto;

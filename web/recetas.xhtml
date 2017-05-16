@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:outputStylesheet name="style.css" />
+        <f:metadata>
+        </f:metadata>
+        <div class="Container100 ui-fluid">
+            <div class="ContainerIndent">
+                <p:panel>
+                    <h:form id="frm">
+                        <p:growl id="growl" showDetail="true"/>
+                        <p:spacer height="10"/>
+                        <p:dataTable id="uTable" value="#{vistaFarmaciaBean.listaRecetas}" var="lro" widgetVar="userTable" paginator="true" rows="10"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     paginatorPosition="bottom"
+                                     rowsPerPageTemplate="5,10,15"  lazy="false" selectionMode="single" selection="#{vistaFarmaciaBean.row}" rowKey="#{lro[2]}">
+                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                            <f:facet name="header">
+                                Recetas Subidas
+                            </f:facet>
+                            <p:column headerText="Nombre">
+                                <h:outputText value="#{lro[2]}" />
+                            </p:column>
+                            <p:column headerText="Fecha" filterBy="#{lro[3]}" filterMatchMode="contains" >
+                                <h:outputText value="#{lro[3]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </div>
+        </div>
+        <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
+                  header="#{vistaFarmaciaBean.row[2]}" modal="true" closable="true" closeOnEscape="true" 
+                  position="top">
+            <h:form id="frmVisor">
+                    <div class="card card-w-title">
+                        <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
+                            <f:param name="ruta" value="#{vistaFarmaciaBean.row[1]}" />
+                        </p:media>
+                    </div>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

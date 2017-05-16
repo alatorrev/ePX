@@ -37,23 +37,28 @@ public class LoginBean implements Serializable {
     private String contrasena;
     private MenuModel modelMenu;
     private List<String> subMenuList = new ArrayList<>();
-    
 
     public String authenticate() throws SQLException {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         setSessionUsuario(usuarioDAO.loginAction(loginname, contrasena, sessionUsuario));
         if (sessionUsuario != null) {
-            if (getSessionUsuario().getActivo()== 0) {
-                //FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
-                return "nuevo";
+            if (getSessionUsuario().getActivo() == 0) {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Su cuenta está como inactiva", "Contacte al administrador para re-activarla"));
+                RequestContext.getCurrentInstance().update("growl");
+                return "incorrecto";
             }
-            if (getSessionUsuario().getActivo()== 1) {
+            if (getSessionUsuario().getActivo() == 1) {
                 initMenu(getSessionUsuario());
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
-                if (sessionUsuario.getDescripcionRol().equals("ADMINISTRADOR")) {
+                if (sessionUsuario.getIdRol() == 1) { //ADMINISTRADOR
                     return "dashboard";
-                } else if (sessionUsuario.getDescripcionRol().equals("DIGITADOR")) {
+                } else if (sessionUsuario.getIdRol() == 3) { //SUPERVISOR
                     return "dashboard";
+                } else if (sessionUsuario.getIdRol() == 2) { //INDEXADOR
+                    return "ingresos";
+                } else if (sessionUsuario.getIdRol() == 4) { //FARMACIA
+                    return "dashboardfarm";
                 } else {
                     return "otros";
                 }
@@ -62,14 +67,14 @@ public class LoginBean implements Serializable {
         } else {
             FacesContext context = FacesContext.getCurrentInstance();
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Usuario o Contraseña incorrecto"));
-            RequestContext.getCurrentInstance().update("growl");
+            RequestContext.getCurrentInstance().update("frmlog:growl");
             return "incorrecto";
         }
         return null;
     }
-    
+
     public void initMenu(Usuario u) throws SQLException {
-        Facesmethods fm = new Facesmethods(); 
+        Facesmethods fm = new Facesmethods();
         modelMenu = new DefaultMenuModel();
         String urlBase = fm.getApplicationUri();
         RecursoDAO daoRecurso = new RecursoDAO();
@@ -150,6 +155,5 @@ public class LoginBean implements Serializable {
     public void setModelMenu(MenuModel modelMenu) {
         this.modelMenu = modelMenu;
     }
-    
-    
+
 }

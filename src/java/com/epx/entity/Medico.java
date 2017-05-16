@@ -19,7 +19,16 @@ public class Medico implements Serializable {
     private String apellidos;
     private String cedula;
     private String direccion;
+    private String especialidad;
     private Date fechaNacimiento;
+
+    public String getEspecialidad() {
+        return especialidad;
+    }
+
+    public void setEspecialidad(String especialidad) {
+        this.especialidad = especialidad;
+    }
 
     public Long getIdMedico() {
         return idMedico;

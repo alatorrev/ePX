@@ -61,10 +61,26 @@ public class MedicoDAO implements Serializable {
         List<Medico> listadoMedicos = new ArrayList<>();
         Conexion con = new Conexion();
         PreparedStatement pst;
-        String sql = "select * from medico_bottago where upper(nombres+' '+apellidos) like upper(?)";
+        String sql = "Select idmedico, fuentemedico, "
+                + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad "
+                + "from medico_difare "
+                + "where upper(nombres+ ' ' + apellidos) like upper(?) "
+                + "union all "
+                + "select m.idmedico, m.fuentemedico, "
+                + "m.nombres, m.apellidos, m.direccion, "
+                + "(STUFF(REPLACE((SELECT '#!' + LTRIM(RTRIM(e.descripcion)) AS 'data()' FROM especialidad e "
+                + "inner join med_espe med on m.idmedico = med.idmedico "
+                + "where e.idespecialidad = med.idespecialidad "
+                + "FOR XML PATH('')),' #!',', '), 1, 2, '')) as Brands "
+                + "from medico_bottago m "
+                + "inner join med_espe e on m.idmedico = e.idmedico "
+                + "inner join especialidad es on e.idespecialidad = es.idespecialidad "
+                + "where upper(m.nombres+ ' ' + m.apellidos) like upper(?) "
+                + "group by m.idmedico, m.fuentemedico, m.nombres, m.apellidos, m.direccion";
         try {
             pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, cadena.trim().concat("%"));
+            pst.setString(1, "%" + cadena.trim().concat("%"));
+            pst.setString(2, "%" + cadena.trim().concat("%"));
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Medico med = new Medico();
@@ -72,9 +88,8 @@ public class MedicoDAO implements Serializable {
                 med.setFuente(rs.getString(2));
                 med.setNombres(rs.getString(3));
                 med.setApellidos(rs.getString(4));
-                med.setCedula(rs.getString(5));
-                med.setDireccion(rs.getString(6));
-                med.setFechaNacimiento(rs.getDate(7));
+                med.setDireccion(rs.getString(5));
+                med.setEspecialidad(rs.getString(6));
                 listadoMedicos.add(med);
             }
         } catch (Exception e) {

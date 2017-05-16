@@ -56,6 +56,45 @@ public class ProductoDAO implements Serializable {
         return listadoProductos;
     }
 
+    public List<Producto> autocompletarproducto(String cadena) {
+        List<Producto> listadoProducto = new ArrayList<>();
+        Conexion con = new Conexion();
+        PreparedStatement pst;
+        String sql = "select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio "
+                + "from producto_difare "
+                + "where upper(marca + ' - ' + sustituto) like (?) "
+                + "union all "
+                + "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, null as laboratorio "
+                + "from producto_bottago "
+                + "where upper(marca + ' - ' + sustituto) like (?)";
+        try {
+            pst = con.getConnection().prepareStatement(sql);
+            pst.setString(1, "%" + cadena.trim().concat("%"));
+            pst.setString(2, "%" + cadena.trim().concat("%"));
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Producto pro = new Producto();
+                pro.setIdProducto(rs.getLong(1));
+                pro.setFuente(rs.getString(2));
+                pro.setMarca(rs.getString(3));
+                pro.setSustituto(rs.getString(4));
+                pro.setForma(rs.getString(5));
+                pro.setConcentracion(rs.getString(6));
+                pro.setLaboratorio(rs.getString(7));
+                listadoProducto.add(pro);
+            }
+        } catch (Exception e) {
+            System.out.println("DAO AUTOCOMPLETE PRODUCTO: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(MedicoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return listadoProducto;
+    }
+
     public boolean createProducto(Producto pro, Usuario u) throws SQLException {
         boolean done = false;
         Conexion con = new Conexion();

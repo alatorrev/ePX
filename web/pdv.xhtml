@@ -42,7 +42,7 @@
                                                showEffect="clip" hideEffect="explode" />
                                 </p:commandLink>
                                 <p:commandLink id="edita" actionListener="#{pdvBean.showUpdateDialog(pdv)}"  
-                                               oncomplete="PF('wdlgUpdate').show();" update="dlgUpdate">
+                                               oncomplete="PF('wdlgUpdate').show();" update="dlgUpdate" disabled="#{pdv.loginname == null}">
                                     <i class="material-icons" style="color: #559688">system_update</i>
                                     <p:tooltip id="edita-message" for="edita" value="Re-Asignar Usuario"
                                                showEffect="clip" hideEffect="explode" />

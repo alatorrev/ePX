@@ -12,10 +12,20 @@ import java.io.Serializable;
  * @author Desarrollo1
  */
 public class DetalleMovimiento implements Serializable {
+    private int  secuencial;
     private Long idDetalle;
     private Long idCabecera;
     private Long idProducto;
     private int cantidad;
+    private String nomPro;
+
+    public String getNomPro() {
+        return nomPro;
+    }
+
+    public void setNomPro(String nomPro) {
+        this.nomPro = nomPro;
+    }
 
     public Long getIdDetalle() {
         return idDetalle;
@@ -47,6 +57,14 @@ public class DetalleMovimiento implements Serializable {
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
+    }
+
+    public int getSecuencial() {
+        return secuencial;
+    }
+
+    public void setSecuencial(int secuencial) {
+        this.secuencial = secuencial;
     }
     
 }

@@ -91,7 +91,7 @@ public class UsuarioDAO implements Serializable {
         List<Usuario> listadoUsuarios = new ArrayList<>();
         PreparedStatement pst;
         ResultSet rs = null;
-        String query = "select u.idusuario, u.nombres, u.apellidos, u.correo, r.idrol, r.descripcion "
+        String query = "select u.idusuario, u.nombres, u.apellidos, u.loginname, u.correo, r.idrol, r.descripcion "
                 + "from usuario u "
                 + "left outer join rol r on u.idrol = r.idrol "
                 + "where u.estado = 1";
@@ -103,9 +103,10 @@ public class UsuarioDAO implements Serializable {
                 us.setIdusuario(rs.getInt(1));
                 us.setNombres(rs.getString(2));
                 us.setApellidos(rs.getString(3));
-                us.setCorreo(rs.getString(4));
-                us.setIdRol(rs.getInt(5));
-                us.setDescripcionRol(rs.getString(6));
+                us.setLoginname(rs.getString(4));
+                us.setCorreo(rs.getString(5));
+                us.setIdRol(rs.getInt(6));
+                us.setDescripcionRol(rs.getString(7));
                 listadoUsuarios.add(us);
             }
         } catch (Exception e) {
