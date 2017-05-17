@@ -36,16 +36,20 @@ public final class IngresosBean implements Serializable {
     private Usuario sessionUsuario;
     private Facesmethods fcm = new Facesmethods();
     private Date today;
-    private String directorioBase = "C:\\Users\\Bottago SA\\Desktop\\PDV\\";
     private String fileDisplay;
     private String fileName;
     private String dateDisplay;
     private List<DetalleMovimiento> listaDetalle = new ArrayList<>();
-    private List<String> listaPDVS;
-    private final List<Object[]> listaRecetas;
+    private List<Object[]>listaNoProcesada = new ArrayList<>();
+    private List<Object[]>listaProcesada = new ArrayList<>();
+    private List<Object[]>listaDesechada = new ArrayList<>();
+    private Object[] row;
+
+    
+    private final List<String> listaPDVS;
     private Medico medico = new Medico();
-    private MedicoDAO daoMedico = new MedicoDAO();
     private Producto pro = new Producto();
+    private MedicoDAO daoMedico = new MedicoDAO();
     private ProductoDAO daoProducto = new ProductoDAO();
     private String nomPro;
     private int canPro;
@@ -53,14 +57,7 @@ public final class IngresosBean implements Serializable {
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
-        listaRecetas = listaRecetasOrdenadas();
-        if (!listaRecetas.isEmpty()) {
-            fileDisplay = listaRecetas.get(0)[1].toString();
-            fileName = new File(fileDisplay).getName();
-        } else {
-            fileDisplay = null;
-            fileName = "NO EXISTEN RECETAS";
-        }
+        listaRecetasOrdenadas();
     }
 
     public void checkAuthorizedViews() {
@@ -90,24 +87,10 @@ public final class IngresosBean implements Serializable {
 
     public void procesarRecetas() {
         //metodo para guardar lo procesado cabecera y detalle
-        nextPDF();
     }
 
     public void desecharRecetas() {
         //metodo para guardar lo rechazado cabecera
-        nextPDF();
-    }
-
-    public void nextPDF() {
-        if (!listaRecetas.isEmpty()) {
-            listaRecetas.remove(0);
-            fileDisplay = listaRecetas.get(0)[1].toString();
-            fileName = new File(fileDisplay).getName();
-            today = new Date();
-        } else {
-            fileDisplay = null;
-            fileName = "RECARGA PARA VER MÁS!";
-        }
     }
 
     public List<Medico> completarMedico(String cadena) {
@@ -120,10 +103,10 @@ public final class IngresosBean implements Serializable {
 
     public void onOpenDialog() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        today = new Date();
-        dateDisplay = sdf.format(today);
-        fileDisplay = listaRecetas.get(0)[1].toString();
-        fileName = new File(fileDisplay).getName();
+//        today = new Date();
+//        dateDisplay = sdf.format(today);
+//        fileDisplay = listaRecetas.get(0)[1].toString();
+//        fileName = new File(fileDisplay).getName();
     }
 
     public void onItemSelectUsuario(SelectEvent event) {
@@ -139,10 +122,24 @@ public final class IngresosBean implements Serializable {
             pro = new Producto();
         }
     }
+    
+    public void onTabChange(){
+        row = null;
+    }
 
-    public List<Object[]> listaRecetasOrdenadas() {
-        List<Object[]> lista = SortFilesDate.archivosPDVS(directorioBase, listaPDVS);
-        return SortFilesDate.ordenamientoAscendente(lista);
+    public void listaRecetasOrdenadas() {
+        Object[] all =SortFilesDate.archivosIndexadores(listaPDVS);
+        setListaNoProcesada(SortFilesDate.ordenamientoAscendente((List<Object[]>)all[0]));
+        setListaProcesada(SortFilesDate.ordenamientoDescendente((List<Object[]>)all[1]));
+        setListaDesechada(SortFilesDate.ordenamientoDescendente((List<Object[]>)all[2]));
+    }
+
+    public Object[] getRow() {
+        return row;
+    }
+
+    public void setRow(Object[] row) {
+        this.row = row;
     }
 
     public List<DetalleMovimiento> getListaDetalle() {
@@ -152,6 +149,31 @@ public final class IngresosBean implements Serializable {
     public void setListaDetalle(List<DetalleMovimiento> listaDetalle) {
         this.listaDetalle = listaDetalle;
     }
+
+    public List<Object[]> getListaNoProcesada() {
+        return listaNoProcesada;
+    }
+
+    public void setListaNoProcesada(List<Object[]> listaNoProcesada) {
+        this.listaNoProcesada = listaNoProcesada;
+    }
+
+    public List<Object[]> getListaProcesada() {
+        return listaProcesada;
+    }
+
+    public void setListaProcesada(List<Object[]> listaProcesada) {
+        this.listaProcesada = listaProcesada;
+    }
+
+    public List<Object[]> getListaDesechada() {
+        return listaDesechada;
+    }
+
+    public void setListaDesechada(List<Object[]> listaDesechada) {
+        this.listaDesechada = listaDesechada;
+    }
+    
 
     public Date getToday() {
         return today;

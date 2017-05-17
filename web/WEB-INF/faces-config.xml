@@ -32,8 +32,8 @@
             <to-view-id>/ingresos.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
-            <from-outcome>dashboardfar</from-outcome>
-            <to-view-id>/dashboardfarm.xhtml</to-view-id>
+            <from-outcome>farmacia</from-outcome>
+            <to-view-id>/recetas.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
     

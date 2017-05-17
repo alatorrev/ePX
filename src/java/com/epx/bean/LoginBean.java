@@ -51,18 +51,22 @@ public class LoginBean implements Serializable {
             if (getSessionUsuario().getActivo() == 1) {
                 initMenu(getSessionUsuario());
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
-                if (sessionUsuario.getIdRol() == 1) { //ADMINISTRADOR
-                    return "dashboard";
-                } else if (sessionUsuario.getIdRol() == 3) { //SUPERVISOR
-                    return "dashboard";
-                } else if (sessionUsuario.getIdRol() == 2) { //INDEXADOR
-                    return "ingresos";
-                } else if (sessionUsuario.getIdRol() == 4) { //FARMACIA
-                    return "dashboardfarm";
-                } else {
-                    return "otros";
+                switch (sessionUsuario.getIdRol()) {
+                    case 1:
+                        //ADMINISTRADOR
+                        return "dashboard";
+                    case 2:
+                        //SUPERVISOR
+                        return "ingresos";
+                    case 3:
+                        //FARMACIA
+                        return "farmacia";
+                    case 4:
+                        //INDEXADOR
+                        return "dashboard";
+                    default:
+                        return "otros";
                 }
-
             }
         } else {
             FacesContext context = FacesContext.getCurrentInstance();

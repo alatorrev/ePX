@@ -5,7 +5,6 @@
  */
 package com.epx.bean;
 
-import com.epx.dao.UsuarioDAO;
 import com.epx.entity.Usuario;
 import java.io.File;
 import java.io.Serializable;
@@ -15,7 +14,6 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import org.primefaces.event.SelectEvent;
 import util.Facesmethods;
 import util.SortFilesDate;
 
@@ -25,21 +23,21 @@ import util.SortFilesDate;
  */
 @ManagedBean
 @ViewScoped
-public class VistaFarmaciaBean implements Serializable{
+public class VistaFarmaciaBean implements Serializable {
+
     private Usuario sessionUsuario;
     private Facesmethods fcm = new Facesmethods();
     private Date today;
-    private String directorioBase = "C:\\Users\\Bottago SA\\Desktop\\PDV\\";
     private String fileDisplay;
     private String fileName;
     private List<String> listaPDVS;
     private List<Object[]> listaRecetas;
     private Object[] row;
-    
+
     public VistaFarmaciaBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         today = new Date();
-        listaRecetas = listaRecetasOrdenadas();
+        listaRecetasOrdenadas();
         if (!listaRecetas.isEmpty()) {
             Object[] temp = (java.lang.Object[]) listaRecetas.get(0);
             fileDisplay = temp[1].toString();
@@ -49,7 +47,7 @@ public class VistaFarmaciaBean implements Serializable{
             fileName = "NO EXISTEN RECETAS";
         }
     }
-    
+
     public void checkAuthorizedViews() {
         try {
             sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
@@ -58,12 +56,12 @@ public class VistaFarmaciaBean implements Serializable{
         } catch (Exception e) {
         }
     }
-    
-    public List<Object[]> listaRecetasOrdenadas() {
+
+    public void listaRecetasOrdenadas() {
         List<String> listaUsuarioFarmacia = new ArrayList<>();
         listaUsuarioFarmacia.add(sessionUsuario.getLoginname());
-        List<Object[]> lista = SortFilesDate.archivosPDVS(directorioBase, listaUsuarioFarmacia);
-        return SortFilesDate.ordenamientoDescendente(lista);
+        List<Object[]> lista = SortFilesDate.archivosPDVS(listaUsuarioFarmacia);
+        listaRecetas = SortFilesDate.ordenamientoDescendente(lista);
     }
 
     public List<Object[]> getListaRecetas() {

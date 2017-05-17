@@ -15,48 +15,79 @@
                 <div class="ui-g">
                     <div class="ui-g-12">
                         <div class="card">
-                            <p:panel header="Datos" style="height:100%">
-                                <p:panelGrid style="width: 100%">
-                                    <p:columnGroup>
-                                        <p:row>
-                                            <p:column rowspan="1" style="width: 30%">
-                                                <p:commandLink oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" 
-                                                               disabled="#{ingresosBean.fileDisplay == null}" >
-                                                    <i class="material-icons" style="color: #559688">search</i>
-                                                    <span style="color: #559688" >#{ingresosBean.fileName}</span>
-                                                </p:commandLink>
-                                            </p:column>
-                                            <p:column>
-                                                <p:outputLabel value="#{ingresosBean.today}">
-                                                    <f:convertDateTime  type="both" pattern="dd-MM-yyyy HH:mm:ss" timeZone="America/Guayaquil"/>
-                                                </p:outputLabel>
-                                            </p:column>
-                                        </p:row>
-                                    </p:columnGroup> 
-                                </p:panelGrid>
-                            </p:panel>
+                            <p:panel header="Hola mundo">
+                                <p:tabView>
+                                    <p:ajax event="tabChange" listener="#{ingresosBean.onTabChange()}"
+                                            update="tblNoProcesadas tblProcesadas tblDesechadas"
+                                            oncomplete="PF('wgtNoProcesadas').unselectAllRows();PF('wgtProcesadas').unselectAllRows();PF('wgtDesechadas').unselectAllRows();" />
+                                    <p:tab title="No Procesadas">
+                                        <p:dataTable id="tblNoProcesadas" value="#{ingresosBean.listaNoProcesada}" var="lnp" widgetVar="wgtNoProcesadas" paginator="true" rows="10"
+                                                     paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                                                     lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lnp[2]}">
 
-                            <h:panelGrid columns="2" style="height:100%">
-                                <p:commandButton value="PROCESAR" icon="ui-icon-save" >
-                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
-                                </p:commandButton>
-                                <p:commandButton value="DESECHAR" icon="ui-icon-trash" update="frm"
-                                                 actionListener="#{ingresosBean.nextPDF()}">
-                                    <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
-                                </p:commandButton>
-                            </h:panelGrid>
+                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                                            <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
+                                            <p:column headerText="Nombre">
+                                                <h:outputText value="#{lnp[2]}" />
+                                            </p:column>
+                                            <p:column headerText="Fecha" filterBy="#{lnp[3]}" filterMatchMode="contains" >
+                                                <h:outputText value="#{lnp[3]}" />
+                                            </p:column>
+                                            <p:column headerText="Directorio">
+                                                <h:outputText value="#{lnp[4]}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:tab>
+                                    <p:tab title="Procesadas">
+                                        <p:dataTable id="tblProcesadas" value="#{ingresosBean.listaProcesada}" var="lp" widgetVar="wgtProcesadas" paginator="true" rows="10"
+                                                     paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                                                     lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lp[2]}">
+
+                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                                            <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
+                                            <p:column headerText="Nombre">
+                                                <h:outputText value="#{lp[2]}" />
+                                            </p:column>
+                                            <p:column headerText="Fecha" filterBy="#{lp[3]}" filterMatchMode="contains" >
+                                                <h:outputText value="#{lp[3]}" />
+                                            </p:column>
+                                            <p:column headerText="Directorio">
+                                                <h:outputText value="#{lp[4]}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:tab>
+                                    <p:tab title="Desechadas">
+                                        <p:dataTable id="tblDesechadas" value="#{ingresosBean.listaDesechada}" var="desechada" widgetVar="wgtDesechadas" paginator="true" rows="10"
+                                                     paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                                                     lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{desechada[2]}">
+
+                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                                            <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
+                                            <p:column headerText="Nombre">
+                                                <h:outputText value="#{desechada[2]}" />
+                                            </p:column>
+                                            <p:column headerText="Fecha" filterBy="#{desechada[3]}" filterMatchMode="contains" >
+                                                <h:outputText value="#{desechada[3]}" />
+                                            </p:column>
+                                            <p:column headerText="Directorio">
+                                                <h:outputText value="#{desechada[4]}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:tab>
+                                </p:tabView>
+                            </p:panel>
                         </div>
                     </div>
                 </div>
             </div>
         </h:form>
         <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
-                  header="#{ingresosBean.fileName}" modal="true" closable="true" closeOnEscape="true" position="top" >
+                  header="#{ingresosBean.row[2]}" modal="true" closable="true" closeOnEscape="true" position="top" >
             <h:form id="frmVisor">
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card card-w-title">
                         <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
-                            <f:param name="ruta" value="#{ingresosBean.fileDisplay}" />
+                            <f:param name="ruta" value="#{ingresosBean.row[1]}" />
                         </p:media>
                     </div>
                 </div>
