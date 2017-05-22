@@ -15,7 +15,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import util.Facesmethods;
-import util.SortFilesDate;
+import util.Filesmethods;
 
 /**
  *
@@ -60,8 +60,8 @@ public class VistaFarmaciaBean implements Serializable {
     public void listaRecetasOrdenadas() {
         List<String> listaUsuarioFarmacia = new ArrayList<>();
         listaUsuarioFarmacia.add(sessionUsuario.getLoginname());
-        List<Object[]> lista = SortFilesDate.archivosPDVS(listaUsuarioFarmacia);
-        listaRecetas = SortFilesDate.ordenamientoDescendente(lista);
+        List<Object[]> lista = Filesmethods.archivosPDVS(listaUsuarioFarmacia);
+        listaRecetas = Filesmethods.ordenamientoDescendente(lista);
     }
 
     public List<Object[]> getListaRecetas() {

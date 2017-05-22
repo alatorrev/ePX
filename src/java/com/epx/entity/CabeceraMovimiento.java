@@ -7,6 +7,7 @@ package com.epx.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -14,16 +15,18 @@ import java.util.Date;
  */
 public class CabeceraMovimiento implements Serializable {
     private Long idCabecera;
-    private Long idMedico;
-    private String fuente;
+    private Medico medico;
     private String codigoPDV;
-    private Long idUsuario;
+    private String idUsuario;
+    private String nombreArchivo;
     private String rutaArchivoDestino;
     private Date fechaReceta;
     private Date fechaArchivo;
     private Date fechaRegistro;
     private Date pantallaInit;
     private boolean estado;
+    
+    private List<DetalleMovimiento> listaDetalleProducto;
 
     public Long getIdCabecera() {
         return idCabecera;
@@ -33,20 +36,12 @@ public class CabeceraMovimiento implements Serializable {
         this.idCabecera = idCabecera;
     }
 
-    public Long getIdMedico() {
-        return idMedico;
+    public Medico getMedico() {
+        return medico;
     }
 
-    public void setIdMedico(Long idMedico) {
-        this.idMedico = idMedico;
-    }
-
-    public String getFuente() {
-        return fuente;
-    }
-
-    public void setFuente(String fuente) {
-        this.fuente = fuente;
+    public void setMedico(Medico medico) {
+        this.medico = medico;
     }
 
     public String getCodigoPDV() {
@@ -57,12 +52,20 @@ public class CabeceraMovimiento implements Serializable {
         this.codigoPDV = codigoPDV;
     }
 
-    public Long getIdUsuario() {
+    public String getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(Long idUsuario) {
+    public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public String getNombreArchivo() {
+        return nombreArchivo;
+    }
+
+    public void setNombreArchivo(String nombreArchivo) {
+        this.nombreArchivo = nombreArchivo;
     }
 
     public String getRutaArchivoDestino() {
@@ -112,6 +115,13 @@ public class CabeceraMovimiento implements Serializable {
     public void setEstado(boolean estado) {
         this.estado = estado;
     }
-    
+
+    public List<DetalleMovimiento> getListaDetalleProducto() {
+        return listaDetalleProducto;
+    }
+
+    public void setListaDetalleProducto(List<DetalleMovimiento> listaDetalleProducto) {
+        this.listaDetalleProducto = listaDetalleProducto;
+    }
     
 }

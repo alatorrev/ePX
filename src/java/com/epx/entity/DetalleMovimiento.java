@@ -15,17 +15,9 @@ public class DetalleMovimiento implements Serializable {
     private int  secuencial;
     private Long idDetalle;
     private Long idCabecera;
-    private Long idProducto;
+    private Producto producto;
     private int cantidad;
-    private String nomPro;
-
-    public String getNomPro() {
-        return nomPro;
-    }
-
-    public void setNomPro(String nomPro) {
-        this.nomPro = nomPro;
-    }
+    
 
     public Long getIdDetalle() {
         return idDetalle;
@@ -43,12 +35,12 @@ public class DetalleMovimiento implements Serializable {
         this.idCabecera = idCabecera;
     }
 
-    public Long getIdProducto() {
-        return idProducto;
+    public Producto getProducto() {
+        return producto;
     }
 
-    public void setIdProducto(Long idProducto) {
-        this.idProducto = idProducto;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     public int getCantidad() {

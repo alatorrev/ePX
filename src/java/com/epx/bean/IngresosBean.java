@@ -7,12 +7,13 @@ package com.epx.bean;
 
 import com.epx.dao.MedicoDAO;
 import com.epx.dao.ProductoDAO;
+import com.epx.dao.TransaccionDAO;
 import com.epx.dao.UsuarioDAO;
+import com.epx.entity.CabeceraMovimiento;
 import com.epx.entity.DetalleMovimiento;
 import com.epx.entity.Medico;
 import com.epx.entity.Producto;
 import com.epx.entity.Usuario;
-import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
 import util.Facesmethods;
-import util.SortFilesDate;
+import util.Filesmethods;
 
 /**
  *
@@ -35,23 +36,20 @@ public final class IngresosBean implements Serializable {
 
     private Usuario sessionUsuario;
     private Facesmethods fcm = new Facesmethods();
-    private Date today;
-    private String fileDisplay;
-    private String fileName;
-    private String dateDisplay;
     private List<DetalleMovimiento> listaDetalle = new ArrayList<>();
-    private List<Object[]>listaNoProcesada = new ArrayList<>();
-    private List<Object[]>listaProcesada = new ArrayList<>();
-    private List<Object[]>listaDesechada = new ArrayList<>();
+    private List<Object[]> listaNoProcesada = new ArrayList<>();
+    private List<Object[]> listaProcesada = new ArrayList<>();
+    private List<Object[]> listaDesechada = new ArrayList<>();
     private Object[] row;
 
-    
     private final List<String> listaPDVS;
     private Medico medico = new Medico();
     private Producto pro = new Producto();
+    private Date pantallaDatetime;
+    private Date fechaReceta;
+    private CabeceraMovimiento cabecera;
     private MedicoDAO daoMedico = new MedicoDAO();
     private ProductoDAO daoProducto = new ProductoDAO();
-    private String nomPro;
     private int canPro;
 
     public IngresosBean() {
@@ -72,10 +70,11 @@ public final class IngresosBean implements Serializable {
     public void agregarDetalle() {
         DetalleMovimiento det = new DetalleMovimiento();
         det.setSecuencial(listaDetalle.size() + 1);
+        det.setProducto(pro);
         det.setCantidad(canPro);
-        det.setNomPro(nomPro);
         det.setIdCabecera(Long.valueOf(listaDetalle.size() + 1));
         listaDetalle.add(det);
+        resetDataEntry();
     }
 
     public void removerDetalle(DetalleMovimiento det) {
@@ -85,12 +84,53 @@ public final class IngresosBean implements Serializable {
         }
     }
 
+    public void resetDataEntry() {
+        pro = new Producto();
+        medico = new Medico();
+        canPro = 0;
+    }
+
     public void procesarRecetas() {
         //metodo para guardar lo procesado cabecera y detalle
+        CabeceraMovimiento cab = new CabeceraMovimiento();
+        cab.setMedico(medico);
+        cab.setEstado(true);
+        cab.setFechaReceta(fechaReceta);
+        cab.setPantallaInit(pantallaDatetime);
+        cab.setIdUsuario(sessionUsuario.getLoginname());
+        cab.setListaDetalleProducto(listaDetalle);
+        if (!row[4].toString().equals("RAIZ")) {
+            //edito existente con estado 1
+            cab.setIdCabecera(cabecera.getIdCabecera());
+            new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
+            listaRecetasOrdenadas();
+
+        } else {
+            //guardo nuevo con estado 1
+            new TransaccionDAO().procesarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
+            listaRecetasOrdenadas();
+        }
     }
 
     public void desecharRecetas() {
         //metodo para guardar lo rechazado cabecera
+        CabeceraMovimiento cab = new CabeceraMovimiento();
+        cab.setMedico(medico);
+        cab.setEstado(true);
+        cab.setFechaReceta(fechaReceta);
+        cab.setPantallaInit(pantallaDatetime);
+        cab.setIdUsuario(sessionUsuario.getLoginname());
+        cab.setListaDetalleProducto(listaDetalle);
+        if (!row[4].toString().equals("RAIZ")) {
+            //cabecera existe
+            cab.setIdCabecera(cabecera.getIdCabecera());
+            new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario);
+            listaRecetasOrdenadas();
+        } else {
+            //cabecera no existe
+            new TransaccionDAO().desecharRaiz(cab, row, "DESECHADAS", sessionUsuario);
+            listaRecetasOrdenadas();
+        }
     }
 
     public List<Medico> completarMedico(String cadena) {
@@ -102,11 +142,18 @@ public final class IngresosBean implements Serializable {
     }
 
     public void onOpenDialog() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//        today = new Date();
-//        dateDisplay = sdf.format(today);
-//        fileDisplay = listaRecetas.get(0)[1].toString();
-//        fileName = new File(fileDisplay).getName();
+        fechaReceta = new Date();
+        pantallaDatetime = new Date();
+        if (!row[4].toString().equals("RAIZ")) {
+            cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
+            medico = cabecera.getMedico() == null ? new Medico() : cabecera.getMedico();
+            listaDetalle = cabecera.getListaDetalleProducto() == null ? new ArrayList<>() : cabecera.getListaDetalleProducto();
+            fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
+        } else {
+            medico = new Medico();
+            listaDetalle = new ArrayList<>();
+
+        }
     }
 
     public void onItemSelectUsuario(SelectEvent event) {
@@ -122,16 +169,16 @@ public final class IngresosBean implements Serializable {
             pro = new Producto();
         }
     }
-    
-    public void onTabChange(){
+
+    public void onTabChange() {
         row = null;
     }
 
     public void listaRecetasOrdenadas() {
-        Object[] all =SortFilesDate.archivosIndexadores(listaPDVS);
-        setListaNoProcesada(SortFilesDate.ordenamientoAscendente((List<Object[]>)all[0]));
-        setListaProcesada(SortFilesDate.ordenamientoDescendente((List<Object[]>)all[1]));
-        setListaDesechada(SortFilesDate.ordenamientoDescendente((List<Object[]>)all[2]));
+        Object[] all = Filesmethods.archivosIndexadores(listaPDVS);
+        setListaNoProcesada(Filesmethods.ordenamientoAscendente((List<Object[]>) all[0]));
+        setListaProcesada(Filesmethods.ordenamientoDescendente((List<Object[]>) all[1]));
+        setListaDesechada(Filesmethods.ordenamientoDescendente((List<Object[]>) all[2]));
     }
 
     public Object[] getRow() {
@@ -173,55 +220,6 @@ public final class IngresosBean implements Serializable {
     public void setListaDesechada(List<Object[]> listaDesechada) {
         this.listaDesechada = listaDesechada;
     }
-    
-
-    public Date getToday() {
-        return today;
-    }
-
-    public void setToday(Date today) {
-        this.today = today;
-    }
-
-    public String getFileDisplay() {
-        return fileDisplay;
-    }
-
-    public void setFileDisplay(String fileDisplay) {
-        this.fileDisplay = fileDisplay;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public Medico getMedico() {
-        return medico;
-    }
-
-    public void setMedico(Medico medico) {
-        this.medico = medico;
-    }
-
-    public String getDateDisplay() {
-        return dateDisplay;
-    }
-
-    public void setDateDisplay(String dateDisplay) {
-        this.dateDisplay = dateDisplay;
-    }
-
-    public String getNomPro() {
-        return nomPro;
-    }
-
-    public void setNomPro(String nomPro) {
-        this.nomPro = nomPro;
-    }
 
     public int getCanPro() {
         return canPro;
@@ -239,4 +237,19 @@ public final class IngresosBean implements Serializable {
         this.pro = pro;
     }
 
+    public Medico getMedico() {
+        return medico;
+    }
+
+    public void setMedico(Medico medico) {
+        this.medico = medico;
+    }
+
+    public Date getFechaReceta() {
+        return fechaReceta;
+    }
+
+    public void setFechaReceta(Date fechaReceta) {
+        this.fechaReceta = fechaReceta;
+    }
 }

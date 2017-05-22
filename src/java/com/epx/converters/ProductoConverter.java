@@ -9,6 +9,7 @@ import com.epx.entity.Producto;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -34,22 +35,15 @@ public class ProductoConverter implements Converter {
     }
 
     @Override
-    public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        if (o == null) {
-            return null;
-        }
-        if (o instanceof String) {
-            return null;
-        }
-        if (o instanceof Producto) {
-            Producto p = (Producto) o;
-            if (p.getIdProducto()== null) {
-                return null;
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        synchronized (entities) {
+            if (!entities.containsKey(value)) {
+                String uuid = UUID.randomUUID().toString();
+                entities.put(value, uuid);
+                return uuid;
             } else {
-                return Long.toString(p.getIdProducto());
+                return entities.get(value);
             }
-        } else {
-            throw new IllegalArgumentException(" object " + o);
         }
     }
 

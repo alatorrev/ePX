@@ -25,7 +25,7 @@
                                                      paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
                                                      lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lnp[2]}">
 
-                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" listener="#{ingresosBean.onOpenDialog()}" />
                                             <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
                                             <p:column headerText="Nombre">
                                                 <h:outputText value="#{lnp[2]}" />
@@ -43,7 +43,7 @@
                                                      paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
                                                      lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lp[2]}">
 
-                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" listener="#{ingresosBean.onOpenDialog()}" />
                                             <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
                                             <p:column headerText="Nombre">
                                                 <h:outputText value="#{lp[2]}" />
@@ -61,7 +61,7 @@
                                                      paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
                                                      lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{desechada[2]}">
 
-                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
+                                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" listener="#{ingresosBean.onOpenDialog()}" />
                                             <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
                                             <p:column headerText="Nombre">
                                                 <h:outputText value="#{desechada[2]}" />
@@ -93,7 +93,7 @@
                 </div>
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card">
-                        <p:panel header="Indexación">
+                        <p:panel id="pnlIndexacion" header="Indexación">
                             <h:panelGrid columns="4" style="width: 100%">
                                 <p:outputLabel value="Médico: "/>
                                 <p:autoComplete id="autoMed" value="#{ingresosBean.medico}" completeMethod="#{ingresosBean.completarMedico}" converter="medicoConverter"
@@ -110,13 +110,15 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
+                                <p:outputLabel value="Fecha receta:"/>
+                                <p:calendar value="#{ingresosBean.fechaReceta}" pattern="yyyy-MM-dd" />
                             </h:panelGrid>
                             <p:separator style="height: 5px; background-color: #559688"  />
                             <h:panelGrid columns="4" style="width: 100%">
                                 <p:outputLabel value="Producto: "/>
                                 <p:autoComplete id="autoPro" value="#{ingresosBean.pro}" completeMethod="#{ingresosBean.completarProducto}" converter="productoConverter"
                                                 minQueryLength="3" maxResults="5" var="pro" forceSelection="true"
-                                                itemValue="#{pro}" itemLabel="#{pro.marca} #{med.sustituto}" >
+                                                itemValue="#{pro}" itemLabel="#{pro.marca} #{pro.sustituto}" >
                                     <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuarioP}"/>
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" border="1">
@@ -139,7 +141,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </div>
-                    <div class="card">
+                    <div id="pnlDetalle" class="card">
                         <p:dataTable id="listDetails" value="#{ingresosBean.listaDetalle}" var="detalle" 
                                      scrollable="true" scrollHeight="140" scrollWidth="97%">
                             <f:facet name="header">
@@ -153,7 +155,7 @@
                                 <p:outputLabel value="#{detalle.secuencial}"/>
                             </p:column>
                             <p:column headerText="Producto" style="width: 35%">
-                                <h:outputText value="#{detalle.nomPro}" />
+                                <h:outputText value="#{detalle.producto.marca}" />
                             </p:column>
                             <p:column headerText="Px" style="width: 10%">
                                 <p:outputLabel value="1"/>
@@ -162,6 +164,14 @@
                                 <p:outputLabel value="#{detalle.cantidad}" style="width:100%" />
                             </p:column>
                         </p:dataTable>
+                        <p:commandButton value="PROCESAR" icon="ui-icon-save" actionListener="#{ingresosBean.procesarRecetas()}" 
+                                         oncomplete="PF('wgtVisor').hide();" update="frm">
+                            <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                        </p:commandButton>
+                        <p:commandButton value="DESECHAR" icon="ui-icon-trash" actionListener="#{ingresosBean.desecharRecetas()}"
+                                         oncomplete="PF('wgtVisor').hide();" update="frm">
+                            <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                        </p:commandButton>
                     </div>
                 </div>
             </h:form>
