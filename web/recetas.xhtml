@@ -5,47 +5,53 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-
     <ui:define name="content">
         <f:metadata>
             <f:viewAction action="#{vistaFarmaciaBean.checkAuthorizedViews()}"/>
         </f:metadata>
-        <div class="Container100 ui-fluid">
-            <div class="ContainerIndent">        
-                <p:panel>
-                    <h:form id="frm">
-                        <p:growl id="growl" showDetail="true"/>
-                        <p:spacer height="10"/>
-                        <p:poll interval="10" update="uTable" listener="#{vistaFarmaciaBean.listaRecetasOrdenadas()}"/>
-                        <p:dataTable id="uTable" value="#{vistaFarmaciaBean.listaRecetas}" var="lro" widgetVar="userTable" paginator="true" rows="10"
-                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-                                     paginatorPosition="bottom"
-                                     rowsPerPageTemplate="5,10,15"  lazy="false" selectionMode="single" selection="#{vistaFarmaciaBean.row}" rowKey="#{lro[2]}">
-                            <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" />
-                            <f:facet name="header">
-                                Recetas Subidas
-                            </f:facet>
-                            <p:column headerText="Nombre">
-                                <h:outputText value="#{lro[2]}" />
-                            </p:column>
-                            <p:column headerText="Fecha" filterBy="#{lro[3]}" filterMatchMode="contains" >
-                                <h:outputText value="#{lro[3]}" />
-                            </p:column>
-                        </p:dataTable>
-                    </h:form>
-                </p:panel>
-            </div>
-        </div>
-        <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
-                  header="#{vistaFarmaciaBean.row[2]}" modal="true" closable="true" closeOnEscape="true" 
-                  position="top">
-            <h:form id="frmVisor">
-                <div class="card card-w-title">
-                    <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
-                        <f:param name="ruta" value="#{vistaFarmaciaBean.row[1]}" />
-                    </p:media>
+        <p:panel>
+            <h:form id="frm">
+                <div class="container">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-lg-3">
+                            <p:spacer height="10"/>
+                            <p:poll interval="10" update="uTable" listener="#{vistaFarmaciaBean.listaRecetasOrdenadas()}"/>
+                            <p:dataTable id="uTable" value="#{vistaFarmaciaBean.listaRecetas}" var="lro" widgetVar="userTable" reflow="true"
+                                         lazy="false" selectionMode="single" selection="#{vistaFarmaciaBean.row}" rowKey="#{lro[2]}"
+                                         scrollable="true" scrollHeight="140" scrollWidth="97%">
+                                <p:ajax event="rowSelect" update="frm:frmVisor:uVisor" listener="#{vistaFarmaciaBean.verValor}" />
+                                <f:facet name="header">
+                                    Recetas Subidas
+                                </f:facet>
+                                <p:column headerText="Fecha" filterBy="#{lro[3]}" filterMatchMode="contains" >
+                                    <h:outputText value="#{lro[3]}" />
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+
+                        <div class="ui-g-12 ui-lg-9">
+                            <h:form id="frmVisor">
+                                <p:panel id="uVisor" widgetVar="VisorPDF">
+                                    <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false" >
+                                        <f:param name="ruta" value="#{vistaFarmaciaBean.row[1]}" />
+                                    </p:media>
+                                </p:panel>
+                            </h:form>
+                        </div>
+                    </div>
                 </div>
             </h:form>
-        </p:dialog>
+        </p:panel>
+        <!--  <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
+                    header="# {vistaFarmaciaBean.row[2]}" modal="true" closable="true" closeOnEscape="true" 
+                    position="top">
+              <h:form id="frmVisor">
+                  <div class="card card-w-title">
+                      <p:media player="pdf" height="450" width="100%" value="# {mediaManager.stream}" cache="false"  >
+                          <f:param name="ruta" value="# {vistaFarmaciaBean.row[1]}" />
+                      </p:media>
+                  </div>
+              </h:form>
+          </p:dialog> -->
     </ui:define>
 </ui:composition>

@@ -14,6 +14,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import org.primefaces.event.SelectEvent;
 import util.Facesmethods;
 import util.Filesmethods;
 
@@ -57,6 +58,12 @@ public class VistaFarmaciaBean implements Serializable {
         }
     }
 
+    public void verValor(SelectEvent e){
+        Object[] temp=(java.lang.Object[])e.getObject();
+        row=temp;
+        System.out.println(temp[2].toString());
+    }
+    
     public void listaRecetasOrdenadas() {
         List<String> listaUsuarioFarmacia = new ArrayList<>();
         listaUsuarioFarmacia.add(sessionUsuario.getLoginname());
