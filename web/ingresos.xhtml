@@ -15,7 +15,7 @@
                 <div class="ui-g">
                     <div class="ui-g-12">
                         <div class="card">
-                            <p:panel header="Hola mundo">
+                            <p:panel header="Área de Trabajo">
                                 <p:tabView>
                                     <p:ajax event="tabChange" listener="#{ingresosBean.onTabChange()}"
                                             update="tblNoProcesadas tblProcesadas tblDesechadas"
@@ -33,9 +33,6 @@
                                             <p:column headerText="Fecha" filterBy="#{lnp[3]}" filterMatchMode="contains" >
                                                 <h:outputText value="#{lnp[3]}" />
                                             </p:column>
-                                            <p:column headerText="Directorio">
-                                                <h:outputText value="#{lnp[4]}" />
-                                            </p:column>
                                         </p:dataTable>
                                     </p:tab>
                                     <p:tab title="Procesadas">
@@ -51,9 +48,6 @@
                                             <p:column headerText="Fecha" filterBy="#{lp[3]}" filterMatchMode="contains" >
                                                 <h:outputText value="#{lp[3]}" />
                                             </p:column>
-                                            <p:column headerText="Directorio">
-                                                <h:outputText value="#{lp[4]}" />
-                                            </p:column>
                                         </p:dataTable>
                                     </p:tab>
                                     <p:tab title="Desechadas">
@@ -68,9 +62,6 @@
                                             </p:column>
                                             <p:column headerText="Fecha" filterBy="#{desechada[3]}" filterMatchMode="contains" >
                                                 <h:outputText value="#{desechada[3]}" />
-                                            </p:column>
-                                            <p:column headerText="Directorio">
-                                                <h:outputText value="#{desechada[4]}" />
                                             </p:column>
                                         </p:dataTable>
                                     </p:tab>
@@ -94,7 +85,7 @@
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card">
                         <p:panel id="pnlIndexacion" header="Indexación">
-                            <h:panelGrid columns="4" style="width: 100%">
+                            <h:panelGrid columns="3" style="width: 100%">
                                 <p:outputLabel value="Médico: "/>
                                 <p:autoComplete id="autoMed" value="#{ingresosBean.medico}" completeMethod="#{ingresosBean.completarMedico}" converter="medicoConverter"
                                                 minQueryLength="3" maxResults="5" var="med" forceSelection="true"
@@ -110,11 +101,14 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
+                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 152px;" title="nuevo médico">
+
+                                </p:commandButton>
                                 <p:outputLabel value="Fecha receta:"/>
                                 <p:calendar value="#{ingresosBean.fechaReceta}" pattern="yyyy-MM-dd" />
                             </h:panelGrid>
                             <p:separator style="height: 5px; background-color: #559688"  />
-                            <h:panelGrid columns="4" style="width: 100%">
+                            <h:panelGrid columns="5" style="width: 100%">
                                 <p:outputLabel value="Producto: "/>
                                 <p:autoComplete id="autoPro" value="#{ingresosBean.pro}" completeMethod="#{ingresosBean.completarProducto}" converter="productoConverter"
                                                 minQueryLength="3" maxResults="5" var="pro" forceSelection="true"
@@ -133,10 +127,14 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
+                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 36px;" title="nuevo producto">
+
+                                </p:commandButton>
                                 <h:inputHidden />
                                 <h:inputHidden />
                                 <p:outputLabel value="Cantidad: "/>
                                 <p:inputText value="#{ingresosBean.canPro}"/>
+                                <h:inputHidden />
                                 <p:commandButton value="Añadir" ajax="true" actionListener="#{ingresosBean.agregarDetalle()}" update="listDetails"/>
                             </h:panelGrid>
                         </p:panel>
@@ -168,7 +166,8 @@
                                          oncomplete="PF('wgtVisor').hide();" update="frm">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
-                        <p:commandButton value="DESECHAR" icon="ui-icon-trash" actionListener="#{ingresosBean.desecharRecetas()}"
+                        <p:commandButton rendered="#{ingresosBean.row[4] eq 'RAIZ' or ingresosBean.row[4] eq 'PROCESADAS'}"  
+                                         value="DESECHAR" icon="ui-icon-trash" actionListener="#{ingresosBean.desecharRecetas()}"
                                          oncomplete="PF('wgtVisor').hide();" update="frm">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
