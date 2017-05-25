@@ -29,6 +29,38 @@ import util.Filesmethods;
  */
 public class TransaccionDAO {
 
+    public List<CabeceraMovimiento> loadWorkingArea(String codigopdv) {
+        Conexion con = new Conexion();
+        List<CabeceraMovimiento> lista = new ArrayList<>();
+        String sql = "select idcabecera,codigopdv,nombrearchivo,rutaarchivoorigen,rutaarchivodestino,fechareceta,fechascanner,estado "
+                + "from cabecera where codigopdv=?";
+        try {
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            pst.setString(1, codigopdv);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                CabeceraMovimiento cab = new CabeceraMovimiento();
+                cab.setIdCabecera(rs.getLong(1));
+                cab.setCodigoPDV(rs.getString(2));
+                cab.setNombreArchivo(rs.getString(3));
+                cab.setRutaArchivoDestino(rs.getString(5));
+                cab.setFechaReceta(rs.getTimestamp(6));
+                cab.setFechaArchivo(rs.getTimestamp(7));
+                cab.setEstado(rs.getInt(8));
+                lista.add(cab);
+            }
+        } catch (Exception e) {
+            System.out.println("TRANSACCIONDAO LOADWORKINGAREA: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return lista;
+    }
+
     public CabeceraMovimiento cargarTransaccion(String nombreArchivo) {
         CabeceraMovimiento cab = new CabeceraMovimiento();
         Conexion con = new Conexion();
@@ -99,6 +131,37 @@ public class TransaccionDAO {
         return cab;
     }
 
+    public CabeceraMovimiento cargarTransaccionDesechada(String nombreArchivo) {
+        CabeceraMovimiento cab = new CabeceraMovimiento();
+        Conexion con = new Conexion();
+        String sql = "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,c.fechareceta from cabecera c "
+                + "where c.nombrearchivo= ?";
+        try {
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            pst.setString(1, nombreArchivo);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Medico tempMedico = new Medico();
+                tempMedico.setIdMedico(rs.getLong(4));
+                tempMedico.setFuente(rs.getString(5));
+                cab.setIdCabecera(rs.getLong(1));
+                cab.setNombreArchivo(rs.getString(2));
+                cab.setRutaArchivoDestino(rs.getString(3));
+                cab.setFechaReceta(rs.getTimestamp(6));
+                cab.setMedico(tempMedico);
+            }
+        } catch (Exception e) {
+            System.out.println("TRANSACCIONDAO CARGAR TRANSACCION: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return cab;
+    }
+
     public void procesarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String SEPARADOR = File.separator;
@@ -142,7 +205,7 @@ public class TransaccionDAO {
                 pst.executeUpdate();
             }
             con.getConnection().commit();
-            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(),row);
+            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO PROCESAR TRANSACCION: " + e.getMessage());
         } finally {
@@ -173,7 +236,7 @@ public class TransaccionDAO {
             pst.setTimestamp(6, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
             pst.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
             pst.setString(8, sessionUsuario.getLoginname());
-            pst.setBoolean(9, true);
+            pst.setInt(9, 1);
             pst.setString(10, row[2].toString());
             pst.executeUpdate();
             borrarDetalle(cab);
@@ -189,7 +252,7 @@ public class TransaccionDAO {
             }
             con.getConnection().commit();
             if (!opcion.equals(row[4].toString())) {
-                Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(),row);
+                Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
             }
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO EDITANDO TRANSACCION: " + e.getMessage());
@@ -206,18 +269,23 @@ public class TransaccionDAO {
         Conexion con = new Conexion();
         String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
         String SEPARADOR = File.separator;
-        String sql = "update cabecera set estado=?,rutaarchivoorigen=?,rutaarchivodestino=? where idcabecera=?";
+        String sql = "update cabecera set estado=?,rutaarchivoorigen=?,rutaarchivodestino=?, "
+                + "fechapantallainit=?,fecharegistro=?,idusuario=? where idcabecera=?";
         try {
             con.getConnection().setAutoCommit(false);
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            pst.setBoolean(1, false);
+            pst.setInt(1, 2);
             pst.setString(2, row[1].toString());
             String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
             pst.setString(3, rutadestino);
-            pst.setInt(4, cab.getIdCabecera().intValue());
+            pst.setTimestamp(4, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
+            pst.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
+            pst.setString(6,sessionUsuario.getLoginname());
+            pst.setInt(7, cab.getIdCabecera().intValue());
             pst.executeUpdate();
+            borrarDetalle(cab);
             con.getConnection().commit();
-            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(),row);
+            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO DESECHANDO TRANSACCION: " + e.getMessage());
         } finally {
@@ -228,7 +296,7 @@ public class TransaccionDAO {
             }
         }
     }
-    
+
     public void desecharRaiz(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String SEPARADOR = File.separator;
@@ -249,26 +317,26 @@ public class TransaccionDAO {
             pst.setTimestamp(6, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
             pst.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
             pst.setString(8, sessionUsuario.getLoginname());
-            pst.setBoolean(9, false);
+            pst.setInt(9, 2);
             pst.executeUpdate();
-            ResultSet rs = pst.getGeneratedKeys();
-            int generatedIdCabecera = 0;
-            if (rs.next()) {
-                generatedIdCabecera = rs.getInt(1);
-            }
-
-            String sql2 = "insert into detalle (idcabecera,idproducto,fuenteproducto,cantidad) "
-                    + "values (?,?,?,?)";
-            pst = con.getConnection().prepareStatement(sql2);
-            for (DetalleMovimiento det : cab.getListaDetalleProducto()) {
-                pst.setInt(1, generatedIdCabecera);
-                pst.setInt(2, det.getProducto().getIdProducto().intValue());
-                pst.setString(3, det.getProducto().getFuente());
-                pst.setInt(4, det.getCantidad());
-                pst.executeUpdate();
-            }
+//            ResultSet rs = pst.getGeneratedKeys();
+//            int generatedIdCabecera = 0;
+//            if (rs.next()) {
+//                generatedIdCabecera = rs.getInt(1);
+//            }
+//
+//            String sql2 = "insert into detalle (idcabecera,idproducto,fuenteproducto,cantidad) "
+//                    + "values (?,?,?,?)";
+//            pst = con.getConnection().prepareStatement(sql2);
+//            for (DetalleMovimiento det : cab.getListaDetalleProducto()) {
+//                pst.setInt(1, generatedIdCabecera);
+//                pst.setInt(2, det.getProducto().getIdProducto().intValue());
+//                pst.setString(3, det.getProducto().getFuente());
+//                pst.setInt(4, det.getCantidad());
+//                pst.executeUpdate();
+//            }
             con.getConnection().commit();
-            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(),row);
+            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO PROCESAR TRANSACCION: " + e.getMessage());
         } finally {

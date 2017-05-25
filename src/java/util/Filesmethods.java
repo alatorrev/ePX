@@ -6,6 +6,8 @@
 package util;
 
 import com.epx.dao.ParametrosDAO;
+import com.epx.dao.TransaccionDAO;
+import com.epx.entity.CabeceraMovimiento;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,18 +24,19 @@ public class Filesmethods {
         String directorioRaiz = new ParametrosDAO().parametroDirectorioRaiz();
         List<Object[]> listaObj = new ArrayList<>();
         for (String rutas : listaFarmacias) {
-            File[] files = new File(directorioRaiz + rutas).listFiles();
-            if (files != null) {
-                for (File receta : files) {
-                    if (receta.isFile()) {
-                        listaObj.add(construccionObjeto(receta, "RAIZ"));
-                    } else {
-                        File[] subDirectorio = new File(receta.getAbsolutePath()).listFiles();
-                        for (File sub : subDirectorio) {
-                            if (sub.isFile()) {
-                                listaObj.add(construccionObjeto(sub, receta.getName()));
-                            }
-                        }
+            List<CabeceraMovimiento> cabeceras = new TransaccionDAO().loadWorkingArea(rutas);
+            if (!cabeceras.isEmpty()) {
+                for (CabeceraMovimiento cabecera : cabeceras) {
+                    switch (cabecera.getEstado()) {
+                        case 0:
+                            listaObj.add(construccionObjeto(new File(cabecera.getRutaArchivoDestino()), "RAIZ"));
+                            break;
+                        case 1:
+                            listaObj.add(construccionObjeto(new File(cabecera.getRutaArchivoDestino()), "PROCESADAS"));
+                            break;
+                        case 2:
+                            listaObj.add(construccionObjeto(new File(cabecera.getRutaArchivoDestino()), "DESECHADAS"));
+                            break;
                     }
                 }
             }
@@ -45,24 +48,21 @@ public class Filesmethods {
         List<Object[]> raiz = new ArrayList<>(),
                 procesadas = new ArrayList<>(),
                 desechadas = new ArrayList<>();
-        String directorioRaiz = new ParametrosDAO().parametroDirectorioRaiz();
         Object[] objTempListas = new Object[3];
         for (String rutas : listaFarmacias) {
-            File[] files = new File(directorioRaiz + rutas).listFiles();
-            if (files != null) {
-                for (File receta : files) {
-                    if (receta.isFile()) {
-                        raiz.add(construccionObjeto(receta, "RAIZ"));
-                    } else {
-                        File[] subDirectorio = new File(receta.getAbsolutePath()).listFiles();
-                        for (File sub : subDirectorio) {
-                            if (receta.getName().equals("PROCESADAS")) {
-                                procesadas.add(construccionObjeto(sub, receta.getName()));
-                            }
-                            if (receta.getName().equals("DESECHADAS")) {
-                                desechadas.add(construccionObjeto(sub, receta.getName()));
-                            }
-                        }
+            List<CabeceraMovimiento> cabeceras = new TransaccionDAO().loadWorkingArea(rutas);
+            if (!cabeceras.isEmpty()) {
+                for (CabeceraMovimiento cabecera : cabeceras) {
+                    switch (cabecera.getEstado()) {
+                        case 0:
+                            raiz.add(construccionObjeto(new File(cabecera.getRutaArchivoDestino()), "RAIZ"));
+                            break;
+                        case 1:
+                            procesadas.add(construccionObjeto(new File(cabecera.getRutaArchivoDestino()), "PROCESADAS"));
+                            break;
+                        case 2:
+                            desechadas.add(construccionObjeto(new File(cabecera.getRutaArchivoDestino()), "DESECHADAS"));
+                            break;
                     }
                 }
             }
@@ -97,8 +97,8 @@ public class Filesmethods {
         return objTemp;
     }
 
-    public static void transferFiletransaccion(String rutaOrigen, String rutaDestino, String opcion, String fileName,Object[] row) {
-        File file = new File(rutaOrigen+opcion);
+    public static void transferFiletransaccion(String rutaOrigen, String rutaDestino, String opcion, String fileName, Object[] row) {
+        File file = new File(rutaOrigen + opcion);
         if (file.exists()) {
             File temp = new File(row[1].toString());
             temp.renameTo(new File(rutaDestino));

@@ -24,7 +24,7 @@ public class CabeceraMovimiento implements Serializable {
     private Date fechaArchivo;
     private Date fechaRegistro;
     private Date pantallaInit;
-    private boolean estado;
+    private int estado;
     
     private List<DetalleMovimiento> listaDetalleProducto;
 
@@ -108,11 +108,11 @@ public class CabeceraMovimiento implements Serializable {
         this.pantallaInit = pantallaInit;
     }
 
-    public boolean isEstado() {
+    public int getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(int estado) {
         this.estado = estado;
     }
 

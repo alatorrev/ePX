@@ -28,7 +28,7 @@ public class UsuarioDAO implements Serializable {
         Usuario us = new Usuario();
         PreparedStatement pst;
         ResultSet rs = null;
-        String query = "select u.nombres,u.apellidos,u.correo,u.loginname,r.idrol,r.descripcion,u.estado "
+        String query = "select u.nombres,u.apellidos,u.correo,u.loginname,r.idrol,r.descripcion,u.estado,u.idusuario "
                 + "from usuario u "
                 + "inner join rol r on r.idrol=u.idrol "
                 + "where u.loginname=? and u.contrasena=? and u.estado=?";
@@ -46,6 +46,7 @@ public class UsuarioDAO implements Serializable {
                 us.setIdRol(rs.getInt(5));
                 us.setDescripcionRol(rs.getString(6));
                 us.setActivo(rs.getInt(7));
+                us.setIdusuario(rs.getInt(8));
                 return us;
             }
         } catch (Exception e) {
@@ -125,10 +126,11 @@ public class UsuarioDAO implements Serializable {
         List<String> pdvs = new ArrayList<>();
         Conexion con = new Conexion();
         PreparedStatement pst;
-        String sql = "select codigopdv from pdv,usuario where loginname=?";
+        String sql = "select codigopdv from pdv,usuario where usuario.idusuario=? and pdv.idusuario=?";
         try {
             pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1,us.getLoginname());
+            pst.setInt(1,us.getIdusuario());
+            pst.setInt(2,us.getIdusuario());
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 pdvs.add(rs.getString(1));

@@ -15,7 +15,6 @@ import com.epx.entity.Medico;
 import com.epx.entity.Producto;
 import com.epx.entity.Usuario;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +93,7 @@ public final class IngresosBean implements Serializable {
         //metodo para guardar lo procesado cabecera y detalle
         CabeceraMovimiento cab = new CabeceraMovimiento();
         cab.setMedico(medico);
-        cab.setEstado(true);
+        cab.setEstado(1);
         cab.setFechaReceta(fechaReceta);
         cab.setPantallaInit(pantallaDatetime);
         cab.setIdUsuario(sessionUsuario.getLoginname());
@@ -107,7 +106,8 @@ public final class IngresosBean implements Serializable {
 
         } else {
             //guardo nuevo con estado 1
-            new TransaccionDAO().procesarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
+            cab.setIdCabecera(cabecera.getIdCabecera());
+            new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
             listaRecetasOrdenadas();
         }
     }
@@ -116,7 +116,7 @@ public final class IngresosBean implements Serializable {
         //metodo para guardar lo rechazado cabecera
         CabeceraMovimiento cab = new CabeceraMovimiento();
         cab.setMedico(medico);
-        cab.setEstado(true);
+        cab.setEstado(2);
         cab.setFechaReceta(fechaReceta);
         cab.setPantallaInit(pantallaDatetime);
         cab.setIdUsuario(sessionUsuario.getLoginname());
@@ -128,7 +128,7 @@ public final class IngresosBean implements Serializable {
             listaRecetasOrdenadas();
         } else {
             //cabecera no existe
-            new TransaccionDAO().desecharRaiz(cab, row, "DESECHADAS", sessionUsuario);
+            new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario);
             listaRecetasOrdenadas();
         }
     }
@@ -145,14 +145,21 @@ public final class IngresosBean implements Serializable {
         fechaReceta = new Date();
         pantallaDatetime = new Date();
         if (!row[4].toString().equals("RAIZ")) {
-            cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
+            if (row[4].toString().equals("PROCESADAS")) {
+                cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
+            }
+            if (row[4].toString().equals("DESECHADAS")) {
+                cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
+            }
             medico = cabecera.getMedico() == null ? new Medico() : cabecera.getMedico();
             listaDetalle = cabecera.getListaDetalleProducto() == null ? new ArrayList<>() : cabecera.getListaDetalleProducto();
             fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
+
         } else {
+            cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
             medico = new Medico();
             listaDetalle = new ArrayList<>();
-
+            fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
         }
     }
 

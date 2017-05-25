@@ -22,18 +22,22 @@
         <navigation-case>
             <from-outcome>dashboard</from-outcome>
             <to-view-id>/empty.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>incorrecto</from-outcome>
             <to-view-id>/login.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>ingresos</from-outcome>
             <to-view-id>/ingresos.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>farmacia</from-outcome>
             <to-view-id>/recetas.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
     </navigation-rule>
     

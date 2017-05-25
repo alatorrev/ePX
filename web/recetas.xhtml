@@ -11,14 +11,12 @@
         </f:metadata>
         <p:panel>
             <h:form id="frm">
-                <div class="container">
                     <div class="ui-g">
                         <div class="ui-g-12 ui-lg-3">
-                            <p:spacer height="10"/>
                             <p:poll interval="10" update="uTable" listener="#{vistaFarmaciaBean.listaRecetasOrdenadas()}"/>
                             <p:dataTable id="uTable" value="#{vistaFarmaciaBean.listaRecetas}" var="lro" widgetVar="userTable" reflow="true"
                                          lazy="false" selectionMode="single" selection="#{vistaFarmaciaBean.row}" rowKey="#{lro[2]}"
-                                         scrollable="true" scrollHeight="140" scrollWidth="97%">
+                                         scrollable="true" scrollHeight="390" scrollWidth="97%">
                                 <p:ajax event="rowSelect" update="frm:frmVisor:uVisor" listener="#{vistaFarmaciaBean.verValor}" />
                                 <f:facet name="header">
                                     Recetas Subidas
@@ -39,7 +37,6 @@
                             </h:form>
                         </div>
                     </div>
-                </div>
             </h:form>
         </p:panel>
         <!--  <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
