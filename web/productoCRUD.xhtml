@@ -112,7 +112,7 @@
                                 <p:commandButton ajax="true" actionListener="#{productoBean.commitCreate()}" value="Crear" oncomplete="PF('wdlgCrearProducto').hide();" update=":frm:uTable" >
                                     <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                                 </p:commandButton>
-                                <p:commandButton value="Cancelar" actionListener="#{productoBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgCrearRol').hide();"/>
+                                <p:commandButton value="Cancelar" actionListener="#{productoBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgCrearProducto').hide();"/>
                             </h:panelGrid>
                         </h:form>
                     </p:dialog>

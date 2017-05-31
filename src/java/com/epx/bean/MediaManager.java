@@ -5,10 +5,13 @@
  */
 package com.epx.bean;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -24,7 +27,7 @@ import org.primefaces.model.StreamedContent;
 @SessionScoped
 public class MediaManager implements Serializable {
 
-    public StreamedContent getStream() throws FileNotFoundException {
+    public StreamedContent getStream() throws FileNotFoundException, IOException {
         FacesContext context = FacesContext.getCurrentInstance();
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE || context.getCurrentPhaseId() == PhaseId.INVOKE_APPLICATION) {
             return new DefaultStreamedContent();

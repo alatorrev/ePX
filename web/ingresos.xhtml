@@ -75,11 +75,16 @@
         <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
                   header="#{ingresosBean.row[2]}" modal="true" closable="true" closeOnEscape="true" position="top" >
             <h:form id="frmVisor">
+                <p:messages id="growl" showDetail="true" autoUpdate="true" closable="true" />
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card card-w-title">
-                        <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
+                       <!-- <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
+                            <f:param name="ruta" value="#{ingresosBean.row[1]}" />
+                        </p:media>-->
+                        <p:media value="#{mediaManager.stream}" player="pdf" height="478" width="100%" >
                             <f:param name="ruta" value="#{ingresosBean.row[1]}" />
                         </p:media>
+
                     </div>
                 </div>
                 <div class="ui-g-12 ui-lg-6" >
@@ -101,7 +106,8 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
-                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 152px;" title="nuevo médico">
+                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 152px;"
+                                                 onclick="PF('wgtMedicoCrud').show();" title="nuevo médico">
 
                                 </p:commandButton>
                                 <p:outputLabel value="Fecha receta:"/>
@@ -127,15 +133,16 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
-                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 36px;" title="nuevo producto">
+                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 36px;" 
+                                                 onclick="PF('wgtProductoCrud').show();" title="nuevo producto">
 
                                 </p:commandButton>
                                 <h:inputHidden />
                                 <h:inputHidden />
                                 <p:outputLabel value="Cantidad: "/>
-                                <p:inputText value="#{ingresosBean.canPro}"/>
+                                <p:inputText id="inputCantidad" value="#{ingresosBean.canPro}"/>
                                 <h:inputHidden />
-                                <p:commandButton value="Añadir" ajax="true" actionListener="#{ingresosBean.agregarDetalle()}" update="listDetails"/>
+                                <p:commandButton value="Añadir" ajax="true" actionListener="#{ingresosBean.agregarDetalle()}" update="listDetails autoPro inputCantidad"/>
                             </h:panelGrid>
                         </p:panel>
                     </div>
@@ -163,7 +170,7 @@
                             </p:column>
                         </p:dataTable>
                         <p:commandButton value="PROCESAR" icon="ui-icon-save" actionListener="#{ingresosBean.procesarRecetas()}" 
-                                         oncomplete="PF('wgtVisor').hide();" update="frm">
+                                         update="frm">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
                         <p:commandButton rendered="#{ingresosBean.row[4] eq 'RAIZ' or ingresosBean.row[4] eq 'PROCESADAS'}"  
@@ -173,6 +180,47 @@
                         </p:commandButton>
                     </div>
                 </div>
+            </h:form>
+        </p:dialog>
+        <p:dialog modal="true" id="dlgMedicoCrud" widgetVar="wgtMedicoCrud" header="Crear Médico" responsive="true" closable="false" >
+            <h:form id="frmCreaMedico">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="Nombres"/>
+                    <p:inputText value="#{ingresosBean.medico.nombres}" />
+                    <p:outputLabel value="Apellidos"/>
+                    <p:inputText value="#{ingresosBean.medico.apellidos}" />
+                    <p:outputLabel value="Cédula"/>
+                    <p:inputText value="#{ingresosBean.medico.cedula}"/>
+                    <p:outputLabel value="Dirección"/>
+                    <p:inputText value="#{ingresosBean.medico.direccion}"  />
+                    <p:outputLabel value="Especialidades "/>
+                    <p:selectCheckboxMenu id="check_especilidad" label="Selecciona" value="#{ingresosBean.espeIdSelected}" style="width: 100%;" filter="true"  filterMatchMode="startsWith" required="true" requiredMessage="listado sdasdasd">
+                        <f:selectItems value="#{ingresosBean.listaEspecialidades}" var="esp" 
+                                       itemLabel="#{esp.descripcion}" itemValue="#{esp.idEspecialidad}" />
+                    </p:selectCheckboxMenu>
+                    <p:commandButton ajax="true" actionListener="#{ingresosBean.commitCreateMedico()}" value="Crear" oncomplete="PF('wgtMedicoCrud').hide();"  >
+                        <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                    </p:commandButton> 
+                    <p:commandButton value="Cancelar" actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}" immediate="true" oncomplete="PF('wgtMedicoCrud').hide();"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="dlgProductoCrud" header="Crear Producto"  widgetVar="wgtProductoCrud" modal="true" responsive="true" closable="false" >
+            <h:form id="frmCreaProducto">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="Marca"/>
+                    <p:inputText value="#{ingresosBean.pro.marca}"/>
+                    <p:outputLabel value="Sustituto"/>
+                    <p:inputText value="#{ingresosBean.pro.sustituto}"/>
+                    <p:outputLabel value="Forma"/>
+                    <p:inputText value="#{ingresosBean.pro.forma}"/>
+                    <p:outputLabel value="Concentración"/>
+                    <p:inputText value="#{ingresosBean.pro.concentracion}"/>
+                    <p:commandButton ajax="true" actionListener="#{ingresosBean.commitCreateProducto()}" value="Crear" oncomplete="PF('wgtProductoCrud').hide();" >
+                        <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
+                    </p:commandButton>
+                    <p:commandButton value="Cancelar" actionListener="#{ingresosBean.onCancelProductoCRUDDialog()}" immediate="true" oncomplete="PF('wgtProductoCrud').hide();"/>
+                </h:panelGrid>
             </h:form>
         </p:dialog>
         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >

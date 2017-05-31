@@ -6,6 +6,7 @@
 package com.epx.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  *
@@ -17,6 +18,7 @@ public class DetalleMovimiento implements Serializable {
     private Long idCabecera;
     private Producto producto;
     private int cantidad;
+    private Date referenciaTiempo;
     
 
     public Long getIdDetalle() {
@@ -57,6 +59,14 @@ public class DetalleMovimiento implements Serializable {
 
     public void setSecuencial(int secuencial) {
         this.secuencial = secuencial;
+    }
+
+    public Date getReferenciaTiempo() {
+        return referenciaTiempo;
+    }
+
+    public void setReferenciaTiempo(Date referenciaTiempo) {
+        this.referenciaTiempo = referenciaTiempo;
     }
     
 }

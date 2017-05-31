@@ -5,25 +5,31 @@
  */
 package com.epx.bean;
 
+import com.epx.dao.EspecialidadDAO;
 import com.epx.dao.MedicoDAO;
 import com.epx.dao.ProductoDAO;
 import com.epx.dao.TransaccionDAO;
 import com.epx.dao.UsuarioDAO;
 import com.epx.entity.CabeceraMovimiento;
 import com.epx.entity.DetalleMovimiento;
+import com.epx.entity.Especialidad;
 import com.epx.entity.Medico;
 import com.epx.entity.Producto;
 import com.epx.entity.Usuario;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import util.Facesmethods;
 import util.Filesmethods;
+import util.Validador;
 
 /**
  *
@@ -40,6 +46,8 @@ public final class IngresosBean implements Serializable {
     private List<Object[]> listaProcesada = new ArrayList<>();
     private List<Object[]> listaDesechada = new ArrayList<>();
     private Object[] row;
+    private List<Especialidad> listaEspecialidades = new EspecialidadDAO().findAllEspecialidades();
+    private List<Integer> EspeIdSelected = new ArrayList<>();
 
     private final List<String> listaPDVS;
     private Medico medico = new Medico();
@@ -49,11 +57,12 @@ public final class IngresosBean implements Serializable {
     private CabeceraMovimiento cabecera;
     private MedicoDAO daoMedico = new MedicoDAO();
     private ProductoDAO daoProducto = new ProductoDAO();
-    private int canPro;
+    private int canPro = 1;
 
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
+        EspeIdSelected.add(listaEspecialidades.get(0).getIdEspecialidad());
         listaRecetasOrdenadas();
     }
 
@@ -67,13 +76,21 @@ public final class IngresosBean implements Serializable {
     }
 
     public void agregarDetalle() {
-        DetalleMovimiento det = new DetalleMovimiento();
-        det.setSecuencial(listaDetalle.size() + 1);
-        det.setProducto(pro);
-        det.setCantidad(canPro);
-        det.setIdCabecera(Long.valueOf(listaDetalle.size() + 1));
-        listaDetalle.add(det);
-        resetDataEntry();
+        List<String> msgs = Validador.validarListaDetalleRepetida(listaDetalle, pro);
+        if (msgs.size() < 1) {
+            DetalleMovimiento det = new DetalleMovimiento();
+            det.setSecuencial(listaDetalle.size() + 1);
+            det.setProducto(pro);
+            det.setCantidad(canPro);
+            det.setReferenciaTiempo(new Date());
+            det.setIdCabecera(Long.valueOf(listaDetalle.size() + 1));
+            listaDetalle.add(det);
+            resetDataEntry();
+        } else {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", msgs.get(0)));
+            RequestContext.getCurrentInstance().update("frmVisor:growl");
+        }
     }
 
     public void removerDetalle(DetalleMovimiento det) {
@@ -86,30 +103,39 @@ public final class IngresosBean implements Serializable {
     public void resetDataEntry() {
         pro = new Producto();
         medico = new Medico();
-        canPro = 0;
+        canPro = 1;
     }
 
     public void procesarRecetas() {
         //metodo para guardar lo procesado cabecera y detalle
-        CabeceraMovimiento cab = new CabeceraMovimiento();
-        cab.setMedico(medico);
-        cab.setEstado(1);
-        cab.setFechaReceta(fechaReceta);
-        cab.setPantallaInit(pantallaDatetime);
-        cab.setIdUsuario(sessionUsuario.getLoginname());
-        cab.setListaDetalleProducto(listaDetalle);
-        if (!row[4].toString().equals("RAIZ")) {
-            //edito existente con estado 1
-            cab.setIdCabecera(cabecera.getIdCabecera());
-            new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
-            listaRecetasOrdenadas();
+        if (listaDetalle.size() > 0) {
+            CabeceraMovimiento cab = new CabeceraMovimiento();
+            cab.setMedico(medico);
+            cab.setEstado(1);
+            cab.setFechaReceta(fechaReceta);
+            cab.setPantallaInit(pantallaDatetime);
+            cab.setIdUsuario(sessionUsuario.getLoginname());
+            cab.setListaDetalleProducto(listaDetalle);
+            if (!row[4].toString().equals("RAIZ")) {
+                //edito existente con estado 1
+                cab.setIdCabecera(cabecera.getIdCabecera());
+                new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
+                listaRecetasOrdenadas();
+
+            } else {
+                //guardo nuevo con estado 1
+                cab.setIdCabecera(cabecera.getIdCabecera());
+                new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
+                listaRecetasOrdenadas();
+            }
+            RequestContext.getCurrentInstance().execute("PF('wgtVisor').hide();");
 
         } else {
-            //guardo nuevo con estado 1
-            cab.setIdCabecera(cabecera.getIdCabecera());
-            new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
-            listaRecetasOrdenadas();
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "El detalle debe tener al menos un producto para ser procesada"));
+            RequestContext.getCurrentInstance().update("frmVisor:growl");
         }
+
     }
 
     public void desecharRecetas() {
@@ -128,6 +154,7 @@ public final class IngresosBean implements Serializable {
             listaRecetasOrdenadas();
         } else {
             //cabecera no existe
+            cab.setIdCabecera(cabecera.getIdCabecera());
             new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario);
             listaRecetasOrdenadas();
         }
@@ -168,6 +195,60 @@ public final class IngresosBean implements Serializable {
         if (medico == null) {
             medico = new Medico();
         }
+    }
+
+    public void commitCreateMedico() throws SQLException {
+        List<String> messagesValidation = Validador.validarMedicoFrm(medico, EspeIdSelected);
+        if (messagesValidation.size() < 1) {
+            boolean flag = daoMedico.createOnFlyMedico(medico, EspeIdSelected, sessionUsuario);
+            if (flag) {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Nuevo médico añadido correctamente al sistema"));
+                RequestContext.getCurrentInstance().update("frmVisor:growl");
+            } else {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                RequestContext.getCurrentInstance().update("frmVisor:growl");
+            }
+        } else {
+            FacesContext context = FacesContext.getCurrentInstance();
+            for (String msg : messagesValidation) {
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", msg));
+            }
+            RequestContext.getCurrentInstance().update("frmVisor:growl");
+        }
+        setMedico(new Medico());
+    }
+
+    public void commitCreateProducto() throws SQLException {
+        List<String> messagesValidation = Validador.validarProductoFrm(pro);
+        if (messagesValidation.size() < 1) {
+            boolean flag = daoProducto.createProducto(pro, sessionUsuario);
+            if (flag) {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado correctamente"));
+                RequestContext.getCurrentInstance().update("frmVisor:growl");
+            } else {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                RequestContext.getCurrentInstance().update("frmVisor:growl");
+            }
+        } else {
+            FacesContext context = FacesContext.getCurrentInstance();
+            for (String msg : messagesValidation) {
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", msg));
+            }
+            RequestContext.getCurrentInstance().update("frmVisor:growl");
+        }
+        setPro(new Producto());
+    }
+
+    public void onCancelMedicoCRUDDialog() {
+        setMedico(new Medico());
+    }
+
+    public void onCancelProductoCRUDDialog() {
+        setPro(new Producto());
     }
 
     public void onItemSelectUsuarioP(SelectEvent event) {
@@ -259,4 +340,21 @@ public final class IngresosBean implements Serializable {
     public void setFechaReceta(Date fechaReceta) {
         this.fechaReceta = fechaReceta;
     }
+
+    public List<Especialidad> getListaEspecialidades() {
+        return listaEspecialidades;
+    }
+
+    public void setListaEspecialidades(List<Especialidad> listaEspecialidades) {
+        this.listaEspecialidades = listaEspecialidades;
+    }
+
+    public List<Integer> getEspeIdSelected() {
+        return EspeIdSelected;
+    }
+
+    public void setEspeIdSelected(List<Integer> EspeIdSelected) {
+        this.EspeIdSelected = EspeIdSelected;
+    }
+
 }

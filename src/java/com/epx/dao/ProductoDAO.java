@@ -106,10 +106,10 @@ public class ProductoDAO implements Serializable {
                 + "CURRENT_TIMESTAMP, ?)";
         pst = con.getConnection().prepareStatement(query);
         try {
-            pst.setString(1, pro.getMarca().toUpperCase());
-            pst.setString(2, pro.getSustituto().toUpperCase());
-            pst.setString(3, pro.getForma().toUpperCase());
-            pst.setString(4, pro.getConcentracion().toUpperCase());
+            pst.setString(1, (pro.getMarca()==null || pro.getMarca().length()==0)?null:pro.getMarca().toUpperCase());
+            pst.setString(2, (pro.getSustituto()==null || pro.getSustituto().length()==0)?null:pro.getSustituto().toUpperCase());
+            pst.setString(3, (pro.getForma()==null || pro.getForma().length()==0)?null:pro.getForma().toUpperCase());
+            pst.setString(4, (pro.getConcentracion()==null || pro.getConcentracion().length()==0)?null:pro.getConcentracion().toUpperCase());
             pst.setString(5, u.getLoginname());
             pst.executeUpdate();
             con.getConnection().commit();

@@ -119,7 +119,7 @@ public class MedicoDAO implements Serializable {
             pst.setString(2, med.getApellidos().toUpperCase());
             pst.setString(3, med.getCedula());
             pst.setString(4, med.getDireccion());
-            pst.setDate(5, java.sql.Date.valueOf(format.format(med.getFechaNacimiento())));
+            pst.setTimestamp(5, med.getFechaNacimiento() == null ? null : new java.sql.Timestamp(med.getFechaNacimiento().getTime()));
             pst.setString(6, u.getLoginname());
             pst.executeUpdate();
             con.getConnection().commit();
@@ -162,6 +162,53 @@ public class MedicoDAO implements Serializable {
             done = false;
         } finally {
             con.desconectar();
+        }
+        return done;
+    }
+
+    public boolean createOnFlyMedico(Medico med, List<Integer> idespecialidad, Usuario u) {
+        Conexion con = new Conexion();
+        boolean done = false;
+        int id = 0;
+        String sql = "select (1 + isnull(max(idmedico),0)) as id from medico_bottago";
+        try {
+            con.getConnection().setAutoCommit(false);
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                id = rs.getInt(1);
+            }
+            String sql2 = "insert into medico_bottago (idmedico, fuentemedico, nombres, apellidos, cedula, "
+                    + "direccion, fechanacimiento, fechacreacion, usuariocreacion) "
+                    + "values(?, 'B', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
+            pst = con.getConnection().prepareStatement(sql2);
+            pst.setInt(1, id);
+            pst.setString(2, (med.getNombres()==null || med.getNombres().length()==0)?null:med.getNombres().toUpperCase());
+            pst.setString(3, (med.getApellidos()==null || med.getApellidos().length()==0)?null:med.getApellidos().toUpperCase());
+            pst.setString(4, (med.getCedula()==null || med.getCedula().length()==0)?null:med.getCedula());
+            pst.setString(5, (med.getDireccion()==null || med.getDireccion().length()==0)?null:med.getDireccion());
+            pst.setTimestamp(6, med.getFechaNacimiento() == null ? null : new java.sql.Timestamp(med.getFechaNacimiento().getTime()));
+            pst.setString(7, u.getLoginname());
+            pst.executeUpdate();
+
+            String sql3 = "insert into med_espe(idmedico, idespecialidad) values(?,?)";
+            pst = con.getConnection().prepareStatement(sql3);
+            for (int i : idespecialidad) {
+                pst.setInt(1, id);
+                pst.setInt(2, i);
+                pst.executeUpdate();
+            }
+            con.getConnection().commit();
+            done = true;
+        } catch (Exception e) {
+            System.out.println("DAO MEDICO ONFLY: " + e.getMessage());
+            done = false;
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(MedicoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return done;
     }
