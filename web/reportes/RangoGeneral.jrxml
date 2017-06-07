@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RangoGeneral" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6bc74f43-3211-4a92-b400-22ee979df252">
+	<property name="ireport.zoom" value="1.210000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.title" value="title"/>
+	<parameter name="RutaImagen" class="java.lang.String"/>
+	<parameter name="desde" class="java.util.Date"/>
+	<parameter name="hasta" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select fechareceta, codigopdv, count(idcabecera) as documentos
+from cabecera
+where fechareceta between $P{desde} and $P{hasta}
+group by fechareceta, codigopdv
+order by fechareceta]]>
+	</queryString>
+	<field name="fechareceta" class="java.sql.Date"/>
+	<field name="codigopdv" class="java.lang.String"/>
+	<field name="documentos" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="79" backcolor="#009688" uuid="82d8d5c3-ef58-42e2-bac5-62e3f5f74bd8"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="79" forecolor="#FFFFFF" uuid="67e4475b-fbf6-4a4b-bf18-9533a9a89a40"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[      Reporte de total escaneos según POS]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="79" uuid="a68d2495-ffa4-451f-9777-3375d0e20598"/>
+			</rectangle>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="35" backcolor="#CCFFFF" uuid="2826b14c-ecf8-4e69-aea4-e9f31f72be0b"/>
+			</rectangle>
+			<textField>
+				<reportElement x="10" y="0" width="545" height="35" uuid="ed437327-aff1-4a7a-9a7d-06f69a89c89f"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Reporte acorde desde " +new SimpleDateFormat("yyyy-MMM-dd").format($P{desde}) + " hasta " +new SimpleDateFormat("yyyy-MMM-dd").format($P{hasta})]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="35" uuid="459d1fbe-0a92-4142-abbd-e99eec23a20f"/>
+			</rectangle>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="400" y="0" width="154" height="35" uuid="3721d5f8-74de-403d-8df9-421abd88e3e5"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="387" y="0" width="168" height="35" uuid="fc3cd5b3-8d22-4acb-8990-a8417095e80a"/>
+			</rectangle>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="185" height="20" uuid="84d6c7e1-c150-474b-9e4d-85037f11910a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="185" y="0" width="185" height="20" uuid="38b62976-3f4d-4d3a-97bf-030e7c944fbf"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="371" y="0" width="184" height="20" uuid="351e5794-f9f6-4125-ac73-9ddf38d1a550"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="185" height="20" uuid="1d862053-1b45-46f9-9ca2-985702afa833"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="185" y="0" width="185" height="20" uuid="ab465b1f-6f19-48ec-a8be-bf9f9dfca95a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PDV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="0" width="185" height="20" uuid="a67a78c9-cf6b-4362-a216-3d8a779fe674"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="0" width="185" height="20" uuid="53c445d9-6143-4081-8e69-8bf013f5a7f0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="185" y="0" width="185" height="20" uuid="d6059fbb-2b75-4c39-90a0-511baf27e0d3"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="371" y="0" width="184" height="20" uuid="a3df3eea-f13d-4173-bd6c-b6e0b99249ca"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="0" width="185" height="20" uuid="e6efae30-b225-4ce1-93c7-eb01fb400688"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{fechareceta}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="185" y="0" width="185" height="20" uuid="b36f8286-6741-44c7-bad3-d0d07598696d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{codigopdv}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="0" width="185" height="20" uuid="0000e0f9-8e5f-408b-a9e6-46287174d4ed"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{documentos}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="345" y="34" width="66" height="20" uuid="d80a6197-b383-467b-aa26-80d2f0736af9"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página  "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="411" y="34" width="83" height="20" uuid="079b45e2-238e-42b0-9260-ac1377a12c53"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="494" y="0" width="60" height="54" uuid="6d116fcf-dcab-4b94-b1c8-4a3535f55015"/>
+				<imageExpression><![CDATA[$P{RutaImagen} + "nurse.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>

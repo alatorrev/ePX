@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <style>
+            .colstilo {width:200px}
+            .colstiloinput {width:300px}
+            .botones {width:200px}
+
+        </style>
+        <h:head>
+            <title>ePX</title>
+        </h:head>
+        <div class="Container100">
+            <div class="ContainerIndent">
+                <p:panel header="Consultas de documentos escaneados">
+                    <h:form id="frm">
+                        <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput, colstilo">
+                            <p:panel id="idmen" style="width: 500px;" >
+                                <p:outputLabel value="Mes" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                <p:selectOneMenu id="Meses" value="#{resumenBean.mes}" style="width: 200px" filter="true" 
+                                                 filterMatchMode="startsWith" converter="productoConverter"
+                                                 rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
+                                    <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
+                                    <f:selectItems value="#{resumenBean.obj}" var="lista" 
+                                                   itemLabel="#{lista[1]}" itemValue="#{lista}"/>
+                                </p:selectOneMenu><br />
+
+                                <p:outputLabel value="Año" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                <p:selectOneMenu id="Anios" value="#{resumenBean.anio}" style="width: 200px" filter="true" 
+                                                 filterMatchMode="startsWith" converter="productoConverter"
+                                                 rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
+                                    <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
+                                    <f:selectItems value="#{resumenBean.objanio}" var="ano" 
+                                                   itemLabel="#{ano[0]}" itemValue="#{ano}"/>
+                                </p:selectOneMenu>
+
+                                <p:outputLabel value="Desde" rendered="#{resumenBean.tipoConsulta == 'Rango'}" />
+                                <p:calendar rendered="#{resumenBean.tipoConsulta == 'Rango'}" navigator="true" value="#{resumenBean.desde}"/>
+                                <br />
+                                <p:outputLabel value="Hasta" rendered="#{resumenBean.tipoConsulta == 'Rango'}" />
+                                <p:calendar rendered="#{resumenBean.tipoConsulta == 'Rango'}" navigator="true" value="#{resumenBean.hasta}"/>
+
+                                <p:outputLabel value="Fecha Corte:" rendered="#{resumenBean.tipoConsulta == 'FechaCorte'}" />
+                                <p:inputText value="#{resumenBean.fechaActual}" rendered="#{resumenBean.tipoConsulta == 'FechaCorte'}" disabled="true" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </p:inputText>
+
+                            </p:panel>
+
+                            <h:panelGrid columns="1">
+                                <p:selectOneRadio value="#{resumenBean.tipoConsulta}" id="tipoEntidad" layout="pageDirection" 
+                                                  required="true">
+                                    <f:selectItem  itemValue="Mensual" itemLabel="Mensual" />
+                                    <f:selectItem  itemValue="Rango" itemLabel="Rango"/>
+                                    <f:selectItem  itemValue="FechaCorte" itemLabel="Corte"/>
+                                    <p:ajax update="@form" listener="#{resumenBean.limpiar()}"/>
+                                </p:selectOneRadio>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="Consultar" actionListener="#{resumenBean.consultaLista()}" update="resumenTbl"/>
+                            <h:panelGrid columns="2">
+                                <h:commandLink actionListener="#{resumenBean.exportpdf()}" style="color: #009688"><i class="material-icons">picture_as_pdf</i></h:commandLink>
+                                <h:commandLink actionListener="#{resumenBean.exportexcel()}" style="color: #009688"><i class="material-icons" >explicit</i></h:commandLink>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <p:panel>
+                            <h:panelGrid>
+                                <p:dataTable id="resumenTbl" value="#{resumenBean.lista}" var="res" paginator="true" widgetVar="resuTable" rows="10"
+                                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                             paginatorPosition="bottom" filteredValue="#{resumenBean.filteredResumen}" lazy="false" 
+                                             rowsPerPageTemplate="10,25,50">
+                                    <f:facet name="header">
+                                        <p:outputPanel style="text-align: right;">
+                                            <table>
+                                                <tr>
+                                                    <td class="FontBold Fs18 hardwhite" style="border: none; text-align: left"><h:outputText value="Resumen Escaneos" style="color: #ffffff" /></td>
+                                                    <td style="border: none; text-align: right"><h:outputText value="Buscar: " style="text-align: right; color: #ffffff"/>
+                                                        <p:inputText id="globalFilter" onkeyup="PF('resuTable').filter()" style="width:150px" placeholder="Buscar.."/></td>
+                                                </tr>
+                                            </table>
+                                        </p:outputPanel>
+                                    </f:facet>
+
+                                    <p:column headerText="Fecha" id="cfecha" rendered="#{resumenBean.tipoConsulta != 'Mensual'}" >
+                                        <p:outputLabel value="#{res.fechareceta}" />
+                                    </p:column>
+                                    <p:column headerText="POS" id="cpos">
+                                        <p:outputLabel value="#{res.codigopdv}" />
+                                    </p:column>
+                                    <p:column headerText="Cantidad" id="ccant">
+                                        <p:outputLabel value="#{res.conteo}" />
+                                    </p:column>
+
+                                </p:dataTable> 
+                            </h:panelGrid>
+                        </p:panel>
+
+                    </h:form>
+                </p:panel>
+
+
+            </div>
+        </div>
+
+
+    </ui:define>
+
+</ui:composition>
