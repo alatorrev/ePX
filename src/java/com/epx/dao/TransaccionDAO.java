@@ -65,11 +65,11 @@ public class TransaccionDAO {
         CabeceraMovimiento cab = new CabeceraMovimiento();
         Conexion con = new Conexion();
         String sql = "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,mb.nombres,mb.apellidos,c.fechareceta from cabecera c "
-                + "inner join medico_bottago mb on mb.idmedico=c.idmedico "
+                + "inner join medico_bottago mb on mb.idmedico=convert(int,(convert( varchar(max),c.idmedico))) "
                 + "where c.nombrearchivo=? and mb.fuentemedico=c.fuentemedico "
                 + "union all "
                 + "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,md.nombres,md.apellidos,c.fechareceta from cabecera c "
-                + "inner join medico_difare md on md.idmedico=c.idmedico "
+                + "inner join medico_difare md on md.cedula=convert(varchar(max),c.idmedico) "
                 + "where c.nombrearchivo=? and md.fuentemedico=c.fuentemedico";
         try {
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
@@ -78,7 +78,7 @@ public class TransaccionDAO {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Medico tempMedico = new Medico();
-                tempMedico.setIdMedico(rs.getLong(4));
+                tempMedico.setIdMedico(rs.getString(4)==null?null:Long.parseLong(rs.getString(4)));
                 tempMedico.setFuente(rs.getString(5));
                 tempMedico.setNombres(rs.getString(6));
                 tempMedico.setApellidos(rs.getString(7));
@@ -143,7 +143,7 @@ public class TransaccionDAO {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Medico tempMedico = new Medico();
-                tempMedico.setIdMedico(rs.getLong(4));
+                tempMedico.setIdMedico(rs.getString(4)==null?null:Long.parseLong(rs.getString(4)));
                 tempMedico.setFuente(rs.getString(5));
                 cab.setIdCabecera(rs.getLong(1));
                 cab.setNombreArchivo(rs.getString(2));
@@ -175,7 +175,7 @@ public class TransaccionDAO {
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             con.getConnection().setAutoCommit(false);
             PreparedStatement pst = con.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, cab.getMedico().getIdMedico().intValue());
+            pst.setString(1, cab.getMedico().getCedula());
             pst.setString(2, cab.getMedico().getFuente());
             pst.setString(3, row[5].toString());
             pst.setString(4, row[2].toString());
@@ -228,7 +228,7 @@ public class TransaccionDAO {
             con.getConnection().setAutoCommit(false);
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            pst.setInt(1, cab.getMedico().getIdMedico().intValue());
+            pst.setString(1, cab.getMedico().getCedula());
             pst.setString(2, cab.getMedico().getFuente());
             pst.setString(3, row[1].toString());
             String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];

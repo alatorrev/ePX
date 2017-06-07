@@ -47,7 +47,7 @@ public final class IngresosBean implements Serializable {
     private List<Object[]> listaDesechada = new ArrayList<>();
     private Object[] row;
     private List<Especialidad> listaEspecialidades = new EspecialidadDAO().findAllEspecialidades();
-    private List<Integer> EspeIdSelected = new ArrayList<>();
+    private List<Especialidad> EspeIdSelected = new ArrayList<>();
 
     private final List<String> listaPDVS;
     private Medico medico = new Medico();
@@ -62,7 +62,7 @@ public final class IngresosBean implements Serializable {
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
-        EspeIdSelected.add(listaEspecialidades.get(0).getIdEspecialidad());
+        EspeIdSelected.add(listaEspecialidades.get(0));
         listaRecetasOrdenadas();
     }
 
@@ -349,11 +349,11 @@ public final class IngresosBean implements Serializable {
         this.listaEspecialidades = listaEspecialidades;
     }
 
-    public List<Integer> getEspeIdSelected() {
+    public List<Especialidad> getEspeIdSelected() {
         return EspeIdSelected;
     }
 
-    public void setEspeIdSelected(List<Integer> EspeIdSelected) {
+    public void setEspeIdSelected(List<Especialidad> EspeIdSelected) {
         this.EspeIdSelected = EspeIdSelected;
     }
 

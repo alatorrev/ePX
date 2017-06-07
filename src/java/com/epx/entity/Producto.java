@@ -16,6 +16,7 @@ public class Producto implements Serializable {
     private Long idProducto;
     private String fuente;
     private String marca;
+    private String descripcion;
     private String sustituto;
     private String forma;
     private String concentracion;
@@ -28,9 +29,15 @@ public class Producto implements Serializable {
     public void setLaboratorio(String laboratorio) {
         this.laboratorio = laboratorio;
     }
-    
-    
 
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    
     public Long getIdProducto() {
         return idProducto;
     }

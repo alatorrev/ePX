@@ -78,13 +78,9 @@
                 <p:messages id="growl" showDetail="true" autoUpdate="true" closable="true" />
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card card-w-title">
-                       <!-- <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false"  >
-                            <f:param name="ruta" value="#{ingresosBean.row[1]}" />
-                        </p:media>-->
                         <p:media value="#{mediaManager.stream}" player="pdf" height="478" width="100%" >
                             <f:param name="ruta" value="#{ingresosBean.row[1]}" />
                         </p:media>
-
                     </div>
                 </div>
                 <div class="ui-g-12 ui-lg-6" >
@@ -93,7 +89,7 @@
                             <h:panelGrid columns="3" style="width: 100%">
                                 <p:outputLabel value="Médico: "/>
                                 <p:autoComplete id="autoMed" value="#{ingresosBean.medico}" completeMethod="#{ingresosBean.completarMedico}" converter="medicoConverter"
-                                                minQueryLength="3" maxResults="5" var="med" forceSelection="true"
+                                                minQueryLength="3" maxResults="20" itemtipAtPosition="bottom" scrollHeight="200" var="med" forceSelection="true"
                                                 itemValue="#{med}" itemLabel="#{med.nombres} #{med.apellidos}" >
                                     <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuario}"/>
                                     <f:facet name="itemtip">
@@ -107,6 +103,7 @@
                                     </f:facet>
                                 </p:autoComplete>
                                 <p:commandButton icon="ui-icon-add" style="position: relative; right: 152px;"
+                                                 actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}"
                                                  onclick="PF('wgtMedicoCrud').show();" title="nuevo médico">
 
                                 </p:commandButton>
@@ -117,11 +114,13 @@
                             <h:panelGrid columns="5" style="width: 100%">
                                 <p:outputLabel value="Producto: "/>
                                 <p:autoComplete id="autoPro" value="#{ingresosBean.pro}" completeMethod="#{ingresosBean.completarProducto}" converter="productoConverter"
-                                                minQueryLength="3" maxResults="5" var="pro" forceSelection="true"
+                                                minQueryLength="3" maxResults="20" itemtipAtPosition="bottom" scrollHeight="200" var="pro" forceSelection="true"
                                                 itemValue="#{pro}" itemLabel="#{pro.marca} #{pro.sustituto}" >
                                     <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuarioP}"/>
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" border="1">
+                                            <h:outputText value="Producto" />
+                                            <h:outputText value="#{pro.descripcion}" />
                                             <h:outputText value="Forma" />
                                             <h:outputText value="#{pro.forma}" />
 
@@ -134,6 +133,7 @@
                                     </f:facet>
                                 </p:autoComplete>
                                 <p:commandButton icon="ui-icon-add" style="position: relative; right: 36px;" 
+                                                 actionListener="#{ingresosBean.onCancelProductoCRUDDialog()}"
                                                  onclick="PF('wgtProductoCrud').show();" title="nuevo producto">
 
                                 </p:commandButton>
@@ -194,9 +194,10 @@
                     <p:outputLabel value="Dirección"/>
                     <p:inputText value="#{ingresosBean.medico.direccion}"  />
                     <p:outputLabel value="Especialidades "/>
-                    <p:selectCheckboxMenu id="check_especilidad" label="Selecciona" value="#{ingresosBean.espeIdSelected}" style="width: 100%;" filter="true"  filterMatchMode="startsWith" required="true" requiredMessage="listado sdasdasd">
+                    <p:selectCheckboxMenu id="check_especilidad" label="Selecciona" converter="medicoConverter"
+                                          value="#{ingresosBean.espeIdSelected}" style="width: 100%;" filter="true"  filterMatchMode="startsWith" >
                         <f:selectItems value="#{ingresosBean.listaEspecialidades}" var="esp" 
-                                       itemLabel="#{esp.descripcion}" itemValue="#{esp.idEspecialidad}" />
+                                       itemLabel="#{esp.descripcion}" itemValue="#{esp}" />
                     </p:selectCheckboxMenu>
                     <p:commandButton ajax="true" actionListener="#{ingresosBean.commitCreateMedico()}" value="Crear" oncomplete="PF('wgtMedicoCrud').hide();"  >
                         <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />

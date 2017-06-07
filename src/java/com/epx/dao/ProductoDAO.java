@@ -60,11 +60,11 @@ public class ProductoDAO implements Serializable {
         List<Producto> listadoProducto = new ArrayList<>();
         Conexion con = new Conexion();
         PreparedStatement pst;
-        String sql = "select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio "
+        String sql = "select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio,descripcion "
                 + "from producto_difare "
                 + "where upper(marca + ' - ' + sustituto) like (?) "
                 + "union all "
-                + "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, null as laboratorio "
+                + "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, null as laboratorio,null as descripcion "
                 + "from producto_bottago "
                 + "where upper(marca + ' - ' + sustituto) like (?)";
         try {
@@ -81,6 +81,7 @@ public class ProductoDAO implements Serializable {
                 pro.setForma(rs.getString(5));
                 pro.setConcentracion(rs.getString(6));
                 pro.setLaboratorio(rs.getString(7));
+                pro.setDescripcion(rs.getString(8));
                 listadoProducto.add(pro);
             }
         } catch (Exception e) {

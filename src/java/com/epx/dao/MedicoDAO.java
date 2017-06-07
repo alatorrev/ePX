@@ -7,6 +7,7 @@ package com.epx.dao;
 
 import com.epx.entity.Medico;
 import com.epx.conexion.Conexion;
+import com.epx.entity.Especialidad;
 import com.epx.entity.Usuario;
 
 import java.io.Serializable;
@@ -64,18 +65,18 @@ public class MedicoDAO implements Serializable {
         String sql = "Select idmedico, fuentemedico, "
                 + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad "
                 + "from medico_difare "
-                + "where upper(nombres+ ' ' + apellidos) like upper(?) "
+                + "where nombres+(case when apellidos IS NULL then '' else apellidos end) like upper(?) "
                 + "union all "
                 + "select m.idmedico, m.fuentemedico, "
                 + "m.nombres, m.apellidos, m.direccion, "
                 + "(STUFF(REPLACE((SELECT '#!' + LTRIM(RTRIM(e.descripcion)) AS 'data()' FROM especialidad e "
-                + "inner join med_espe med on m.idmedico = med.idmedico "
+                + "left join med_espe med on m.idmedico = med.idmedico "
                 + "where e.idespecialidad = med.idespecialidad "
                 + "FOR XML PATH('')),' #!',', '), 1, 2, '')) as Brands "
                 + "from medico_bottago m "
-                + "inner join med_espe e on m.idmedico = e.idmedico "
-                + "inner join especialidad es on e.idespecialidad = es.idespecialidad "
-                + "where upper(m.nombres+ ' ' + m.apellidos) like upper(?) "
+                + "left join med_espe e on m.idmedico = e.idmedico "
+                + "left join especialidad es on e.idespecialidad = es.idespecialidad "
+                + "where m.nombres+(case when m.apellidos IS NULL then '' else m.apellidos end) like upper(?) "
                 + "group by m.idmedico, m.fuentemedico, m.nombres, m.apellidos, m.direccion";
         try {
             pst = con.getConnection().prepareStatement(sql);
@@ -166,7 +167,7 @@ public class MedicoDAO implements Serializable {
         return done;
     }
 
-    public boolean createOnFlyMedico(Medico med, List<Integer> idespecialidad, Usuario u) {
+    public boolean createOnFlyMedico(Medico med, List<Especialidad> idespecialidad, Usuario u) {
         Conexion con = new Conexion();
         boolean done = false;
         int id = 0;
@@ -193,9 +194,9 @@ public class MedicoDAO implements Serializable {
 
             String sql3 = "insert into med_espe(idmedico, idespecialidad) values(?,?)";
             pst = con.getConnection().prepareStatement(sql3);
-            for (int i : idespecialidad) {
+            for (Especialidad e : idespecialidad) {
                 pst.setInt(1, id);
-                pst.setInt(2, i);
+                pst.setInt(2, e.getIdEspecialidad());
                 pst.executeUpdate();
             }
             con.getConnection().commit();

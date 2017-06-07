@@ -6,6 +6,7 @@
 package util;
 
 import com.epx.entity.DetalleMovimiento;
+import com.epx.entity.Especialidad;
 import com.epx.entity.Medico;
 import com.epx.entity.Producto;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class Validador {
 
-    public static List<String> validarMedicoFrm(Medico medico, List<Integer> especialidades) {
+    public static List<String> validarMedicoFrm(Medico medico, List<Especialidad> especialidades) {
         List<String> messages = new ArrayList<>();
         if (medico.getNombres() == null || medico.getNombres().length() < 1) {
             messages.add("Campo nombres obligatorio");
