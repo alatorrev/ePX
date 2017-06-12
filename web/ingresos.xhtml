@@ -119,6 +119,8 @@
                                     <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuarioP}"/>
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" border="1">
+                                            <h:outputText value="Marca" />
+                                            <h:outputText value="#{pro.marca}" />
                                             <h:outputText value="Producto" />
                                             <h:outputText value="#{pro.descripcion}" />
                                             <h:outputText value="Forma" />

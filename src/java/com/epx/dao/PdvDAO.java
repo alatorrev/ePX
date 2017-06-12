@@ -29,7 +29,7 @@ public class PdvDAO implements Serializable {
         List<Pdv> listadoPdvs = new ArrayList<>();
         PreparedStatement pst;
         ResultSet rs = null;
-        String query = "Select p.codigopdv, u.loginname, p.idgrupopdv, p.idparroquia, p.pdv, p.coordx, p.coordy "
+        String query = "Select p.codigopdv, u.loginname, p.idgrupopdv, p.pdv, p.coordx, p.coordy "
                 + "from pdv p "
                 + "left outer join usuario u on p.idusuario = u.idusuario";
         try {
@@ -40,10 +40,9 @@ public class PdvDAO implements Serializable {
                 pdv.setCodigopdv(rs.getString(1));
                 pdv.setLoginname(rs.getString(2));
                 pdv.setIdgrupopdv(rs.getInt(3));
-                pdv.setIdparroquia(rs.getInt(4));
-                pdv.setPdv(rs.getString(5));
-                pdv.setCoordx(rs.getLong(6));
-                pdv.setCoordy(rs.getLong(7));
+                pdv.setPdv(rs.getString(4));
+                pdv.setCoordx(rs.getLong(5));
+                pdv.setCoordy(rs.getLong(6));
                 listadoPdvs.add(pdv);
             }
         } catch (Exception e) {
