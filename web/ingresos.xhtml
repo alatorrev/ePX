@@ -115,10 +115,18 @@
                                 <p:outputLabel value="Producto: "/>
                                 <p:autoComplete id="autoPro" value="#{ingresosBean.pro}" completeMethod="#{ingresosBean.completarProducto}" converter="productoConverter"
                                                 minQueryLength="3" maxResults="20" itemtipAtPosition="bottom" scrollHeight="200" var="pro" forceSelection="true"
-                                                itemValue="#{pro}" itemLabel="#{pro.marca} #{pro.sustituto}" >
+                                                itemValue="#{pro}" itemLabel="#{pro.marca}" >
                                     <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuarioP}"/>
+                                    <p:column>
+                                        <p:outputLabel value="#{pro.marca}" />
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="#{pro.sustituto}" />
+                                    </p:column>
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" border="1">
+                                            <h:outputText value="Marca" />
+                                            <h:outputText value="#{pro.marca}" />
                                             <h:outputText value="Producto" />
                                             <h:outputText value="#{pro.descripcion}" />
                                             <h:outputText value="Forma" />
@@ -161,6 +169,9 @@
                             </p:column>
                             <p:column headerText="Producto" style="width: 35%">
                                 <h:outputText value="#{detalle.producto.marca}" />
+                            </p:column>
+                            <p:column headerText="Concentración" style="width: 35%">
+                                <h:outputText value="#{detalle.producto.concentracion}" />
                             </p:column>
                             <p:column headerText="Px" style="width: 10%">
                                 <p:outputLabel value="1"/>

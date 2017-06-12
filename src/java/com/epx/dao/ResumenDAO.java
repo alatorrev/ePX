@@ -34,19 +34,18 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select datename(month, fechareceta) as fechareceta, codigopdv, count(idcabecera) as documentos "
+            query = "select codigopdv, count(idcabecera) as documentos "
                     + "from cabecera "
                     + "where year(fechareceta) = ? and month(fechareceta) = ? "
-                    + "group by fechareceta, codigopdv";
+                    + "group by codigopdv";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, anio + "");
             pst.setString(2, mes + "");
             rs = pst.executeQuery();
             while (rs.next()) {
                 Resumen res = new Resumen();
-                res.setMes(rs.getString(1));
-                res.setCodigopdv(rs.getString(2));
-                res.setConteo(rs.getInt(3));
+                res.setCodigopdv(rs.getString(1));
+                res.setConteo(rs.getInt(2));
                 lista.add(res);
             }
         } catch (Exception e) {

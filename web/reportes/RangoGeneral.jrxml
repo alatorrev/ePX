@@ -10,13 +10,13 @@
 	<parameter name="desde" class="java.util.Date"/>
 	<parameter name="hasta" class="java.util.Date"/>
 	<queryString>
-		<![CDATA[select fechareceta, codigopdv, count(idcabecera) as documentos
+		<![CDATA[select convert(varchar(10),fechareceta, 120) as fechareceta, codigopdv, count(idcabecera) as documentos
 from cabecera
 where fechareceta between $P{desde} and $P{hasta}
 group by fechareceta, codigopdv
 order by fechareceta]]>
 	</queryString>
-	<field name="fechareceta" class="java.sql.Date"/>
+	<field name="fechareceta" class="java.lang.String"/>
 	<field name="codigopdv" class="java.lang.String"/>
 	<field name="documentos" class="java.lang.Integer"/>
 	<background>

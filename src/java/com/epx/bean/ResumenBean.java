@@ -10,6 +10,7 @@ import com.epx.dao.ResumenDAO;
 import com.epx.entity.Resumen;
 import java.io.IOException;
 import com.epx.conexion.Conexion;
+import com.epx.entity.Usuario;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -32,6 +33,7 @@ import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
+import util.Facesmethods;
 
 /**
  *
@@ -43,6 +45,7 @@ public class ResumenBean implements Serializable {
 
     private List<Resumen> lista = new ArrayList<>();
     private List<Resumen> filteredResumen;
+    private Usuario sessionUsuario;
     ResumenDAO daoResumen = new ResumenDAO();
     Resumen res = new Resumen();
     List<Object[]> obj = new utilMeses().getListameses();
@@ -52,6 +55,7 @@ public class ResumenBean implements Serializable {
     private String tipoConsulta = "Mensual";
     private Date FechaActual = new Date();
     private Date desde = new Date(), hasta = new Date();
+    private Facesmethods fcm = new Facesmethods();
 
     public ResumenBean() {
 
@@ -67,6 +71,15 @@ public class ResumenBean implements Serializable {
         }
 
     }
+    
+    public void checkAuthorizedViews() {
+        try {
+            sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
+            fcm.authenticaticatedUser(sessionUsuario);
+            fcm.permissionChecker(sessionUsuario.getListaVista());
+        } catch (Exception e) {
+        }
+    }
 
     public void exportpdf() throws JRException, IOException {
         Conexion con = new Conexion();
@@ -75,7 +88,7 @@ public class ResumenBean implements Serializable {
         ServletContext servleContext = (ServletContext) context.getExternalContext().getContext();
         if (tipoConsulta.equals("Mensual")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
-            parametros.put("desde", Integer.parseInt(mes[0].toString()));
+            parametros.put("mes", Integer.parseInt(mes[0].toString()));
             parametros.put("anio", Integer.parseInt(anio[0].toString()));
             String dirReporte = servleContext.getRealPath("/reportes/MensualGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
@@ -84,7 +97,8 @@ public class ResumenBean implements Serializable {
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
             JasperExportManager.exportReportToPdfStream(impres, response.getOutputStream());
             context.responseComplete();
-        }else if (tipoConsulta.equals("Rango")){
+        }
+        else if (tipoConsulta.equals("Rango")){
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             parametros.put("desde", desde);
             parametros.put("hasta", hasta);
@@ -95,7 +109,8 @@ public class ResumenBean implements Serializable {
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
             JasperExportManager.exportReportToPdfStream(impres, response.getOutputStream());
             context.responseComplete();
-        }else if (tipoConsulta.equals("FechaCorte")){
+        }
+        else if (tipoConsulta.equals("FechaCorte")){
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             String dirReporte = servleContext.getRealPath("/reportes/CorteGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();

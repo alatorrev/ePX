@@ -62,15 +62,17 @@ public class ProductoDAO implements Serializable {
         PreparedStatement pst;
         String sql = "select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio,descripcion "
                 + "from producto_difare "
-                + "where upper(marca + ' - ' + sustituto) like (?) "
+                + "where upper(marca) like (?) or upper(sustituto) like (?) "
                 + "union all "
                 + "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, null as laboratorio,null as descripcion "
                 + "from producto_bottago "
-                + "where upper(marca + ' - ' + sustituto) like (?)";
+                + "where upper(marca) like (?) or upper(sustituto) like (?)";
         try {
             pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, "%" + cadena.trim().concat("%"));
-            pst.setString(2, "%" + cadena.trim().concat("%"));
+            pst.setString(1, cadena.trim().concat("%"));
+            pst.setString(2, cadena.trim().concat("%"));
+            pst.setString(3, cadena.trim().concat("%"));
+            pst.setString(4, cadena.trim().concat("%"));
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Producto pro = new Producto();

@@ -31,7 +31,13 @@ public class MedicoDAO implements Serializable {
         List<Medico> listadoMedicos = new ArrayList<>();
         PreparedStatement pst;
         ResultSet rs = null;
-        String query = "select * from medico_bottago";
+        String query = "Select mbo.idmedico, mbo.fuentemedico, mbo.nombres, mbo.apellidos, mbo.cedula, mbo.direccion,  mbo.fechanacimiento, "
+                + "substring((select ','+esp.descripcion  as [text()] "
+                + "from especialidad esp "
+                + "left join med_espe mesp on mbo.idmedico = mesp.idmedico "
+                + "where mesp.idespecialidad = esp.idespecialidad "
+                + "for xml path('')),2,1000) as especialidad "
+                + "from medico_bottago mbo";
         try {
             pst = con.getConnection().prepareStatement(query);
             rs = pst.executeQuery();
@@ -44,6 +50,7 @@ public class MedicoDAO implements Serializable {
                 med.setCedula(rs.getString(5));
                 med.setDireccion(rs.getString(6));
                 med.setFechaNacimiento(rs.getDate(7));
+                med.setEspecialidad(rs.getString(8));
                 listadoMedicos.add(med);
             }
         } catch (Exception e) {
@@ -184,10 +191,10 @@ public class MedicoDAO implements Serializable {
                     + "values(?, 'B', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
             pst = con.getConnection().prepareStatement(sql2);
             pst.setInt(1, id);
-            pst.setString(2, (med.getNombres()==null || med.getNombres().length()==0)?null:med.getNombres().toUpperCase());
-            pst.setString(3, (med.getApellidos()==null || med.getApellidos().length()==0)?null:med.getApellidos().toUpperCase());
-            pst.setString(4, (med.getCedula()==null || med.getCedula().length()==0)?null:med.getCedula());
-            pst.setString(5, (med.getDireccion()==null || med.getDireccion().length()==0)?null:med.getDireccion());
+            pst.setString(2, (med.getNombres() == null || med.getNombres().length() == 0) ? null : med.getNombres().toUpperCase());
+            pst.setString(3, (med.getApellidos() == null || med.getApellidos().length() == 0) ? null : med.getApellidos().toUpperCase());
+            pst.setString(4, (med.getCedula() == null || med.getCedula().length() == 0) ? null : med.getCedula());
+            pst.setString(5, (med.getDireccion() == null || med.getDireccion().length() == 0) ? null : med.getDireccion());
             pst.setTimestamp(6, med.getFechaNacimiento() == null ? null : new java.sql.Timestamp(med.getFechaNacimiento().getTime()));
             pst.setString(7, u.getLoginname());
             pst.executeUpdate();

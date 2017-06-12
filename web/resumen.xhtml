@@ -90,27 +90,21 @@
                                     </f:facet>
 
                                     <p:column headerText="Fecha" id="cfecha" rendered="#{resumenBean.tipoConsulta != 'Mensual'}" >
-                                        <p:outputLabel value="#{res.fechareceta}" />
+                                        <p:outputLabel value="#{res.fechareceta}" style="text-align: center"/>
                                     </p:column>
                                     <p:column headerText="POS" id="cpos">
-                                        <p:outputLabel value="#{res.codigopdv}" />
+                                        <p:outputLabel value="#{res.codigopdv}" style="text-align: center"/>
                                     </p:column>
                                     <p:column headerText="Cantidad" id="ccant">
-                                        <p:outputLabel value="#{res.conteo}" />
+                                        <p:outputLabel value="#{res.conteo}" style="text-align: center"/>
                                     </p:column>
-
                                 </p:dataTable> 
                             </h:panelGrid>
                         </p:panel>
 
                     </h:form>
                 </p:panel>
-
-
             </div>
         </div>
-
-
     </ui:define>
-
 </ui:composition>
