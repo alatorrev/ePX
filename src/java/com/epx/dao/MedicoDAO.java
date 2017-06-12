@@ -70,7 +70,7 @@ public class MedicoDAO implements Serializable {
         Conexion con = new Conexion();
         PreparedStatement pst;
         String sql = "Select idmedico, fuentemedico, "
-                + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad "
+                + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad,cedula "
                 + "from medico_difare "
                 + "where nombres+(case when apellidos IS NULL then '' else apellidos end) like upper(?) "
                 + "union all "
@@ -79,12 +79,12 @@ public class MedicoDAO implements Serializable {
                 + "(STUFF(REPLACE((SELECT '#!' + LTRIM(RTRIM(e.descripcion)) AS 'data()' FROM especialidad e "
                 + "left join med_espe med on m.idmedico = med.idmedico "
                 + "where e.idespecialidad = med.idespecialidad "
-                + "FOR XML PATH('')),' #!',', '), 1, 2, '')) as Brands "
+                + "FOR XML PATH('')),' #!',', '), 1, 2, '')) as Brands,m.cedula "
                 + "from medico_bottago m "
                 + "left join med_espe e on m.idmedico = e.idmedico "
                 + "left join especialidad es on e.idespecialidad = es.idespecialidad "
                 + "where m.nombres+(case when m.apellidos IS NULL then '' else m.apellidos end) like upper(?) "
-                + "group by m.idmedico, m.fuentemedico, m.nombres, m.apellidos, m.direccion";
+                + "group by m.idmedico, m.fuentemedico, m.nombres, m.apellidos, m.direccion,m.cedula";
         try {
             pst = con.getConnection().prepareStatement(sql);
             pst.setString(1, "%" + cadena.trim().concat("%"));
@@ -98,6 +98,7 @@ public class MedicoDAO implements Serializable {
                 med.setApellidos(rs.getString(4));
                 med.setDireccion(rs.getString(5));
                 med.setEspecialidad(rs.getString(6));
+                med.setCedula(rs.getString(7));
                 listadoMedicos.add(med);
             }
         } catch (Exception e) {
@@ -191,10 +192,10 @@ public class MedicoDAO implements Serializable {
                     + "values(?, 'B', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
             pst = con.getConnection().prepareStatement(sql2);
             pst.setInt(1, id);
-            pst.setString(2, (med.getNombres() == null || med.getNombres().length() == 0) ? null : med.getNombres().toUpperCase());
-            pst.setString(3, (med.getApellidos() == null || med.getApellidos().length() == 0) ? null : med.getApellidos().toUpperCase());
-            pst.setString(4, (med.getCedula() == null || med.getCedula().length() == 0) ? null : med.getCedula());
-            pst.setString(5, (med.getDireccion() == null || med.getDireccion().length() == 0) ? null : med.getDireccion());
+            pst.setString(2, (med.getNombres()==null || med.getNombres().length()==0)?null:med.getNombres().toUpperCase());
+            pst.setString(3, (med.getApellidos()==null || med.getApellidos().length()==0)?null:med.getApellidos().toUpperCase());
+            pst.setString(4, (med.getCedula()==null || med.getCedula().length()==0)?null:med.getCedula());
+            pst.setString(5, (med.getDireccion()==null || med.getDireccion().length()==0)?null:med.getDireccion());
             pst.setTimestamp(6, med.getFechaNacimiento() == null ? null : new java.sql.Timestamp(med.getFechaNacimiento().getTime()));
             pst.setString(7, u.getLoginname());
             pst.executeUpdate();

@@ -228,7 +228,7 @@ public class TransaccionDAO {
             con.getConnection().setAutoCommit(false);
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, cab.getMedico().getCedula());
+            pst.setString(1, cab.getMedico().getFuente().equals("D")?cab.getMedico().getCedula():cab.getMedico().getIdMedico().toString());
             pst.setString(2, cab.getMedico().getFuente());
             pst.setString(3, row[1].toString());
             String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
