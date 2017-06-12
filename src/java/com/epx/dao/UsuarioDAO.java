@@ -227,6 +227,33 @@ public class UsuarioDAO implements Serializable {
         }
         return done;
     }
+    
+    public boolean cambioPass(Usuario us, Usuario session) throws SQLException {
+        boolean done = false;
+        Conexion con = new Conexion();
+        con.getConnection().setAutoCommit(false);
+        PreparedStatement pst;
+        String query = "update usuario "
+                + "set contrasena=?, fechamod=CURRENT_TIMESTAMP, usumod=? "
+                + "where idusuario=? ";
+        pst = con.getConnection().prepareStatement(query);
+        try {
+            pst.setString(1, us.getPassword());
+            pst.setString(2, session.getLoginname());
+            pst.setInt(3, us.getIdusuario());
+
+            pst.executeUpdate();
+            con.getConnection().commit();
+            done = true;
+        } catch (Exception e) {
+            System.out.println("DAO CAMBIAR CONTRASEÑA: " + e.getMessage());
+            con.getConnection().rollback();
+            done = false;
+        } finally {
+            con.desconectar();
+        }
+        return done;
+    }
 
     public boolean deleteUsuario(Usuario us, Usuario session) throws SQLException {
         boolean done = false;

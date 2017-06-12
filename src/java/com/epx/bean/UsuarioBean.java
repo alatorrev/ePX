@@ -65,6 +65,10 @@ public class UsuarioBean implements Serializable {
         usuario = u;
     }
 
+    public void showCambioDialog(Usuario u){
+        usuario = u;
+    }
+    
     public void showCreateDialog() {
         usuario = new Usuario();
     }
@@ -85,6 +89,30 @@ public class UsuarioBean implements Serializable {
         } else {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "aprobed", "aprobed"));
+        }
+
+    }
+    
+    public void CambioPass() throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {
+            sb.append("<ul> <li> La contraseña no puede ser vacía </li> </ul>");
+        }
+        if (sb.length() > 0) {
+            FacesMessage fm = new FacesMessage("¡Ocurrió un error!", sb.toString());
+            RequestContext.getCurrentInstance().showMessageInDialog(fm);
+        } else {
+            boolean flag = daoUsuario.cambioPass(usuario, sessionUsuario);
+            if (flag) {
+                listadoUsuarios = daoUsuario.findAllUsuarios();
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Contraseña correctamente actualizada"));
+                RequestContext.getCurrentInstance().update("frm:growl");
+            } else {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                RequestContext.getCurrentInstance().update("frm:growl");
+            }
         }
 
     }

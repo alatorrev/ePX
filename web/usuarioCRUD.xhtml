@@ -27,7 +27,8 @@
                         <p:dataTable id="uTable" value="#{usuarioBean.listadoUsuarios}" var="us" widgetVar="userTable" paginator="true" rows="10"
                                      paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      paginatorPosition="bottom" filteredValue="#{usuarioBean.filteredUsers}"
-                                     rowsPerPageTemplate="5,10,15"  lazy="false">
+                                     rowsPerPageTemplate="5,10,15"  lazy="false"
+                                     >
                             <f:facet name="header">
                                 <p:outputPanel style="text-align: right;">
                                     <table>
@@ -39,7 +40,7 @@
                                     </table>
                                 </p:outputPanel>
                             </f:facet>
-                            <p:column  style="text-align: center" width="10%">
+                            <p:column  style="text-align: center" width="13%">
                                 <p:commandLink id="editarr" actionListener="#{usuarioBean.showEditDialog(us)}" 
                                                oncomplete="PF('wdlgDatos').show();" update="dlgDatos">
                                     <i class="material-icons" style="color: #559688">create</i>
@@ -58,6 +59,12 @@
                                                showEffect="clip" hideEffect="explode" />
                                     <i class="material-icons" style="color: #559688">people_outline</i>
                                 </p:commandLink>
+                                <p:commandLink id="cambio" actionListener="#{usuarioBean.showCambioDialog(us)}" 
+                                               oncomplete="PF('wdlgCambio').show();" update="dlgCambio">
+                                    <p:tooltip id="permisos-cambio" for="cambio" value="Cambiar contraseña"
+                                               showEffect="clip" hideEffect="explode" />
+                                    <i class="material-icons" style="color: #559688">lock</i>
+                                </p:commandLink>
                             </p:column>
                             <p:column headerText="Nombres" style="width: 15%"
                                       filterBy="#{us.nombres}" filterStyle="display:none" filterMatchMode="contains">
@@ -75,7 +82,7 @@
                                       filterBy="#{us.correo}" filterStyle="display:none" filterMatchMode="contains">
                                 <h:outputText value="#{us.correo}"/>
                             </p:column>
-                            <p:column headerText="Rol" style="width: 10%"
+                            <p:column headerText="Rol" style="width: 15%"
                                       filterBy="#{us.descripcionRol}" filterStyle="display:none" filterMatchMode="contains">
                                 <h:outputText value="#{us.descripcionRol}"/>
                             </p:column>
@@ -133,6 +140,19 @@
                                     <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" />
                                 </p:commandButton>
                                 <p:commandButton value="Cancelar" actionListener="#{usuarioBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgPermisos').hide();"/>
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog> 
+                    
+                    <p:dialog id="dlgCambio" header="Cambiar Contraseña" widgetVar="wdlgCambio" modal="true" responsive="true">
+                        <h:form>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Password"/>
+                                <p:inputText value="#{usuarioBean.usuario.password}"/>
+                                <p:commandButton ajax="true" actionListener="#{usuarioBean.CambioPass()}" value="Cambiar" oncomplete="PF('wdlgCambio').hide();" update=":frm:uTable" >
+                                    <p:confirm header="Confirmación" message="Está seguro de cambiar la contraseña?" />
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar" actionListener="#{usuarioBean.onCancelDialog()}" immediate="true" oncomplete="PF('wdlgCambio').hide();"/>
                             </h:panelGrid>
                         </h:form>
                     </p:dialog> 
