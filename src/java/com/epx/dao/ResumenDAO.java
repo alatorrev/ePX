@@ -34,10 +34,11 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select codigopdv, count(idcabecera) as documentos "
+            query = "select codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
                     + "from cabecera "
                     + "where year(fechareceta) = ? and month(fechareceta) = ? "
-                    + "group by codigopdv";
+                    + "group by codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
+                    + "order by codigopdv";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, anio + "");
             pst.setString(2, mes + "");
@@ -45,7 +46,8 @@ public class ResumenDAO implements Serializable {
             while (rs.next()) {
                 Resumen res = new Resumen();
                 res.setCodigopdv(rs.getString(1));
-                res.setConteo(rs.getInt(2));
+                res.setScanner(rs.getString(2));
+                res.setConteo(rs.getInt(3));
                 lista.add(res);
             }
         } catch (Exception e) {
@@ -69,11 +71,11 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select fechareceta, codigopdv, count(idcabecera) as documentos "
+            query = "select fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
                     + "from cabecera "
                     + "where fechareceta between ? and ? "
-                    + "group by fechareceta, codigopdv "
-                    + "order by fechareceta";
+                    + "group by fechareceta,  codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
+                    + "order by fechareceta, codigopdv";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, format.format(desde));
             pst.setString(2, format.format(hasta));
@@ -82,7 +84,8 @@ public class ResumenDAO implements Serializable {
                 Resumen res = new Resumen();
                 res.setFechareceta(rs.getDate(1));
                 res.setCodigopdv(rs.getString(2));
-                res.setConteo(rs.getInt(3));
+                res.setScanner(rs.getString(3));
+                res.setConteo(rs.getInt(4));
                 lista.add(res);
             }
         } catch (Exception e) {
@@ -106,19 +109,21 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-                query = "select fechareceta, codigopdv, count(idcabecera) as documentos "
-                        + "from cabecera "
-                        + "where fechareceta = format(getdate(), 'yyyy-MM-dd') "
-                        + "group by fechareceta, codigopdv";
-                pst = con.getConnection().prepareStatement(query);
-                rs = pst.executeQuery();
-                while (rs.next()) {
-                    Resumen res = new Resumen();
-                    res.setFechareceta(rs.getDate(1));
-                    res.setCodigopdv(rs.getString(2));
-                    res.setConteo(rs.getInt(3));
-                    lista.add(res);
-                }
+            query = "select fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
+                    + "from cabecera "
+                    + "where fechareceta = format(getdate(), 'yyyy-MM-dd') "
+                    + "group by fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
+                    + "order by codigopdv";
+            pst = con.getConnection().prepareStatement(query);
+            rs = pst.executeQuery();
+            while (rs.next()) {
+                Resumen res = new Resumen();
+                res.setFechareceta(rs.getDate(1));
+                res.setCodigopdv(rs.getString(2));
+                res.setScanner(rs.getString(3));
+                res.setConteo(rs.getInt(4));
+                lista.add(res);
+            }
         } catch (Exception e) {
             System.out.println("DAO Resumen: " + e.getMessage());
         } finally {

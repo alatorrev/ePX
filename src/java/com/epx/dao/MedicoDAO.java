@@ -192,10 +192,10 @@ public class MedicoDAO implements Serializable {
                     + "values(?, 'B', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
             pst = con.getConnection().prepareStatement(sql2);
             pst.setInt(1, id);
-            pst.setString(2, (med.getNombres()==null || med.getNombres().length()==0)?null:med.getNombres().toUpperCase());
-            pst.setString(3, (med.getApellidos()==null || med.getApellidos().length()==0)?null:med.getApellidos().toUpperCase());
-            pst.setString(4, (med.getCedula()==null || med.getCedula().length()==0)?null:med.getCedula());
-            pst.setString(5, (med.getDireccion()==null || med.getDireccion().length()==0)?null:med.getDireccion());
+            pst.setString(2, (med.getNombres() == null || med.getNombres().length() == 0) ? null : med.getNombres().toUpperCase());
+            pst.setString(3, (med.getApellidos() == null || med.getApellidos().length() == 0) ? null : med.getApellidos().toUpperCase());
+            pst.setString(4, (med.getCedula() == null || med.getCedula().length() == 0) ? null : med.getCedula());
+            pst.setString(5, (med.getDireccion() == null || med.getDireccion().length() == 0) ? null : med.getDireccion());
             pst.setTimestamp(6, med.getFechaNacimiento() == null ? null : new java.sql.Timestamp(med.getFechaNacimiento().getTime()));
             pst.setString(7, u.getLoginname());
             pst.executeUpdate();
@@ -220,5 +220,45 @@ public class MedicoDAO implements Serializable {
             }
         }
         return done;
+    }
+
+    public List<Medico> MedicosBusquedaIndexacion() {
+        Conexion con = new Conexion();
+        List<Medico> listadoMedicos = new ArrayList<>();
+        PreparedStatement pst;
+        ResultSet rs = null;
+        String query = "select idmedico, fuentemedico, nombres, apellidos, direccion, cedula, (especialidad + ', ' + especialidad2) as especialidad "
+                + "from medico_difare "
+                + "union all "
+                + "Select mbo.idmedico, mbo.fuentemedico, mbo.nombres, mbo.apellidos, mbo.direccion,  mbo.cedula, substring((select ','+esp.descripcion  as [text()] "
+                + "from especialidad esp "
+                + "left join med_espe mesp on mbo.idmedico = mesp.idmedico "
+                + "where mesp.idespecialidad = esp.idespecialidad "
+                + "for xml path('')),2,1000) as especialidad "
+                + "from medico_bottago mbo";
+        try {
+            pst = con.getConnection().prepareStatement(query);
+            rs = pst.executeQuery();
+            while (rs.next()) {
+                Medico med = new Medico();
+                med.setIdMedico(rs.getLong(1));
+                med.setFuente(rs.getString(2));
+                med.setNombres(rs.getString(3));
+                med.setApellidos(rs.getString(4));
+                 med.setDireccion(rs.getString(5));
+                med.setCedula(rs.getString(6));
+                med.setEspecialidad(rs.getString(7));
+                listadoMedicos.add(med);
+            }
+        } catch (Exception e) {
+            System.out.println("DAO MEDICO TABLA BUSQUEDA PROCESO INDEXACTION: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(MedicoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return listadoMedicos;
     }
 }

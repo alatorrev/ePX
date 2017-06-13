@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CorteGeneral" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Error" uuid="7a60597a-99a1-4234-b7e5-6226f8c238c5">
-	<property name="ireport.zoom" value="1.6500000000000001"/>
-	<property name="ireport.x" value="191"/>
-	<property name="ireport.y" value="60"/>
+	<property name="ireport.zoom" value="1.2396694214876034"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.title" value="title"/>
@@ -10,13 +10,14 @@
 	<property name="net.sf.jasperreports.export.xls.column.width" value="100"/>
 	<parameter name="RutaImagen" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[select fechareceta, codigopdv, count(idcabecera) as documentos
+		<![CDATA[select fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner,count(idcabecera) as documentos
 from cabecera
 where fechareceta = format(getdate(), 'yyyy-MM-dd')
-group by fechareceta, codigopdv]]>
+group by fechareceta, codigopdv,SUBSTRING(nombrearchivo, 7, 2)]]>
 	</queryString>
 	<field name="fechareceta" class="java.sql.Date"/>
 	<field name="codigopdv" class="java.lang.String"/>
+	<field name="scanner" class="java.lang.String"/>
 	<field name="documentos" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
@@ -68,44 +69,62 @@ group by fechareceta, codigopdv]]>
 	<columnHeader>
 		<band height="20" splitType="Stretch">
 			<rectangle>
-				<reportElement mode="Transparent" x="0" y="0" width="263" height="20" uuid="2df587ba-66c8-47da-b8c2-3f10fe5afd24"/>
+				<reportElement mode="Transparent" x="0" y="0" width="201" height="20" uuid="2df587ba-66c8-47da-b8c2-3f10fe5afd24"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Transparent" x="263" y="0" width="291" height="20" uuid="d289f32f-f175-4bbd-beeb-a0b85397d070"/>
+				<reportElement mode="Transparent" x="344" y="0" width="210" height="20" uuid="d289f32f-f175-4bbd-beeb-a0b85397d070"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="1" y="0" width="263" height="20" uuid="8dfff53f-6ed7-4755-9621-9944d7546e5e"/>
+				<reportElement x="1" y="0" width="201" height="20" uuid="8dfff53f-6ed7-4755-9621-9944d7546e5e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[PDV]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="264" y="0" width="292" height="20" uuid="b14aea8e-036a-41fc-bd48-e07e29f6e56e"/>
+				<reportElement x="345" y="0" width="211" height="20" uuid="b14aea8e-036a-41fc-bd48-e07e29f6e56e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="202" y="0" width="142" height="20" uuid="2a0dae37-7ef6-47f6-9f0a-bf5486a22b53"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="202" y="0" width="142" height="20" uuid="664d01a3-fac8-44b0-b218-9ac940427a93"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scanner]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="20" splitType="Stretch">
 			<rectangle>
-				<reportElement mode="Transparent" x="0" y="0" width="295" height="20" uuid="e050e677-c641-44a1-b79b-8e53d1c0c8ab"/>
+				<reportElement mode="Transparent" x="0" y="0" width="202" height="20" uuid="e050e677-c641-44a1-b79b-8e53d1c0c8ab"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Transparent" x="263" y="0" width="291" height="20" uuid="ac9250bd-c5d2-4fb0-9910-7cadf5ea3fdc"/>
+				<reportElement mode="Transparent" x="345" y="0" width="209" height="20" uuid="ac9250bd-c5d2-4fb0-9910-7cadf5ea3fdc"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="201" y="0" width="144" height="20" uuid="abc29985-be24-492f-b328-c4b878b2ce0c"/>
 			</rectangle>
 			<textField>
-				<reportElement x="1" y="0" width="263" height="20" uuid="358fda7f-5f47-4f31-b97d-e92c84797ed4"/>
+				<reportElement x="1" y="0" width="200" height="20" uuid="358fda7f-5f47-4f31-b97d-e92c84797ed4"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{codigopdv}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="264" y="0" width="260" height="20" uuid="dc9e288b-21a6-464f-be6b-caf4fac7f74b"/>
+				<reportElement x="345" y="0" width="209" height="20" uuid="dc9e288b-21a6-464f-be6b-caf4fac7f74b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{documentos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="202" y="0" width="142" height="20" uuid="9582ee32-824b-49ff-88e6-d5194bd42a9a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{scanner}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

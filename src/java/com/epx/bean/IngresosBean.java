@@ -58,12 +58,17 @@ public final class IngresosBean implements Serializable {
     private MedicoDAO daoMedico = new MedicoDAO();
     private ProductoDAO daoProducto = new ProductoDAO();
     private int canPro = 1;
-
+    
+    private List<Medico> listadoMedicosTabla = new ArrayList<>();
+    private List<Medico> MedicoSeleccionado = new ArrayList<>();
+    
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
+        listadoMedicosTabla = daoMedico.MedicosBusquedaIndexacion();
         EspeIdSelected.add(listaEspecialidades.get(0));
         listaRecetasOrdenadas();
+        
     }
 
     public void checkAuthorizedViews() {
@@ -171,6 +176,26 @@ public final class IngresosBean implements Serializable {
     public void onOpenDialog() {
         fechaReceta = new Date();
         pantallaDatetime = new Date();
+        if (!row[4].toString().equals("RAIZ")) {
+            if (row[4].toString().equals("PROCESADAS")) {
+                cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
+            }
+            if (row[4].toString().equals("DESECHADAS")) {
+                cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
+            }
+            medico = cabecera.getMedico() == null ? new Medico() : cabecera.getMedico();
+            listaDetalle = cabecera.getListaDetalleProducto() == null ? new ArrayList<>() : cabecera.getListaDetalleProducto();
+            fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
+
+        } else {
+            cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
+            medico = new Medico();
+            listaDetalle = new ArrayList<>();
+            fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
+        }
+    }
+    
+    public void onCloseDialog() {
         if (!row[4].toString().equals("RAIZ")) {
             if (row[4].toString().equals("PROCESADAS")) {
                 cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
@@ -357,4 +382,21 @@ public final class IngresosBean implements Serializable {
         this.EspeIdSelected = EspeIdSelected;
     }
 
+    public List<Medico> getListadoMedicosTabla() {
+        return listadoMedicosTabla;
+    }
+
+    public void setListadoMedicosTabla(List<Medico> listadoMedicosTabla) {
+        this.listadoMedicosTabla = listadoMedicosTabla;
+    }
+
+    public List<Medico> getMedicoSeleccionado() {
+        return MedicoSeleccionado;
+    }
+
+    public void setMedicoSeleccionado(List<Medico> MedicoSeleccionado) {
+        this.MedicoSeleccionado = MedicoSeleccionado;
+    }
+    
+    
 }

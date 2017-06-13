@@ -60,19 +60,29 @@ public class ProductoDAO implements Serializable {
         List<Producto> listadoProducto = new ArrayList<>();
         Conexion con = new Conexion();
         PreparedStatement pst;
-        String sql = "select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio,descripcion "
+//        String sql = "select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio,descripcion "
+//                + "from producto_difare "
+//                + "where upper(marca) like (?) or upper(sustituto) like (?) "
+//                + "union all "
+//                + "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, null as laboratorio,null as descripcion "
+//                + "from producto_bottago "
+//                + "where upper(marca) like (?) or upper(sustituto) like (?)"
+//                + "order by ?";
+        String sql = "select * from (select idproducto, fuenteproducto, marca, sustituto, forma1, concentracion, laboratorio,descripcion "
                 + "from producto_difare "
                 + "where upper(marca) like (?) or upper(sustituto) like (?) "
                 + "union all "
                 + "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, null as laboratorio,null as descripcion "
                 + "from producto_bottago "
-                + "where upper(marca) like (?) or upper(sustituto) like (?)";
+                + "where upper(marca) like (?) or upper(sustituto) like (?)) x "
+                + "ORDER BY case when marca= ? THEN 0 ELSE 1 END";
         try {
             pst = con.getConnection().prepareStatement(sql);
             pst.setString(1, cadena.trim().concat("%"));
             pst.setString(2, cadena.trim().concat("%"));
             pst.setString(3, cadena.trim().concat("%"));
             pst.setString(4, cadena.trim().concat("%"));
+            pst.setString(5, cadena.trim());
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Producto pro = new Producto();
@@ -109,10 +119,10 @@ public class ProductoDAO implements Serializable {
                 + "CURRENT_TIMESTAMP, ?)";
         pst = con.getConnection().prepareStatement(query);
         try {
-            pst.setString(1, (pro.getMarca()==null || pro.getMarca().length()==0)?null:pro.getMarca().toUpperCase());
-            pst.setString(2, (pro.getSustituto()==null || pro.getSustituto().length()==0)?null:pro.getSustituto().toUpperCase());
-            pst.setString(3, (pro.getForma()==null || pro.getForma().length()==0)?null:pro.getForma().toUpperCase());
-            pst.setString(4, (pro.getConcentracion()==null || pro.getConcentracion().length()==0)?null:pro.getConcentracion().toUpperCase());
+            pst.setString(1, (pro.getMarca() == null || pro.getMarca().length() == 0) ? null : pro.getMarca().toUpperCase());
+            pst.setString(2, (pro.getSustituto() == null || pro.getSustituto().length() == 0) ? null : pro.getSustituto().toUpperCase());
+            pst.setString(3, (pro.getForma() == null || pro.getForma().length() == 0) ? null : pro.getForma().toUpperCase());
+            pst.setString(4, (pro.getConcentracion() == null || pro.getConcentracion().length() == 0) ? null : pro.getConcentracion().toUpperCase());
             pst.setString(5, u.getLoginname());
             pst.executeUpdate();
             con.getConnection().commit();

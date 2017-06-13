@@ -86,7 +86,7 @@
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card">
                         <p:panel id="pnlIndexacion" header="Indexación">
-                            <h:panelGrid columns="3" style="width: 100%">
+                            <h:panelGrid columns="4" style="width: 100%">
                                 <p:outputLabel value="Médico: "/>
                                 <p:autoComplete id="autoMed" value="#{ingresosBean.medico}" completeMethod="#{ingresosBean.completarMedico}" converter="medicoConverter"
                                                 minQueryLength="3" maxResults="20" itemtipAtPosition="bottom" scrollHeight="200" var="med" forceSelection="true"
@@ -102,11 +102,15 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
-                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 152px;"
+                                <p:commandButton icon="ui-icon-search" style="position: relative; right: 130px;"
                                                  actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}"
-                                                 onclick="PF('wgtMedicoCrud').show();" title="nuevo médico">
-
+                                                 onclick="PF('wgtMedicoTbl').show();" title="Buscar Médico">
                                 </p:commandButton>
+                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 150px;"
+                                                 actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}"
+                                                 onclick="PF('wgtMedicoCrud').show();" title="Nuevo Médico">
+                                </p:commandButton>
+
                                 <p:outputLabel value="Fecha receta:"/>
                                 <p:calendar value="#{ingresosBean.fechaReceta}" pattern="yyyy-MM-dd" />
                             </h:panelGrid>
@@ -114,21 +118,24 @@
                             <h:panelGrid columns="5" style="width: 100%">
                                 <p:outputLabel value="Producto: "/>
                                 <p:autoComplete id="autoPro" value="#{ingresosBean.pro}" completeMethod="#{ingresosBean.completarProducto}" converter="productoConverter"
-                                                minQueryLength="3" maxResults="20" itemtipAtPosition="bottom" scrollHeight="200" var="pro" forceSelection="true"
+                                                minQueryLength="3" maxResults="30" itemtipAtPosition="bottom" scrollHeight="200" var="pro" forceSelection="true"
                                                 itemValue="#{pro}" itemLabel="#{pro.marca}" >
                                     <p:ajax event="itemSelect" listener="#{ingresosBean.onItemSelectUsuarioP}"/>
                                     <p:column>
                                         <p:outputLabel value="#{pro.marca}" />
                                     </p:column>
                                     <p:column>
-                                        <p:outputLabel value="#{pro.sustituto}" />
+                                        <p:outputLabel value="#{pro.descripcion}" />
                                     </p:column>
+                                    <!--                                    <p:column>
+                                                                            <p:outputLabel value="# {pro.sustituto}" />
+                                                                        </p:column>-->
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" border="1">
                                             <h:outputText value="Marca" />
                                             <h:outputText value="#{pro.marca}" />
-                                            <h:outputText value="Producto" />
-                                            <h:outputText value="#{pro.descripcion}" />
+                                            <h:outputText value="Sustituto" />
+                                            <h:outputText value="#{pro.sustituto}" />
                                             <h:outputText value="Forma" />
                                             <h:outputText value="#{pro.forma}" />
 
@@ -233,6 +240,36 @@
                     </p:commandButton>
                     <p:commandButton value="Cancelar" actionListener="#{ingresosBean.onCancelProductoCRUDDialog()}" immediate="true" oncomplete="PF('wgtProductoCrud').hide();"/>
                 </h:panelGrid>
+            </h:form>
+        </p:dialog>
+        <p:dialog modal="true" id="dlgMedicoTbl" widgetVar="wgtMedicoTbl" header="Buscar Médico" responsive="true" height="400" width="700" >
+            <h:form id="frmmedi">
+                <p:dataTable id="uTable" value="#{ingresosBean.listadoMedicosTabla}" var="medi" widgetVar="userTable" paginator="true" rows="5"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"  lazy="false" tableStyle="width:auto"
+                             reflow="true" selectionMode="single" selection="#{ingresosBean.medicoSeleccionado}" rowKey="#{medi}">
+                    <p:ajax event="rowSelect" oncomplete="PF('wgtMedicoTbl').close();" update="dlgVisor frmVisor" listener="#{ingresosBean.onCloseDialog()}" />
+                    <p:column headerText="Nombres" style="width: 15%"
+                              filterBy="#{medi.nombres}" filterMatchMode="contains">
+                        <h:outputText value="#{medi.nombres}"/>
+                    </p:column>
+                    <p:column headerText="Apellidos" style="width: 20%"
+                              filterBy="#{medi.apellidos}" filterMatchMode="contains">
+                        <h:outputText value="#{medi.apellidos}"/>
+                    </p:column>
+                    <p:column headerText="Dirección" style="width: 10%"
+                              filterBy="#{medi.direccion}" filterMatchMode="contains">
+                        <h:outputText value="#{medi.direccion}"/>
+                    </p:column>
+                    <p:column headerText="Cédula" style="width: 20%"
+                              filterBy="#{medi.cedula}" filterMatchMode="contains">
+                        <h:outputText value="#{medi.cedula}"/>
+                    </p:column>
+                    <p:column headerText="Especialidad" style="width: 20%"
+                              filterBy="#{medi.especialidad}" filterMatchMode="contains">
+                        <h:outputText value="#{medi.especialidad}"/>
+                    </p:column>
+                </p:dataTable>
             </h:form>
         </p:dialog>
         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >

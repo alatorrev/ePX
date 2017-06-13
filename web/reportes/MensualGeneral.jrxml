@@ -10,12 +10,14 @@
 	<parameter name="mes" class="java.lang.Integer"/>
 	<parameter name="RutaImagen" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[select codigopdv, count(idcabecera) as documentos
+		<![CDATA[select codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos
 from cabecera
 where year(fechareceta) = $P{anio} and month(fechareceta) = $P{mes}
-group by codigopdv]]>
+group by codigopdv,SUBSTRING(nombrearchivo, 7, 2)
+order by codigopdv]]>
 	</queryString>
 	<field name="codigopdv" class="java.lang.String"/>
+	<field name="scanner" class="java.lang.String"/>
 	<field name="documentos" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
@@ -67,44 +69,62 @@ group by codigopdv]]>
 	<columnHeader>
 		<band height="20" splitType="Stretch">
 			<rectangle>
-				<reportElement mode="Transparent" x="0" y="0" width="257" height="20" uuid="83c5ee1d-68df-43bc-bd45-16e5f5c926e1"/>
+				<reportElement mode="Transparent" x="0" y="0" width="197" height="20" uuid="83c5ee1d-68df-43bc-bd45-16e5f5c926e1"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Transparent" x="257" y="0" width="298" height="20" uuid="5c40ef64-b748-41ca-86ef-271bae70f516"/>
+				<reportElement mode="Transparent" x="352" y="0" width="203" height="20" uuid="5c40ef64-b748-41ca-86ef-271bae70f516"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="197" y="0" width="155" height="20" uuid="bc5ab493-092c-4695-90cd-1d8cb3bd9855"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="0" y="0" width="257" height="20" uuid="37e2fb7d-6206-4a86-b9a3-7f27b9040a76"/>
+				<reportElement x="0" y="0" width="197" height="20" uuid="37e2fb7d-6206-4a86-b9a3-7f27b9040a76"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[POS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="257" y="0" width="298" height="20" uuid="eceefbf1-243f-4e0b-b318-7d9e31f8222d"/>
+				<reportElement x="352" y="0" width="203" height="20" uuid="eceefbf1-243f-4e0b-b318-7d9e31f8222d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="197" y="0" width="155" height="20" uuid="86c57ee2-90c1-498d-81ea-5ce5b0b61496"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scanner]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="20" splitType="Stretch">
 			<rectangle>
-				<reportElement mode="Transparent" x="0" y="0" width="257" height="20" uuid="1f5ccdb3-3cf6-45f5-a196-0869467b07ef"/>
+				<reportElement mode="Transparent" x="0" y="0" width="197" height="20" uuid="1f5ccdb3-3cf6-45f5-a196-0869467b07ef"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Transparent" x="257" y="0" width="298" height="20" uuid="7ebeb30b-bf4d-4e8e-a070-05e997cd7a35"/>
+				<reportElement mode="Transparent" x="352" y="0" width="203" height="20" uuid="7ebeb30b-bf4d-4e8e-a070-05e997cd7a35"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="197" y="0" width="155" height="20" uuid="cb0a5935-018b-4eb5-a7de-8f2d67f2294e"/>
 			</rectangle>
 			<textField>
-				<reportElement x="0" y="0" width="257" height="20" uuid="e8a98d0a-b5c9-4526-a3c0-e60aec96c92a"/>
+				<reportElement x="0" y="0" width="197" height="20" uuid="e8a98d0a-b5c9-4526-a3c0-e60aec96c92a"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{codigopdv}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="257" y="0" width="298" height="20" uuid="6e06a54f-d76d-48ea-9dc3-053416083d73"/>
+				<reportElement x="352" y="0" width="203" height="20" uuid="6e06a54f-d76d-48ea-9dc3-053416083d73"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{documentos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="197" y="0" width="155" height="20" uuid="1e7d6ec1-69a0-4e60-aed5-88556af88e51"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{scanner}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

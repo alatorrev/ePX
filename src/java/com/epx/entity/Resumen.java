@@ -18,6 +18,7 @@ public class Resumen implements Serializable {
     String codigopdv;
     int conteo;
     String mes;
+    String scanner;
 
     public Date getFechareceta() {
         return fechareceta;
@@ -49,6 +50,14 @@ public class Resumen implements Serializable {
 
     public void setMes(String mes) {
         this.mes = mes;
+    }
+
+    public String getScanner() {
+        return scanner;
+    }
+
+    public void setScanner(String scanner) {
+        this.scanner = scanner;
     }
 
 }

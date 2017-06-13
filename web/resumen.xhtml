@@ -11,7 +11,7 @@
             .colstilo {width:200px}
             .colstiloinput {width:300px}
             .botones {width:200px}
-
+            .centeredColumn{text-align:center !important}
         </style>
         <h:head>
             <title>ePX</title>
@@ -23,18 +23,20 @@
                         <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput, colstilo">
                             <p:panel id="idmen" style="width: 500px;" >
                                 <p:outputLabel value="Mes" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
-                                <p:selectOneMenu id="Meses" value="#{resumenBean.mes}" style="width: 200px" filter="true" 
+                                <p:selectOneMenu id="Meses" value="#{resumenBean.mes}" style="width: 200px;vertical-align: top" filter="true" 
                                                  filterMatchMode="startsWith" converter="productoConverter"
                                                  rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
+                                    
                                     <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
                                     <f:selectItems value="#{resumenBean.obj}" var="lista" 
                                                    itemLabel="#{lista[1]}" itemValue="#{lista}"/>
                                 </p:selectOneMenu><br />
 
                                 <p:outputLabel value="Año" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
-                                <p:selectOneMenu id="Anios" value="#{resumenBean.anio}" style="width: 200px" filter="true" 
+                                <p:selectOneMenu id="Anios" value="#{resumenBean.anio}" style="width: 200px; vertical-align: middle;" filter="true" 
                                                  filterMatchMode="startsWith" converter="productoConverter"
-                                                 rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
+                                                 rendered="#{resumenBean.tipoConsulta == 'Mensual'}" >
+                                    
                                     <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
                                     <f:selectItems value="#{resumenBean.objanio}" var="ano" 
                                                    itemLabel="#{ano[0]}" itemValue="#{ano}"/>
@@ -89,14 +91,17 @@
                                         </p:outputPanel>
                                     </f:facet>
 
-                                    <p:column headerText="Fecha" id="cfecha" rendered="#{resumenBean.tipoConsulta != 'Mensual'}" >
-                                        <p:outputLabel value="#{res.fechareceta}" style="text-align: center"/>
+                                    <p:column headerText="Fecha" id="cfecha" rendered="#{resumenBean.tipoConsulta != 'Mensual'}" styleClass="centeredColumn" >
+                                        <p:outputLabel value="#{res.fechareceta}" />
                                     </p:column>
-                                    <p:column headerText="POS" id="cpos">
-                                        <p:outputLabel value="#{res.codigopdv}" style="text-align: center"/>
+                                    <p:column headerText="POS" id="cpos" styleClass="centeredColumn">
+                                        <p:outputLabel value="#{res.codigopdv}" />
                                     </p:column>
-                                    <p:column headerText="Cantidad" id="ccant">
-                                        <p:outputLabel value="#{res.conteo}" style="text-align: center"/>
+                                    <p:column headerText="Scanner" id="scan" styleClass="centeredColumn">
+                                        <p:outputLabel value="#{res.scanner}" />
+                                    </p:column>
+                                    <p:column headerText="Cantidad" id="ccant" styleClass="centeredColumn">
+                                        <p:outputLabel value="#{res.conteo}" />
                                     </p:column>
                                 </p:dataTable> 
                             </h:panelGrid>
