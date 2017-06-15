@@ -248,7 +248,7 @@
                              paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                              paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"  lazy="false" tableStyle="width:auto"
                              reflow="true" selectionMode="single" selection="#{ingresosBean.medicoSeleccionado}" rowKey="#{medi}">
-                    <p:ajax event="rowSelect" oncomplete="PF('wgtMedicoTbl').close();" update="dlgVisor frmVisor" listener="#{ingresosBean.onCloseDialog()}" />
+                    
                     <p:column headerText="Nombres" style="width: 15%"
                               filterBy="#{medi.nombres}" filterMatchMode="contains">
                         <h:outputText value="#{medi.nombres}"/>

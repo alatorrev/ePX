@@ -59,13 +59,12 @@ public final class IngresosBean implements Serializable {
     private ProductoDAO daoProducto = new ProductoDAO();
     private int canPro = 1;
     
-    private List<Medico> listadoMedicosTabla = new ArrayList<>();
+    private List<Medico> listadoMedicosTabla = new MedicoDAO().MedicosBusquedaIndexacion();
     private List<Medico> MedicoSeleccionado = new ArrayList<>();
     
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
-        listadoMedicosTabla = daoMedico.MedicosBusquedaIndexacion();
         EspeIdSelected.add(listaEspecialidades.get(0));
         listaRecetasOrdenadas();
         
@@ -195,24 +194,9 @@ public final class IngresosBean implements Serializable {
         }
     }
     
-    public void onCloseDialog() {
-        if (!row[4].toString().equals("RAIZ")) {
-            if (row[4].toString().equals("PROCESADAS")) {
-                cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
-            }
-            if (row[4].toString().equals("DESECHADAS")) {
-                cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
-            }
-            medico = cabecera.getMedico() == null ? new Medico() : cabecera.getMedico();
-            listaDetalle = cabecera.getListaDetalleProducto() == null ? new ArrayList<>() : cabecera.getListaDetalleProducto();
-            fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
-
-        } else {
-            cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
-            medico = new Medico();
-            listaDetalle = new ArrayList<>();
-            fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
-        }
+    public void onCloseDialog(Medico medi) {
+            Medico[] arreglo = listadoMedicosTabla.toArray(new Medico[listadoMedicosTabla.size()]);
+            
     }
 
     public void onItemSelectUsuario(SelectEvent event) {

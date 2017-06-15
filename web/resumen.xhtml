@@ -79,28 +79,17 @@
                                              paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                              paginatorPosition="bottom" filteredValue="#{resumenBean.filteredResumen}" lazy="false" 
                                              rowsPerPageTemplate="10,25,50">
-                                    <f:facet name="header">
-                                        <p:outputPanel style="text-align: right;">
-                                            <table>
-                                                <tr>
-                                                    <td class="FontBold Fs18 hardwhite" style="border: none; text-align: left"><h:outputText value="Resumen Escaneos" style="color: #ffffff" /></td>
-                                                    <td style="border: none; text-align: right"><h:outputText value="Buscar: " style="text-align: right; color: #ffffff"/>
-                                                        <p:inputText id="globalFilter" onkeyup="PF('resuTable').filter()" style="width:150px" placeholder="Buscar.."/></td>
-                                                </tr>
-                                            </table>
-                                        </p:outputPanel>
-                                    </f:facet>
-
-                                    <p:column headerText="Fecha" id="cfecha" rendered="#{resumenBean.tipoConsulta != 'Mensual'}" styleClass="centeredColumn" >
+                                    <p:column headerText="Fecha" id="cfecha" rendered="#{resumenBean.tipoConsulta != 'Mensual'}" styleClass="centeredColumn" 
+                                              filterBy="#{res.fechareceta}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.fechareceta}" />
                                     </p:column>
-                                    <p:column headerText="POS" id="cpos" styleClass="centeredColumn">
+                                    <p:column headerText="POS" id="cpos" styleClass="centeredColumn" filterBy="#{res.codigopdv}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.codigopdv}" />
                                     </p:column>
-                                    <p:column headerText="Scanner" id="scan" styleClass="centeredColumn">
+                                    <p:column headerText="Scanner" id="scan" styleClass="centeredColumn" filterBy="#{res.scanner}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.scanner}" />
                                     </p:column>
-                                    <p:column headerText="Cantidad" id="ccant" styleClass="centeredColumn">
+                                    <p:column headerText="Cantidad" id="ccant" styleClass="centeredColumn" filterBy="#{res.conteo}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.conteo}" />
                                     </p:column>
                                 </p:dataTable> 

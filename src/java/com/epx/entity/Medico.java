@@ -21,6 +21,7 @@ public class Medico implements Serializable {
     private String direccion;
     private String especialidad;
     private Date fechaNacimiento;
+    private Medico medico;
 
     public String getEspecialidad() {
         return especialidad;
@@ -84,6 +85,14 @@ public class Medico implements Serializable {
 
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public Medico getMedico() {
+        return medico;
+    }
+
+    public void setMedico(Medico medico) {
+        this.medico = medico;
     }
     
 }

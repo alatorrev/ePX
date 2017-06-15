@@ -7,6 +7,7 @@ package com.epx.dao;
 
 import com.epx.entity.Medico;
 import com.epx.conexion.Conexion;
+import com.epx.entity.CabeceraMovimiento;
 import com.epx.entity.Especialidad;
 import com.epx.entity.Usuario;
 
@@ -73,6 +74,7 @@ public class MedicoDAO implements Serializable {
                 + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad,cedula "
                 + "from medico_difare "
                 + "where nombres+(case when apellidos IS NULL then '' else apellidos end) like upper(?) "
+                + "or (case when apellidos is null then '' else apellidos end)+nombres like upper(?) "
                 + "union all "
                 + "select m.idmedico, m.fuentemedico, "
                 + "m.nombres, m.apellidos, m.direccion, "
@@ -84,11 +86,14 @@ public class MedicoDAO implements Serializable {
                 + "left join med_espe e on m.idmedico = e.idmedico "
                 + "left join especialidad es on e.idespecialidad = es.idespecialidad "
                 + "where m.nombres+(case when m.apellidos IS NULL then '' else m.apellidos end) like upper(?) "
+                + "or (case when m.apellidos is null then '' else m.apellidos end)+m.nombres like upper(?)"
                 + "group by m.idmedico, m.fuentemedico, m.nombres, m.apellidos, m.direccion,m.cedula";
         try {
             pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, "%" + cadena.trim().concat("%"));
-            pst.setString(2, "%" + cadena.trim().concat("%"));
+            pst.setString(1, "%" + cadena.trim().replaceAll(" +", "%") + "%");
+            pst.setString(2, "%" + cadena.trim().replaceAll(" +", "%")+ "%");
+            pst.setString(3, "%" + cadena.trim().replaceAll(" +", "%")+ "%");
+            pst.setString(4, "%" + cadena.trim().replaceAll(" +", "%")+ "%");
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Medico med = new Medico();
@@ -245,10 +250,11 @@ public class MedicoDAO implements Serializable {
                 med.setFuente(rs.getString(2));
                 med.setNombres(rs.getString(3));
                 med.setApellidos(rs.getString(4));
-                 med.setDireccion(rs.getString(5));
+                med.setDireccion(rs.getString(5));
                 med.setCedula(rs.getString(6));
                 med.setEspecialidad(rs.getString(7));
                 listadoMedicos.add(med);
+                med.setMedico(med);
             }
         } catch (Exception e) {
             System.out.println("DAO MEDICO TABLA BUSQUEDA PROCESO INDEXACTION: " + e.getMessage());
