@@ -189,4 +189,43 @@ public class ProductoDAO implements Serializable {
         }
         return done;
     }
+
+    public List<Producto> findAllProductoSearch() {
+        Conexion con = new Conexion();
+        List<Producto> listadoProductos = new ArrayList<>();
+        PreparedStatement pst;
+        ResultSet rs = null;
+        String query = "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, '' as medida "
+                + "from producto_bottago "
+                + "union all "
+                + "select idproducto, fuenteproducto, marca, sustituto, "
+                + "(case when forma1='NULL' then '' else forma1 end), "
+                + "(case when concentracion='NULL' then '' else concentracion end), "
+                + "(case when medida='NULL' then '' else medida end) "
+                + "from producto_difare";
+        try {
+            pst = con.getConnection().prepareStatement(query);
+            rs = pst.executeQuery();
+            while (rs.next()) {
+                Producto pro = new Producto();
+                pro.setIdProducto(rs.getLong(1));
+                pro.setFuente(rs.getString(2));
+                pro.setMarca(rs.getString(3));
+                pro.setSustituto(rs.getString(4));
+                pro.setForma(rs.getString(5));
+                pro.setConcentracion(rs.getString(6));
+                pro.setMedida(rs.getString(7));
+                listadoProductos.add(pro);
+            }
+        } catch (Exception e) {
+            System.out.println("DAO FIND ALL PRODUCTO SEARCH: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(RolDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return listadoProductos;
+    }
 }

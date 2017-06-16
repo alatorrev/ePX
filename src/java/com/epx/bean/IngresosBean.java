@@ -48,6 +48,8 @@ public final class IngresosBean implements Serializable {
     private Object[] row;
     private List<Especialidad> listaEspecialidades = new EspecialidadDAO().findAllEspecialidades();
     private List<Especialidad> EspeIdSelected = new ArrayList<>();
+    private List<Producto> listadoProductos = new ArrayList<>();
+    private List<Producto> filteredProducto;
 
     private final List<String> listaPDVS;
     private Medico medico = new Medico();
@@ -59,12 +61,10 @@ public final class IngresosBean implements Serializable {
     private ProductoDAO daoProducto = new ProductoDAO();
     private int canPro = 1;
     
-    private List<Medico> listadoMedicosTabla = new MedicoDAO().MedicosBusquedaIndexacion();
-    private List<Medico> MedicoSeleccionado = new ArrayList<>();
-    
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
+        listadoProductos = daoProducto.findAllProductoSearch();
         EspeIdSelected.add(listaEspecialidades.get(0));
         listaRecetasOrdenadas();
         
@@ -192,11 +192,6 @@ public final class IngresosBean implements Serializable {
             listaDetalle = new ArrayList<>();
             fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
         }
-    }
-    
-    public void onCloseDialog(Medico medi) {
-            Medico[] arreglo = listadoMedicosTabla.toArray(new Medico[listadoMedicosTabla.size()]);
-            
     }
 
     public void onItemSelectUsuario(SelectEvent event) {
@@ -364,22 +359,22 @@ public final class IngresosBean implements Serializable {
 
     public void setEspeIdSelected(List<Especialidad> EspeIdSelected) {
         this.EspeIdSelected = EspeIdSelected;
+    }   
+
+    public List<Producto> getListadoProductos() {
+        return listadoProductos;
     }
 
-    public List<Medico> getListadoMedicosTabla() {
-        return listadoMedicosTabla;
+    public void setListadoProductos(List<Producto> listadoProductos) {
+        this.listadoProductos = listadoProductos;
     }
 
-    public void setListadoMedicosTabla(List<Medico> listadoMedicosTabla) {
-        this.listadoMedicosTabla = listadoMedicosTabla;
+    public List<Producto> getFilteredProducto() {
+        return filteredProducto;
     }
 
-    public List<Medico> getMedicoSeleccionado() {
-        return MedicoSeleccionado;
-    }
-
-    public void setMedicoSeleccionado(List<Medico> MedicoSeleccionado) {
-        this.MedicoSeleccionado = MedicoSeleccionado;
+    public void setFilteredProducto(List<Producto> filteredProducto) {
+        this.filteredProducto = filteredProducto;
     }
     
     

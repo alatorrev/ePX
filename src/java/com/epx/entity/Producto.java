@@ -21,6 +21,15 @@ public class Producto implements Serializable {
     private String forma;
     private String concentracion;
     private String laboratorio;
+    private String medida;
+
+    public String getMedida() {
+        return medida;
+    }
+
+    public void setMedida(String medida) {
+        this.medida = medida;
+    }
 
     public String getLaboratorio() {
         return laboratorio;
