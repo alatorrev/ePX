@@ -14,6 +14,7 @@ import com.epx.entity.Usuario;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,7 +72,7 @@ public class ResumenBean implements Serializable {
         }
 
     }
-    
+
     public void checkAuthorizedViews() {
         try {
             sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
@@ -86,35 +87,37 @@ public class ResumenBean implements Serializable {
         Map<String, Object> parametros = new HashMap<String, Object>();
         FacesContext context = FacesContext.getCurrentInstance();
         ServletContext servleContext = (ServletContext) context.getExternalContext().getContext();
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MMM-dd");
         if (tipoConsulta.equals("Mensual")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             parametros.put("mes", Integer.parseInt(mes[0].toString()));
             parametros.put("anio", Integer.parseInt(anio[0].toString()));
             String dirReporte = servleContext.getRealPath("/reportes/MensualGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            response.addHeader("Content-disposition", "attachment;filename=MensualGeneral.pdf");
+            String nomar = "ePX " + mes[1].toString() + " " + anio[0].toString() + ".pdf";
+            response.addHeader("Content-disposition", "attachment;filename=\"" + nomar + "\"");
             response.setContentType("application/pdf");
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
             JasperExportManager.exportReportToPdfStream(impres, response.getOutputStream());
             context.responseComplete();
-        }
-        else if (tipoConsulta.equals("Rango")){
+        } else if (tipoConsulta.equals("Rango")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             parametros.put("desde", desde);
             parametros.put("hasta", hasta);
             String dirReporte = servleContext.getRealPath("/reportes/RangoGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            response.addHeader("Content-disposition", "attachment;filename=RangoGeneral.pdf");
+            String nomar = "ePX " + fmt.format(desde) + " hasta " + fmt.format(hasta) + ".pdf";
+            response.addHeader("Content-disposition", "attachment;filename=\"" + nomar + "\"");
             response.setContentType("application/pdf");
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
             JasperExportManager.exportReportToPdfStream(impres, response.getOutputStream());
             context.responseComplete();
-        }
-        else if (tipoConsulta.equals("FechaCorte")){
+        } else if (tipoConsulta.equals("FechaCorte")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             String dirReporte = servleContext.getRealPath("/reportes/CorteGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            response.addHeader("Content-disposition", "attachment;filename=CorteGeneral.pdf");
+            String nomar = "ePX Corte al " + fmt.format(FechaActual) + ".pdf";
+            response.addHeader("Content-disposition", "attachment;filename=\"" + nomar + "\"");
             response.setContentType("application/pdf");
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
             JasperExportManager.exportReportToPdfStream(impres, response.getOutputStream());
@@ -127,6 +130,7 @@ public class ResumenBean implements Serializable {
         Map<String, Object> parametros = new HashMap<String, Object>();
         FacesContext context = FacesContext.getCurrentInstance();
         ServletContext servleContext = (ServletContext) context.getExternalContext().getContext();
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MMM-dd");
         if (tipoConsulta.equals("Mensual")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             parametros.put("mes", Integer.parseInt(mes[0].toString()));
@@ -135,7 +139,8 @@ public class ResumenBean implements Serializable {
 
             String dirReporte = servleContext.getRealPath("/reportes/MensualGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            response.addHeader("Content-disposition", "attachment;filename=MensualGeneral.xlsx");
+            String nomar = "ePX " + mes[1].toString() + " " + anio[0].toString() + ".xlsx";
+            response.addHeader("Content-disposition", "attachment;filename=\"" + nomar + "\"");
             response.setContentType("application/xlsx");
 
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
@@ -149,11 +154,12 @@ public class ResumenBean implements Serializable {
             config.setRemoveEmptySpaceBetweenRows(Boolean.TRUE);
             config.setIgnoreTextFormatting(Boolean.TRUE);
             config.setDetectCellType(Boolean.TRUE);
+            
 
             expor.setConfiguration(config);
             expor.exportReport();
             context.responseComplete();
-        }else if (tipoConsulta.equals("Rango")){
+        } else if (tipoConsulta.equals("Rango")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             parametros.put("desde", desde);
             parametros.put("hasta", hasta);
@@ -161,7 +167,8 @@ public class ResumenBean implements Serializable {
 
             String dirReporte = servleContext.getRealPath("/reportes/RangoGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            response.addHeader("Content-disposition", "attachment;filename=RangoGeneral.xlsx");
+            String nomar = "ePX " + fmt.format(desde) + " hasta " + fmt.format(hasta) + ".xlsx";
+            response.addHeader("Content-disposition", "attachment;filename=\""+nomar+"\"");
             response.setContentType("application/xlsx");
 
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
@@ -173,17 +180,21 @@ public class ResumenBean implements Serializable {
             config.setCollapseRowSpan(Boolean.FALSE);
             config.setWhitePageBackground(Boolean.FALSE);
             config.setRemoveEmptySpaceBetweenRows(Boolean.TRUE);
-
+            config.setIgnoreTextFormatting(Boolean.TRUE);
+            config.setDetectCellType(Boolean.TRUE);
+            
             expor.setConfiguration(config);
             expor.exportReport();
             context.responseComplete();
-        }else if (tipoConsulta.equals("FechaCorte")){
+        } else if (tipoConsulta.equals("FechaCorte")) {
             parametros.put("RutaImagen", servleContext.getRealPath("/reportes/"));
             parametros.put(JRParameter.IS_IGNORE_PAGINATION, true);
 
             String dirReporte = servleContext.getRealPath("/reportes/CorteGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            response.addHeader("Content-disposition", "attachment;filename=CorteGeneral.xlsx");
+            
+            String nomar = "ePX Corte al " + fmt.format(FechaActual) + ".xlsx";
+            response.addHeader("Content-disposition", "attachment;filename=\""+nomar+"\"");
             response.setContentType("application/xlsx");
 
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
@@ -195,6 +206,8 @@ public class ResumenBean implements Serializable {
             config.setCollapseRowSpan(Boolean.FALSE);
             config.setWhitePageBackground(Boolean.FALSE);
             config.setRemoveEmptySpaceBetweenRows(Boolean.TRUE);
+            config.setIgnoreTextFormatting(Boolean.TRUE);
+            config.setDetectCellType(Boolean.TRUE);
 
             expor.setConfiguration(config);
             expor.exportReport();

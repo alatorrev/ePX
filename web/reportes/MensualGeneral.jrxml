@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MensualGeneral" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fb1d6cae-c8fa-4fd2-aac6-4f96ed6ab2d6">
-	<property name="ireport.zoom" value="1.2100000000000009"/>
+	<property name="ireport.zoom" value="1.100000000000001"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xlsx.exclude.origin.band.title" value="title"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
 	<parameter name="anio" class="java.lang.Integer"/>
 	<parameter name="mes" class="java.lang.Integer"/>
 	<parameter name="RutaImagen" class="java.lang.String"/>
@@ -25,18 +26,32 @@ order by codigopdv]]>
 	<title>
 		<band height="79" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="555" height="79" backcolor="#009688" uuid="1a13f0d8-c057-4be9-9e6c-f8fe2c12100d"/>
-			</rectangle>
-			<staticText>
-				<reportElement x="0" y="0" width="555" height="79" forecolor="#FFFFFF" uuid="598dbc77-ebfd-40e9-93c4-e697c8796b42"/>
-				<textElement verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[      Reporte Mensual de total escaneos según POS]]></text>
-			</staticText>
-			<rectangle>
 				<reportElement mode="Transparent" x="0" y="0" width="555" height="79" uuid="094cb214-fe78-494c-86f9-7c40ecf9fe89"/>
 			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="79" backcolor="#009688" uuid="1a13f0d8-c057-4be9-9e6c-f8fe2c12100d"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="455" y="0" width="100" height="79" uuid="8dbfe141-f32f-46f5-9ba4-7e8cfb75056f"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="0" width="407" height="79" forecolor="#FFFFFF" uuid="598dbc77-ebfd-40e9-93c4-e697c8796b42"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reporte Mensual de total escaneos según POS]]></text>
+			</staticText>
+			<image onErrorType="Blank">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="479" y="7" width="59" height="52" uuid="4b4beb1d-5c44-4fa8-87c3-c01fab9e0dd4"/>
+				<imageExpression><![CDATA[$P{RutaImagen} + "nurse.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="455" y="59" width="100" height="20" uuid="07349ede-cf79-419f-bf86-550f4b2a90a8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ePX]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -55,8 +70,8 @@ order by codigopdv]]>
 				<reportElement mode="Transparent" x="0" y="0" width="555" height="35" uuid="e7ff8218-d544-4df1-a801-80a3f12588f9"/>
 			</rectangle>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="400" y="0" width="154" height="35" uuid="0a474fcb-1e58-4187-9080-5db5274693a8"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement x="387" y="0" width="167" height="35" uuid="0a474fcb-1e58-4187-9080-5db5274693a8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
@@ -129,20 +144,15 @@ order by codigopdv]]>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="54" splitType="Stretch">
+		<band height="22" splitType="Stretch">
 			<textField>
-				<reportElement x="346" y="34" width="66" height="20" uuid="ca48c071-fa53-415a-9b7b-cb9978cde77f"/>
-				<textElement textAlignment="Right"/>
+				<reportElement x="446" y="0" width="66" height="20" uuid="ca48c071-fa53-415a-9b7b-cb9978cde77f"/>
 				<textFieldExpression><![CDATA["Página  "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="412" y="34" width="83" height="20" uuid="f93fd380-767c-4187-a109-8c5f9eac447d"/>
+				<reportElement x="511" y="0" width="43" height="20" uuid="f93fd380-767c-4187-a109-8c5f9eac447d"/>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<image onErrorType="Blank">
-				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="495" y="0" width="60" height="54" uuid="4b4beb1d-5c44-4fa8-87c3-c01fab9e0dd4"/>
-				<imageExpression><![CDATA[$P{RutaImagen} + "nurse.png"]]></imageExpression>
-			</image>
 		</band>
 	</pageFooter>
 </jasperReport>

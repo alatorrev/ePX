@@ -26,7 +26,7 @@
                                 <p:selectOneMenu id="Meses" value="#{resumenBean.mes}" style="width: 200px;vertical-align: top" filter="true" 
                                                  filterMatchMode="startsWith" converter="productoConverter"
                                                  rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
-                                    
+
                                     <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
                                     <f:selectItems value="#{resumenBean.obj}" var="lista" 
                                                    itemLabel="#{lista[1]}" itemValue="#{lista}"/>
@@ -36,7 +36,7 @@
                                 <p:selectOneMenu id="Anios" value="#{resumenBean.anio}" style="width: 200px; vertical-align: middle;" filter="true" 
                                                  filterMatchMode="startsWith" converter="productoConverter"
                                                  rendered="#{resumenBean.tipoConsulta == 'Mensual'}" >
-                                    
+
                                     <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
                                     <f:selectItems value="#{resumenBean.objanio}" var="ano" 
                                                    itemLabel="#{ano[0]}" itemValue="#{ano}"/>
@@ -69,8 +69,12 @@
                         <h:panelGrid columns="2">
                             <p:commandButton value="Consultar" actionListener="#{resumenBean.consultaLista()}" update="resumenTbl"/>
                             <h:panelGrid columns="2">
-                                <h:commandLink actionListener="#{resumenBean.exportpdf()}" style="color: #009688"><i class="material-icons">picture_as_pdf</i></h:commandLink>
-                                <h:commandLink actionListener="#{resumenBean.exportexcel()}" style="color: #009688"><i class="material-icons" >explicit</i></h:commandLink>
+                                <h:commandLink actionListener="#{resumenBean.exportpdf()}" style="color: #009688">
+                                    <h:graphicImage name="pdf.png" width="24" height="24"/>
+                                </h:commandLink>
+                                <h:commandLink actionListener="#{resumenBean.exportexcel()}" style="color: #009688">
+                                    <h:graphicImage name="xls.png" width="24" height="24"/>
+                                </h:commandLink>
                             </h:panelGrid>
                         </h:panelGrid>
                         <p:panel>

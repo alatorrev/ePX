@@ -37,7 +37,7 @@
     </context-param>
     <context-param>
         <param-name>environment</param-name>
-        <param-value>produccion</param-value>
+        <param-value>desarrollo</param-value>
     </context-param>
     <context-param>
         <param-name>primefaces.FONT_AWESOME</param-name>

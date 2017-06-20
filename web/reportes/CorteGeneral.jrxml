@@ -13,7 +13,8 @@
 		<![CDATA[select fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner,count(idcabecera) as documentos
 from cabecera
 where fechareceta = format(getdate(), 'yyyy-MM-dd')
-group by fechareceta, codigopdv,SUBSTRING(nombrearchivo, 7, 2)]]>
+group by fechareceta, codigopdv,SUBSTRING(nombrearchivo, 7, 2)
+order by codigopdv]]>
 	</queryString>
 	<field name="fechareceta" class="java.sql.Date"/>
 	<field name="codigopdv" class="java.lang.String"/>
@@ -30,13 +31,27 @@ group by fechareceta, codigopdv,SUBSTRING(nombrearchivo, 7, 2)]]>
 			<staticText>
 				<reportElement x="0" y="0" width="555" height="79" forecolor="#FFFFFF" uuid="f7e44f6a-09be-4c18-b28e-03f4ea41a993"/>
 				<textElement verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
+					<font size="18" isBold="true"/>
 				</textElement>
-				<text><![CDATA[      Reporte de total escaneos según POS]]></text>
+				<text><![CDATA[ Reporte de total escaneos según POS]]></text>
 			</staticText>
 			<rectangle>
 				<reportElement mode="Transparent" x="0" y="0" width="555" height="79" uuid="bdc7dc31-c141-42a9-985e-27a5cc2c02de"/>
 			</rectangle>
+			<rectangle>
+				<reportElement x="455" y="0" width="100" height="79" uuid="b24f89d1-8826-4c2a-8188-6ff788c35bac"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="455" y="59" width="100" height="20" uuid="3efe1527-cf6a-4f40-b4bb-5badffeb4cb8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ePX]]></text>
+			</staticText>
+			<image onErrorType="Blank">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="479" y="6" width="59" height="52" uuid="d60dd770-e044-4d39-a03a-9bc2350bcec8"/>
+				<imageExpression><![CDATA[$P{RutaImagen} + "nurse.png"]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<pageHeader>
@@ -55,8 +70,8 @@ group by fechareceta, codigopdv,SUBSTRING(nombrearchivo, 7, 2)]]>
 				<reportElement mode="Transparent" x="0" y="0" width="555" height="35" uuid="b3775552-071e-4521-a990-49449bdfa06e"/>
 			</rectangle>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="400" y="0" width="154" height="35" uuid="abdd53e1-6c48-4634-a600-a7f53753b7a9"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement x="387" y="0" width="167" height="35" uuid="abdd53e1-6c48-4634-a600-a7f53753b7a9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
@@ -129,20 +144,16 @@ group by fechareceta, codigopdv,SUBSTRING(nombrearchivo, 7, 2)]]>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="54" splitType="Stretch">
+		<band height="21" splitType="Stretch">
 			<textField>
-				<reportElement x="345" y="34" width="66" height="20" uuid="321fde57-f303-4531-b960-b3d7d9b3ecb7"/>
+				<reportElement x="450" y="0" width="66" height="20" uuid="321fde57-f303-4531-b960-b3d7d9b3ecb7"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA["Página  "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="411" y="34" width="83" height="20" uuid="fd469b83-9c4d-4695-9065-f25496f67636"/>
+				<reportElement x="516" y="0" width="38" height="20" uuid="fd469b83-9c4d-4695-9065-f25496f67636"/>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<image onErrorType="Blank">
-				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="494" y="0" width="60" height="54" uuid="d60dd770-e044-4d39-a03a-9bc2350bcec8"/>
-				<imageExpression><![CDATA[$P{RutaImagen} + "nurse.png"]]></imageExpression>
-			</image>
 		</band>
 	</pageFooter>
 </jasperReport>

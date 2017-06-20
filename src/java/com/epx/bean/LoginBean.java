@@ -57,7 +57,7 @@ public class LoginBean implements Serializable {
                         return "dashboard";
                     case 2:
                         //SUPERVISOR
-                        return "ingresos";
+                        return "dashboard";
                     case 3:
                         //FARMACIA
                         return "farmacia";
@@ -65,7 +65,7 @@ public class LoginBean implements Serializable {
                         //INDEXADOR
                         return "dashboard";
                     default:
-                        return "otros";
+                        return "dashboard";
                 }
             }
         } else {
