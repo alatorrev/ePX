@@ -71,7 +71,7 @@ public class MedicoDAO implements Serializable {
         Conexion con = new Conexion();
         PreparedStatement pst;
         String sql = "Select idmedico, fuentemedico, "
-                + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad,cedula "
+                + "nombres, apellidos, direccion, (especialidad + ', ' + especialidad2) as especialidad,cedula,region "
                 + "from medico_difare "
                 + "where nombres+(case when apellidos IS NULL then '' else apellidos end) like upper(?) "
                 + "or (case when apellidos is null then '' else apellidos end)+nombres like upper(?) "
@@ -81,7 +81,7 @@ public class MedicoDAO implements Serializable {
                 + "(STUFF(REPLACE((SELECT '#!' + LTRIM(RTRIM(e.descripcion)) AS 'data()' FROM especialidad e "
                 + "left join med_espe med on m.idmedico = med.idmedico "
                 + "where e.idespecialidad = med.idespecialidad "
-                + "FOR XML PATH('')),' #!',', '), 1, 2, '')) as Brands,m.cedula "
+                + "FOR XML PATH('')),' #!',', '), 1, 2, '')) as Brands,m.cedula, null as region "
                 + "from medico_bottago m "
                 + "left join med_espe e on m.idmedico = e.idmedico "
                 + "left join especialidad es on e.idespecialidad = es.idespecialidad "
@@ -104,6 +104,7 @@ public class MedicoDAO implements Serializable {
                 med.setDireccion(rs.getString(5));
                 med.setEspecialidad(rs.getString(6));
                 med.setCedula(rs.getString(7));
+                med.setRegion(rs.getString(8));
                 listadoMedicos.add(med);
             }
         } catch (Exception e) {
@@ -155,7 +156,7 @@ public class MedicoDAO implements Serializable {
         con.getConnection().setAutoCommit(false);
         PreparedStatement pst;
         String query = "update medico_bottago "
-                + "set nombres=?, apellidos=?, cedula=?, direccion=?, fechanacimiento=?, "
+                + "set nombres=?, apellidos=?, cedula=?, direccion=?, "
                 + "fechamodificacion=CURRENT_TIMESTAMP, usuariomod=? "
                 + "where idmedico = ?";
         pst = con.getConnection().prepareStatement(query);
@@ -164,9 +165,8 @@ public class MedicoDAO implements Serializable {
             pst.setString(2, med.getApellidos().toUpperCase());
             pst.setString(3, med.getCedula());
             pst.setString(4, med.getDireccion());
-            pst.setDate(5, java.sql.Date.valueOf(format.format(med.getFechaNacimiento())));
-            pst.setString(6, u.getLoginname());
-            pst.setLong(7, med.getIdMedico());
+            pst.setString(5, u.getLoginname());
+            pst.setLong(6, med.getIdMedico());
             pst.executeUpdate();
             con.getConnection().commit();
             done = true;

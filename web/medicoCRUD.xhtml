@@ -94,8 +94,6 @@
                                 <p:inputText value="#{medicoBean.med.cedula}"/>
                                 <p:outputLabel value="Dirección"/>
                                 <p:inputText value="#{medicoBean.med.direccion}"/>
-                                <p:outputLabel for="fecarribo" value="Fecha Nacimiento" />
-                                <p:calendar id="fecarribo" value="#{medicoBean.med.fechaNacimiento}" pattern="yyyy-MM-dd" mask="true" />
                                 <p:commandButton ajax="true" value="Editar" actionListener="#{medicoBean.commitEdit()}"  oncomplete="PF('wdlgDatos').hide();" update=":frm:uTable">
                                     <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                                 </p:commandButton>
