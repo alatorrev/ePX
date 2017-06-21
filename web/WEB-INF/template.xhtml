@@ -35,15 +35,17 @@
         </div>
         
         <!--<p:ajaxStatus style="width:32px;height:32px;position:fixed;right:7px;bottom:7px">-->
-        <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;">
-           <f:facet name="start">
-               <i class="fa fa-circle-o-notch fa-spin ajax-loader" aria-hidden="true"></i>
-           </f:facet>
+        <p:ajaxStatus style="display:block;width:100px;height:100px">
+            <f:facet name="start">
+                <h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64"/>
+            </f:facet>
+        </p:ajaxStatus>
+        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
 
-           <f:facet name="complete">
-               <h:outputText value="" />
-           </f:facet>
-       </p:ajaxStatus>
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" 
+                  resizable="true" showHeader="false" >
+            <h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64"/>
+        </p:dialog>
         
 
         <h:outputStylesheet name="css/nanoscroller.css" library="ultima-layout" />
