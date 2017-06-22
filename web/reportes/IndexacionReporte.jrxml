@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="IndexacionReporte" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="05f1c5f8-6a64-416a-ae6e-a9e0e2a2ef16">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\Bottago SA\\Documents\\NetBeansProjects\\Contenedores\\web\\reportes\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="desde" class="java.util.Date"/>
+	<parameter name="hasta" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select convert(VARCHAR, cab.fechascanner, 120) as fechascanner,cab.codigopdv, SUBSTRING(cab.nombrearchivo, 7,2) as codigoscanner,
+cab.idmedico, det.idproducto, det.fuenteproducto, det.secuencial, 1 as px
+from cabecera cab
+inner join detalle det on cab.idcabecera = det.idcabecera
+where cast(cab.fecharegistro as date) between $P{desde} and $P{hasta}
+and cab.estado = 1]]>
+	</queryString>
+	<field name="fechascanner" class="java.lang.String"/>
+	<field name="codigopdv" class="java.lang.String"/>
+	<field name="codigoscanner" class="java.lang.String"/>
+	<field name="idmedico" class="java.lang.String"/>
+	<field name="idproducto" class="java.lang.Integer"/>
+	<field name="fuenteproducto" class="java.lang.String"/>
+	<field name="secuencial" class="java.lang.Integer"/>
+	<field name="px" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="105" height="20" uuid="b9efc529-f004-4963-85fd-cb50addec7ff"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fecha captura]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="0" width="69" height="20" uuid="d9758ab0-1f39-4e42-8d64-9b7a7e0d24a8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Código PDV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="174" y="0" width="54" height="20" uuid="5e86a358-a8f8-4ca7-906f-98c44bd8295c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Scanner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="228" y="0" width="84" height="20" uuid="8cb7f0ea-a2a0-4c00-995e-570385281d72"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Código Médico]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="0" width="69" height="20" uuid="413176ba-535a-4742-a1cf-7f998c2dc701"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Código Producto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="0" width="54" height="20" uuid="a7f3236d-762c-4770-a936-eb7267fafade"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fuente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="0" width="69" height="20" uuid="1325272b-802f-4885-8404-862a60d861b1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Secuencial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="504" y="0" width="48" height="20" uuid="7edc5ce3-a277-4f66-8af1-6b1afb4fbed7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PX]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="105" height="20" uuid="06a16b05-d4fb-4593-8c7f-bd6d74eedc14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{fechascanner}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="0" width="69" height="20" uuid="4055ad36-6794-4e16-b144-9e2e7938ae7e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{codigopdv}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="174" y="0" width="54" height="20" uuid="d266365d-facc-4310-8039-05d03c6b1025"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{codigoscanner}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="228" y="0" width="84" height="20" uuid="39e14dbc-f3b6-42fc-ac5f-71139f12660d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{idmedico}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="312" y="0" width="69" height="20" uuid="99cb46a7-b97e-400f-8190-2d2486c3439b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{idproducto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="381" y="0" width="54" height="20" uuid="645f8d12-fa18-44ae-a51b-e24ea926a630"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{fuenteproducto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="435" y="0" width="69" height="20" uuid="304b6626-58cc-49a0-b9fa-c146bf82ef7c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{secuencial}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="504" y="0" width="48" height="20" uuid="805ce713-443e-4bf4-aca8-9703ed9bcd9f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{px}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <style>
+            .colstilo {width:200px}
+            .colstiloinput {width:300px}
+            .botones {width:200px}
+            .centeredColumn{text-align:center !important}
+        </style>
+        <f:metadata>
+            <!--<f:viewAction action="# {indexacionBean.checkAuthorizedViews()}"/>-->
+        </f:metadata>
+        <h:form id="frm">
+            <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput, colstilo">
+                <p:panel id="idmen" style="width: 500px;" >
+                    <p:outputLabel value="Desde" />
+                    <p:calendar navigator="true" value="#{indexacionBean.desde}"/>
+                    <br />
+                    <p:outputLabel value="Hasta" />
+                    <p:calendar navigator="true" value="#{indexacionBean.hasta}"/>
+                </p:panel>
+                <h:panelGrid columns="2">
+                    <p:commandButton value="Consultar" actionListener="#{indexacionBean.consultaLista()}" update="pnlConsulta"/>
+                    <h:panelGrid columns="2">
+                        <h:commandLink actionListener="#{indexacionBean.exportexcelfinal()}" style="color: #009688">
+                                    <h:graphicImage name="xls.png" width="24" height="24"/>
+                                </h:commandLink>
+                            </h:panelGrid>
+                </h:panelGrid>
+            </h:panelGrid>
+            <p:panel header="Reportes de Indexacion">
+                <p:tabView id="pnlConsulta">
+                    <p:tab title="Indexaciones Al Corte">
+                        <p:dataTable id="indexaTbl" value="#{indexacionBean.listaIndexacion}" var="li" paginator="true" widgetVar="resuTable" rows="10"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     paginatorPosition="bottom" filteredValue="#{indexacionBean.filteredlistaIndexacion}" lazy="false" 
+                                     rowsPerPageTemplate="10,25,50">
+                            <p:column headerText="Fecha Captura" id="cfecha" styleClass="centeredColumn" 
+                                      filterBy="#{li.fechascanner}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.fechascanner}" />
+                            </p:column>
+                            <p:column headerText="POS" id="cpos" styleClass="centeredColumn" filterBy="#{li.codigopdv}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.codigopdv}" />
+                            </p:column>
+                            <p:column headerText="Scanner" id="scan" styleClass="centeredColumn" filterBy="#{li.codigoscanner}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.codigoscanner}" />
+                            </p:column>
+                            <p:column headerText="Médico" id="medi" styleClass="centeredColumn" filterBy="#{li.idmedico}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.idmedico}" />
+                            </p:column>
+                            <p:column headerText="Producto" id="prod" styleClass="centeredColumn" filterBy="#{li.idproducto}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.idproducto}" />
+                            </p:column>
+                            <p:column headerText="Fuente Producto" id="ftpr" styleClass="centeredColumn" filterBy="#{li.fuenteproducto}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.fuenteproducto}" />
+                            </p:column>
+                            <p:column headerText="Secuencial" id="secu" styleClass="centeredColumn" filterBy="#{li.secuencial}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.secuencial}" />
+                            </p:column>
+                            <p:column headerText="PX" id="pxid" styleClass="centeredColumn" filterBy="#{li.px}" filterMatchMode="contains">
+                                <p:outputLabel value="#{li.px}" />
+                            </p:column>
+                        </p:dataTable> 
+                    </p:tab>
+                    <p:tab title="Productos Nuevos">
+                        <p:dataTable id="producTbl" value="#{indexacionBean.listaProductos}" var="lp" paginator="true" widgetVar="resuTable" rows="10"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     paginatorPosition="bottom" filteredValue="#{indexacionBean.filteredlistaProductos}" lazy="false" 
+                                     rowsPerPageTemplate="10,25,50">
+
+                            <p:column headerText="Id Producto" id="idpro" styleClass="centeredColumn" filterBy="#{lp.idproducto}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lp.idproducto}" />
+                            </p:column>
+                            <p:column headerText="Producto (Comercial)" id="comer" styleClass="centeredColumn" filterBy="#{lp.marca}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lp.marca}" />
+                            </p:column>
+                            <p:column headerText="Producto (Genérico)" id="gene" styleClass="centeredColumn" filterBy="#{lp.sustituto}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lp.sustituto}" />
+                            </p:column>
+                            <p:column headerText="Forma" id="form" styleClass="centeredColumn" filterBy="#{lp.forma}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lp.forma}" />
+                            </p:column>
+                            <p:column headerText="Concentración" id="concen" styleClass="centeredColumn" filterBy="#{lp.concentracion}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lp.concentracion}" />
+                            </p:column>
+                        </p:dataTable> 
+                    </p:tab>
+                    <p:tab title="Médicos Nuevos">
+                        <p:dataTable id="medicTbl" value="#{indexacionBean.listaMedicos}" var="lm" paginator="true" widgetVar="resuTable" rows="10"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     paginatorPosition="bottom" filteredValue="#{indexacionBean.filteredlistaMedicos}" lazy="false" 
+                                     rowsPerPageTemplate="10,25,50">
+
+                            <p:column headerText="Id Médico" id="idme" styleClass="centeredColumn" filterBy="#{lm.idmedico}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lm.idmedico}" />
+                            </p:column>
+                            <p:column headerText="Nombres" id="nomb" styleClass="centeredColumn" filterBy="#{lm.nombres}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lm.nombres}" />
+                            </p:column>
+                            <p:column headerText="Apellidos" id="apell" styleClass="centeredColumn" filterBy="#{lm.apellidos}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lm.apellidos}" />
+                            </p:column>
+                            <p:column headerText="Dirección" id="direc" styleClass="centeredColumn" filterBy="#{lm.direccion}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lm.direccion}" />
+                            </p:column>
+                            <p:column headerText="Especialidad" id="espec" styleClass="centeredColumn" filterBy="#{lm.especialidad}" filterMatchMode="contains">
+                                <p:outputLabel value="#{lm.especialidad}" />
+                            </p:column>
+                        </p:dataTable> 
+                    </p:tab>
+                </p:tabView>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

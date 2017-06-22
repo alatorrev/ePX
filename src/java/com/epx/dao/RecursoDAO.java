@@ -30,7 +30,8 @@ public class RecursoDAO implements Serializable {
                 + "FROM ROL R "
                 + "INNER JOIN RECURSOROL RR ON R.IDROL=RR.IDROL "
                 + "INNER JOIN RECURSO RE ON RR.IDRECURSO=RE.IDRECURSO "
-                + "WHERE R.IDROL=? AND RR.ESTADO=1";
+                + "WHERE R.IDROL=? AND RR.ESTADO=1 "
+                + "order by re.prioridad";
         pst = con.getConnection().prepareStatement(query);
         try {
             pst.setInt(1, u.getIdRol());
