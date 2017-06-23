@@ -97,17 +97,18 @@ public class Filesmethods {
         return objTemp;
     }
 
-    public static void transferFiletransaccion(String rutaOrigen, String rutaDestino, String opcion, String fileName, Object[] row) {
+    public static boolean transferFiletransaccion(String rutaOrigen, String rutaDestino, String opcion, String fileName, Object[] row) {
+        boolean succed=false;
         File file = new File(rutaOrigen + opcion);
         if (file.exists()) {
             File temp = new File(row[1].toString());
-            temp.renameTo(new File(rutaDestino));
+            succed=temp.renameTo(new File(rutaDestino));
         } else {
             file.mkdirs();
             File temp = new File(row[1].toString());
-            temp.renameTo(new File(rutaDestino));
+            succed=temp.renameTo(new File(rutaDestino));
         }
-
+        return succed;
     }
 
     public static List<Object[]> ordenamientoAscendente(List<Object[]> listaObj) {

@@ -10,11 +10,12 @@
         <style>
             .ui-blockui {position: fixed;}
         </style>
-           
+
         <f:metadata>
             <f:viewAction action="#{ingresosBean.checkAuthorizedViews()}"/>
         </f:metadata>
         <h:form id="frm">
+            <p:growl id="notificacion" showDetail="true" autoUpdate="false" />
             <div class="container">
                 <div class="ui-g">
                     <div class="ui-g-12">
@@ -111,7 +112,7 @@
                                 </p:autoComplete>
                                 <p:commandButton icon="ui-icon-add" style="position: relative; right: 150px;"
                                                  actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}"
-                                                 onclick="PF('wgtMedicoCrud').show();" title="Nuevo Médico">
+                                                 oncomplete="PF('wgtMedicoCrud').show();" update="frmCreaMedico" title="Nuevo Médico">
                                 </p:commandButton>
 
                                 <p:outputLabel value="Fecha receta:"/>
@@ -155,7 +156,7 @@
                                 </p:commandButton>
                                 <p:commandButton icon="ui-icon-add" style="position: relative; right: 130px;" 
                                                  actionListener="#{ingresosBean.onCancelProductoCRUDDialog()}"
-                                                 onclick="PF('wgtProductoCrud').show();" title="Nuevo Producto">
+                                                 oncomplete="PF('wgtProductoCrud').show();" update="frmCreaProducto" title="Nuevo Producto">
                                 </p:commandButton>
                                 <h:inputHidden />
                                 <p:outputLabel value="Cantidad: "/>
@@ -192,23 +193,23 @@
                             </p:column>
                         </p:dataTable>
                         <p:commandButton id="cmdProces" value="PROCESAR" icon="ui-icon-save" actionListener="#{ingresosBean.procesarRecetas()}" 
-                                         update="frm">
+                                         update="frm" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
                         <p:commandButton id="cmdDeses" rendered="#{ingresosBean.row[4] eq 'RAIZ' or ingresosBean.row[4] eq 'PROCESADAS'}"  
                                          value="DESECHAR" icon="ui-icon-trash" actionListener="#{ingresosBean.desecharRecetas()}"
-                                         oncomplete="PF('wgtVisor').hide();" update="frm">
+                                         oncomplete="PF('wgtVisor').hide();" update="frm" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
                     </div>
                 </div>
-                <p:blockUI block="frmVisor" trigger="cmdProces" >
-                    <!--<h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64" />-->
-                </p:blockUI>
-                
-                <p:blockUI block="frmVisor" trigger="cmdDeses" >
-                    <!--<h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64" />-->
-                </p:blockUI>
+                <!--                <p:blockUI block="frmVisor" trigger="cmdProces" >
+                                    <h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64" />
+                                </p:blockUI>
+                                
+                                <p:blockUI block="frmVisor" trigger="cmdDeses" >
+                                    <h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64" />
+                                </p:blockUI>-->
             </h:form>
         </p:dialog>
 
@@ -232,7 +233,7 @@
                     <p:commandButton ajax="true" actionListener="#{ingresosBean.commitCreateMedico()}" value="Crear" oncomplete="PF('wgtMedicoCrud').hide();"  >
                         <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                     </p:commandButton> 
-                    <p:commandButton value="Cancelar" actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}" immediate="true" oncomplete="PF('wgtMedicoCrud').hide();"/>
+                    <p:commandButton value="Cancelar" actionListener="#{ingresosBean.onCancelMedicoCRUDDialog()}" immediate="true" oncomplete="PF('wgtMedicoCrud').hide();" update="dlgMedicoCrud"/>
                 </h:panelGrid>
             </h:form>
         </p:dialog>
@@ -259,7 +260,12 @@
                 <p:dataTable id="uTable" value="#{ingresosBean.listadoProductos}" var="pro" widgetVar="wgtProductoS" paginator="true" rows="10"
                              paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                              paginatorPosition="bottom" filteredValue="#{ingresosBean.filteredProducto}"
-                             rowsPerPageTemplate="5,10,15"  lazy="false">
+                             rowsPerPageTemplate="5,10,15"  lazy="false"
+                             selectionMode="single" selection="#{ingresosBean.pro}" rowKey="#{pro.idProducto}">
+
+                    <p:ajax event="rowDblselect"  update="frmVisor:autoPro" oncomplete="PF('wgtProductoSearch').hide();"/>
+                    <!--<p:ajax event="rowUnselect" listener="# {aisvBean.rowunSelect}" update="noapro apro"/>-->
+                    
                     <p:column headerText="Id" filterBy="#{pro.idProducto}" filterMatchMode="contains" style="text-align: center">
                         <h:outputText value="#{pro.idProducto}"/>
                     </p:column>
@@ -290,6 +296,9 @@
             <p:commandButton id="YesQu" value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check fa fa-check Fs14 white" />
             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close fa fa-close Fs14 white" />
         </p:confirmDialog>
-
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" 
+                  resizable="true" showHeader="false" >
+            <h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64"/>
+        </p:dialog>
     </ui:define>
 </ui:composition>

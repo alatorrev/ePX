@@ -60,14 +60,14 @@ public final class IngresosBean implements Serializable {
     private MedicoDAO daoMedico = new MedicoDAO();
     private ProductoDAO daoProducto = new ProductoDAO();
     private int canPro = 1;
-    
+
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
         listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
         listadoProductos = daoProducto.findAllProductoSearch();
         EspeIdSelected.add(listaEspecialidades.get(0));
         listaRecetasOrdenadas();
-        
+
     }
 
     public void checkAuthorizedViews() {
@@ -120,20 +120,41 @@ public final class IngresosBean implements Serializable {
             cab.setPantallaInit(pantallaDatetime);
             cab.setIdUsuario(sessionUsuario.getLoginname());
             cab.setListaDetalleProducto(listaDetalle);
-            if (!row[4].toString().equals("RAIZ")) {
-                //edito existente con estado 1
-                cab.setIdCabecera(cabecera.getIdCabecera());
-                new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
-                listaRecetasOrdenadas();
+            if (cab.getMedico().getIdMedico() != null) {
+                if (!row[4].toString().equals("RAIZ")) {
+                    //edito existente con estado 1
+                    cab.setIdCabecera(cabecera.getIdCabecera());
+                    if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario)) {
+                        listaRecetasOrdenadas();
+                        FacesContext context = FacesContext.getCurrentInstance();
+                        context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Atención", "Transacción completada correctamente"));
+                        RequestContext.getCurrentInstance().update("frm:notificacion");
+                    } else {
+                        FacesContext context = FacesContext.getCurrentInstance();
+                        context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                        RequestContext.getCurrentInstance().update("frm:notificacion");
+                    }
 
+                } else {
+                    //guardo nuevo con estado 1
+                    cab.setIdCabecera(cabecera.getIdCabecera());
+                    if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario)) {
+                        listaRecetasOrdenadas();
+                        FacesContext context = FacesContext.getCurrentInstance();
+                        context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Atención", "Transacción completada correctamente"));
+                        RequestContext.getCurrentInstance().update("frm:notificacion");
+                    } else {
+                        FacesContext context = FacesContext.getCurrentInstance();
+                        context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                        RequestContext.getCurrentInstance().update("frm:notificacion");
+                    }
+                }
+                RequestContext.getCurrentInstance().execute("PF('wgtVisor').hide();");
             } else {
-                //guardo nuevo con estado 1
-                cab.setIdCabecera(cabecera.getIdCabecera());
-                new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario);
-                listaRecetasOrdenadas();
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Debe ingresar un médico con un identificador válido"));
+                RequestContext.getCurrentInstance().update("frmVisor:growl");
             }
-            RequestContext.getCurrentInstance().execute("PF('wgtVisor').hide();");
-
         } else {
             FacesContext context = FacesContext.getCurrentInstance();
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atención", "El detalle debe tener al menos un producto para ser procesada"));
@@ -154,13 +175,30 @@ public final class IngresosBean implements Serializable {
         if (!row[4].toString().equals("RAIZ")) {
             //cabecera existe
             cab.setIdCabecera(cabecera.getIdCabecera());
-            new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario);
-            listaRecetasOrdenadas();
+            if (new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario)) {
+                listaRecetasOrdenadas();
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Atención", "Transacción completada correctamente"));
+                RequestContext.getCurrentInstance().update("frm:notificacion");
+            } else {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                RequestContext.getCurrentInstance().update("frm:notificacion");
+            }
+
         } else {
             //cabecera no existe
             cab.setIdCabecera(cabecera.getIdCabecera());
-            new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario);
-            listaRecetasOrdenadas();
+            if (new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario)) {
+                listaRecetasOrdenadas();
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Atención", "Transacción completada correctamente"));
+                RequestContext.getCurrentInstance().update("frm:notificacion");
+            } else {
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Lo sentimos, ocurrió un problema"));
+                RequestContext.getCurrentInstance().update("frm:notificacion");
+            }
         }
     }
 
@@ -222,6 +260,9 @@ public final class IngresosBean implements Serializable {
             RequestContext.getCurrentInstance().update("frmVisor:growl");
         }
         setMedico(new Medico());
+        listaEspecialidades = new EspecialidadDAO().findAllEspecialidades();
+        EspeIdSelected = new ArrayList<>();
+        EspeIdSelected.add(listaEspecialidades.get(0));
     }
 
     public void commitCreateProducto() throws SQLException {
@@ -359,7 +400,7 @@ public final class IngresosBean implements Serializable {
 
     public void setEspeIdSelected(List<Especialidad> EspeIdSelected) {
         this.EspeIdSelected = EspeIdSelected;
-    }   
+    }
 
     public List<Producto> getListadoProductos() {
         return listadoProductos;
@@ -376,6 +417,5 @@ public final class IngresosBean implements Serializable {
     public void setFilteredProducto(List<Producto> filteredProducto) {
         this.filteredProducto = filteredProducto;
     }
-    
-    
+
 }

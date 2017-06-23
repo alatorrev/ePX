@@ -78,7 +78,7 @@ public class TransaccionDAO {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Medico tempMedico = new Medico();
-                tempMedico.setIdMedico(rs.getString(4)==null?null:Long.parseLong(rs.getString(4)));
+                tempMedico.setIdMedico(rs.getString(4) == null ? null : Long.parseLong(rs.getString(4)));
                 tempMedico.setFuente(rs.getString(5));
                 tempMedico.setNombres(rs.getString(6));
                 tempMedico.setApellidos(rs.getString(7));
@@ -143,7 +143,7 @@ public class TransaccionDAO {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Medico tempMedico = new Medico();
-                tempMedico.setIdMedico(rs.getString(4)==null?null:Long.parseLong(rs.getString(4)));
+                tempMedico.setIdMedico(rs.getString(4) == null ? null : Long.parseLong(rs.getString(4)));
                 tempMedico.setFuente(rs.getString(5));
                 cab.setIdCabecera(rs.getLong(1));
                 cab.setNombreArchivo(rs.getString(2));
@@ -218,8 +218,9 @@ public class TransaccionDAO {
         }
     }
 
-    public void editarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
+    public boolean editarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        boolean flag = false;
         String SEPARADOR = File.separator;
         Conexion con = new Conexion();
         String sql = "update cabecera set idmedico=?,fuentemedico=?,rutaarchivoorigen=?,rutaarchivodestino=?,fechareceta=?,fechapantallainit=?,"
@@ -228,7 +229,7 @@ public class TransaccionDAO {
             con.getConnection().setAutoCommit(false);
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, cab.getMedico().getFuente().equals("D")?cab.getMedico().getCedula():cab.getMedico().getIdMedico().toString());
+            pst.setString(1, cab.getMedico().getFuente().equals("D") ? cab.getMedico().getCedula() : cab.getMedico().getIdMedico().toString());
             pst.setString(2, cab.getMedico().getFuente());
             pst.setString(3, row[1].toString());
             String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
@@ -254,12 +255,23 @@ public class TransaccionDAO {
                 pst.setTimestamp(6, new java.sql.Timestamp(det.getReferenciaTiempo().getTime()));
                 pst.executeUpdate();
             }
-            con.getConnection().commit();
             if (!opcion.equals(row[4].toString())) {
-                Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+                flag = Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
             }
+            if (flag) {
+                con.getConnection().commit();
+            } else {
+                con.getConnection().rollback();
+            }
+
         } catch (Exception e) {
-            System.out.println("TRANSACCIONDAO EDITANDO TRANSACCION: " + e.getMessage());
+            try {
+                System.out.println("TRANSACCIONDAO EDITANDO TRANSACCION: " + e.getMessage());
+                con.getConnection().rollback();
+            } catch (SQLException ex) {
+                Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            flag = false;
         } finally {
             try {
                 con.desconectar();
@@ -267,10 +279,12 @@ public class TransaccionDAO {
                 Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        return flag;
     }
 
-    public void desecharTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
+    public boolean desecharTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
         Conexion con = new Conexion();
+        boolean flag = false;
         String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
         String SEPARADOR = File.separator;
         String sql = "update cabecera set estado=?,rutaarchivoorigen=?,rutaarchivodestino=?, "
@@ -284,14 +298,19 @@ public class TransaccionDAO {
             pst.setString(3, rutadestino);
             pst.setTimestamp(4, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
             pst.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
-            pst.setString(6,sessionUsuario.getLoginname());
+            pst.setString(6, sessionUsuario.getLoginname());
             pst.setInt(7, cab.getIdCabecera().intValue());
             pst.executeUpdate();
             borrarDetalle(cab);
-            con.getConnection().commit();
-            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+            flag = Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+            if (flag) {
+                con.getConnection().commit();
+            } else {
+                con.getConnection().rollback();
+            }
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO DESECHANDO TRANSACCION: " + e.getMessage());
+            flag = false;
         } finally {
             try {
                 con.desconectar();
@@ -299,6 +318,7 @@ public class TransaccionDAO {
                 Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        return flag;
     }
 
     public void desecharRaiz(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
