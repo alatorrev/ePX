@@ -57,6 +57,7 @@ public class ResumenBean implements Serializable {
     private Date FechaActual = new Date();
     private Date desde = new Date(), hasta = new Date();
     private Facesmethods fcm = new Facesmethods();
+    int totalizador = 0;
 
     public ResumenBean() {
 
@@ -70,7 +71,10 @@ public class ResumenBean implements Serializable {
         } else if (tipoConsulta.equals("FechaCorte")) {
             lista = daoResumen.ReporteCorte();
         }
-
+        for (Resumen resumen : lista) {
+            totalizador = totalizador + resumen.getConteo();
+        }
+        
     }
 
     public void checkAuthorizedViews() {
@@ -217,6 +221,7 @@ public class ResumenBean implements Serializable {
 
     public void limpiar() {
         lista.clear();
+        totalizador = 0;
     }
 
     public List<Object[]> getObj() {
@@ -314,5 +319,15 @@ public class ResumenBean implements Serializable {
     public void setObjanio(List<Object[]> objanio) {
         this.objanio = objanio;
     }
+
+    public int getTotalizador() {
+        return totalizador;
+    }
+
+    public void setTotalizador(int totalizador) {
+        this.totalizador = totalizador;
+    }
+    
+    
 
 }

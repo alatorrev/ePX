@@ -96,6 +96,15 @@
                                     <p:column headerText="Cantidad" id="ccant" styleClass="centeredColumn" filterBy="#{res.conteo}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.conteo}" />
                                     </p:column>
+                                    <p:columnGroup type="footer">
+                                        <p:row>
+                                            <p:column colspan="2" style="text-align:right" footerText="Total Escaneado:" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                            <p:column style="text-align:right" footerText="#{resumenBean.totalizador}" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                            
+                                            <p:column colspan="3" style="text-align:right" footerText="Total Escaneado:" rendered="#{resumenBean.tipoConsulta != 'Mensual'}"/>
+                                            <p:column style="text-align:right" footerText="#{resumenBean.totalizador}" rendered="#{resumenBean.tipoConsulta != 'Mensual'}"/>
+                                        </p:row>
+                                    </p:columnGroup>
                                 </p:dataTable> 
                             </h:panelGrid>
                         </p:panel>
