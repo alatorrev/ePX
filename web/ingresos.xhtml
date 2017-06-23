@@ -7,6 +7,10 @@
 
 
     <ui:define name="content">
+        <style>
+            .ui-blockui {position: fixed;}
+        </style>
+           
         <f:metadata>
             <f:viewAction action="#{ingresosBean.checkAuthorizedViews()}"/>
         </f:metadata>
@@ -149,11 +153,10 @@
                                 <p:commandButton icon="ui-icon-search" style="position: relative; right: 10px;" 
                                                  onclick="PF('wgtProductoSearch').show();" title="Buscar producto">
                                 </p:commandButton>
-                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 150px;" 
+                                <p:commandButton icon="ui-icon-add" style="position: relative; right: 130px;" 
                                                  actionListener="#{ingresosBean.onCancelProductoCRUDDialog()}"
                                                  onclick="PF('wgtProductoCrud').show();" title="Nuevo Producto">
                                 </p:commandButton>
-                                <h:inputHidden />
                                 <h:inputHidden />
                                 <p:outputLabel value="Cantidad: "/>
                                 <p:inputText id="inputCantidad" value="#{ingresosBean.canPro}"/>
@@ -188,19 +191,27 @@
                                 <p:outputLabel value="#{detalle.cantidad}" style="width:100%" />
                             </p:column>
                         </p:dataTable>
-                        <p:commandButton value="PROCESAR" icon="ui-icon-save" actionListener="#{ingresosBean.procesarRecetas()}" 
+                        <p:commandButton id="cmdProces" value="PROCESAR" icon="ui-icon-save" actionListener="#{ingresosBean.procesarRecetas()}" 
                                          update="frm">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
-                        <p:commandButton rendered="#{ingresosBean.row[4] eq 'RAIZ' or ingresosBean.row[4] eq 'PROCESADAS'}"  
+                        <p:commandButton id="cmdDeses" rendered="#{ingresosBean.row[4] eq 'RAIZ' or ingresosBean.row[4] eq 'PROCESADAS'}"  
                                          value="DESECHAR" icon="ui-icon-trash" actionListener="#{ingresosBean.desecharRecetas()}"
                                          oncomplete="PF('wgtVisor').hide();" update="frm">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
                     </div>
                 </div>
+                <p:blockUI block="frmVisor" trigger="cmdProces" >
+                    <!--<h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64" />-->
+                </p:blockUI>
+                
+                <p:blockUI block="frmVisor" trigger="cmdDeses" >
+                    <!--<h:graphicImage name="ultima-layout/images/preloader_1.gif" width="64" height="64" />-->
+                </p:blockUI>
             </h:form>
         </p:dialog>
+
         <p:dialog modal="true" id="dlgMedicoCrud" widgetVar="wgtMedicoCrud" header="Crear Médico" responsive="true" closable="false" >
             <h:form id="frmCreaMedico">
                 <h:panelGrid columns="2">
@@ -275,9 +286,10 @@
                 </p:dataTable>
             </h:form>
         </p:dialog>
-        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
-            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check fa fa-check Fs14 white" />
+        <p:confirmDialog id="ConfirmDlg" global="true" showEffect="fade" hideEffect="fade" >
+            <p:commandButton id="YesQu" value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check fa fa-check Fs14 white" />
             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close fa fa-close Fs14 white" />
         </p:confirmDialog>
+
     </ui:define>
 </ui:composition>
