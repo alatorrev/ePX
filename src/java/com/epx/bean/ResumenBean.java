@@ -64,6 +64,7 @@ public class ResumenBean implements Serializable {
     }
 
     public void consultaLista() throws SQLException {
+        totalizador = 0;
         if (tipoConsulta.equals("Mensual")) {
             lista = daoResumen.ReporteMensual(Integer.parseInt(mes[0].toString()), Integer.parseInt(anio[0].toString()));
         } else if (tipoConsulta.equals("Rango")) {
