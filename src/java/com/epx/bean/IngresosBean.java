@@ -124,7 +124,7 @@ public final class IngresosBean implements Serializable {
                 if (!row[4].toString().equals("RAIZ")) {
                     //edito existente con estado 1
                     cab.setIdCabecera(cabecera.getIdCabecera());
-                    if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario)) {
+                    if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario, true)) {
                         listaRecetasOrdenadas();
                         FacesContext context = FacesContext.getCurrentInstance();
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Atención", "Transacción completada correctamente"));
@@ -138,7 +138,7 @@ public final class IngresosBean implements Serializable {
                 } else {
                     //guardo nuevo con estado 1
                     cab.setIdCabecera(cabecera.getIdCabecera());
-                    if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario)) {
+                    if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario, false)) {
                         listaRecetasOrdenadas();
                         FacesContext context = FacesContext.getCurrentInstance();
                         context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Atención", "Transacción completada correctamente"));

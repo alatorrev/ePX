@@ -64,11 +64,11 @@ public class TransaccionDAO {
     public CabeceraMovimiento cargarTransaccion(String nombreArchivo) {
         CabeceraMovimiento cab = new CabeceraMovimiento();
         Conexion con = new Conexion();
-        String sql = "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,mb.nombres,mb.apellidos,c.fechareceta from cabecera c "
+        String sql = "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,mb.nombres,mb.apellidos,c.fechareceta,null as cedula from cabecera c "
                 + "inner join medico_bottago mb on mb.idmedico=convert(int,(convert( varchar(max),c.idmedico))) "
                 + "where c.nombrearchivo=? and mb.fuentemedico=c.fuentemedico "
                 + "union all "
-                + "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,md.nombres,md.apellidos,c.fechareceta from cabecera c "
+                + "select c.idcabecera,c.nombrearchivo,c.rutaarchivodestino,c.idmedico,c.fuentemedico,md.nombres,md.apellidos,c.fechareceta,md.cedula as cedula from cabecera c "
                 + "inner join medico_difare md on md.cedula=convert(varchar(max),c.idmedico) "
                 + "where c.nombrearchivo=? and md.fuentemedico=c.fuentemedico";
         try {
@@ -82,16 +82,17 @@ public class TransaccionDAO {
                 tempMedico.setFuente(rs.getString(5));
                 tempMedico.setNombres(rs.getString(6));
                 tempMedico.setApellidos(rs.getString(7));
+                tempMedico.setCedula(rs.getString(9));
                 cab.setIdCabecera(rs.getLong(1));
                 cab.setNombreArchivo(rs.getString(2));
                 cab.setRutaArchivoDestino(rs.getString(3));
                 cab.setFechaReceta(rs.getTimestamp(8));
                 cab.setMedico(tempMedico);
             }
-            String sql2 = "select d.iddetalle,d.idcabecera,d.secuencial,d.cantidad,pb.idproducto,pb.fuenteproducto,pb.marca,pb.sustituto,pb.forma,pb.concentracion,null as laboratorio from detalle d "
+            String sql2 = "select d.iddetalle,d.idcabecera,d.secuencial,d.cantidad,pb.idproducto,pb.fuenteproducto,pb.marca,pb.sustituto,pb.forma,pb.concentracion,null as laboratorio,d.referenciatiempo from detalle d "
                     + "inner join producto_bottago pb on pb.idproducto=d.idproducto where d.idcabecera=? "
                     + "and pb.fuenteproducto=d.fuenteproducto union all "
-                    + "select d.iddetalle,d.idcabecera,d.secuencial,d.cantidad,pd.idproducto,pd.fuenteproducto,pd.marca,pd.sustituto,pd.forma1,pd.concentracion,pd.laboratorio from detalle d "
+                    + "select d.iddetalle,d.idcabecera,d.secuencial,d.cantidad,pd.idproducto,pd.fuenteproducto,pd.marca,pd.sustituto,pd.forma1,pd.concentracion,pd.laboratorio,d.referenciatiempo from detalle d "
                     + "inner join producto_difare pd on pd.idproducto=d.idproducto where d.idcabecera=? "
                     + "and pd.fuenteproducto=d.fuenteproducto";
             pst = con.getConnection().prepareStatement(sql2);
@@ -115,6 +116,7 @@ public class TransaccionDAO {
                 det.setIdCabecera(rs.getLong(2));
                 det.setSecuencial(rs.getInt(3));
                 det.setCantidad(rs.getInt(4));
+                det.setReferenciaTiempo(new Date(rs.getTimestamp(12).getTime()));
                 det.setProducto(pro);
                 det.setSecuencial(cont);
                 listaDetalle.add(det);
@@ -218,7 +220,7 @@ public class TransaccionDAO {
         }
     }
 
-    public boolean editarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
+    public boolean editarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario, boolean esraiz) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         boolean flag = false;
         String SEPARADOR = File.separator;
@@ -229,7 +231,8 @@ public class TransaccionDAO {
             con.getConnection().setAutoCommit(false);
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, cab.getMedico().getFuente().equals("D") ? cab.getMedico().getCedula() : cab.getMedico().getIdMedico().toString());
+            String idmedico=cab.getMedico().getFuente().equals("D") ? cab.getMedico().getCedula() : cab.getMedico().getIdMedico().toString();
+            pst.setString(1, idmedico);
             pst.setString(2, cab.getMedico().getFuente());
             pst.setString(3, row[1].toString());
             String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
@@ -242,7 +245,7 @@ public class TransaccionDAO {
             pst.setInt(10, 1);
             pst.setString(11, row[2].toString());
             pst.executeUpdate();
-            borrarDetalle(cab);
+            borrarDetalle(cab, con);
             String sql2 = "insert into detalle (idcabecera,idproducto,fuenteproducto,secuencial,cantidad,referenciatiempo) "
                     + "values (?,?,?,?,?,?)";
             pst = con.getConnection().prepareStatement(sql2);
@@ -254,6 +257,7 @@ public class TransaccionDAO {
                 pst.setInt(5, det.getCantidad());
                 pst.setTimestamp(6, new java.sql.Timestamp(det.getReferenciaTiempo().getTime()));
                 pst.executeUpdate();
+                flag = true;
             }
             if (!opcion.equals(row[4].toString())) {
                 flag = Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
@@ -301,7 +305,7 @@ public class TransaccionDAO {
             pst.setString(6, sessionUsuario.getLoginname());
             pst.setInt(7, cab.getIdCabecera().intValue());
             pst.executeUpdate();
-            borrarDetalle(cab);
+            borrarDetalle(cab, con);
             flag = Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
             if (flag) {
                 con.getConnection().commit();
@@ -372,23 +376,15 @@ public class TransaccionDAO {
         }
     }
 
-    public void borrarDetalle(CabeceraMovimiento cab) {
-        Conexion con = new Conexion();
+    public void borrarDetalle(CabeceraMovimiento cab, Conexion con) {
         String sql = "delete from detalle where idcabecera=?";
         try {
             con.getConnection().setAutoCommit(false);
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
             pst.setInt(1, cab.getIdCabecera().intValue());
             pst.executeUpdate();
-            con.getConnection().commit();
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO BORRANDO DETALLE TRANSACCION: " + e.getMessage());
-        } finally {
-            try {
-                con.desconectar();
-            } catch (SQLException ex) {
-                Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 }
