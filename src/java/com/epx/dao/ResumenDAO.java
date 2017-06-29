@@ -34,11 +34,14 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
-                    + "from cabecera "
-                    + "where year(fechareceta) = ? and month(fechareceta) = ? "
-                    + "group by codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
-                    + "order by codigopdv";
+            query = "select pd.codigopdv, isnull(SUBSTRING(cab.nombrearchivo, 7, 2), 00), count(cab.idcabecera) as documentos "
+                    + "from pdv pd "
+                    + "left outer join cabecera cab on pd.codigopdv = cab.codigopdv "
+                    + "and year(cab.fechascanner) = '2017' and month(cab.fechascanner) = '06' "
+                    + "where pd.idusuario is not null "
+                    + "and pd.activo = 'S' "
+                    + "group by pd.codigopdv, SUBSTRING(cab.nombrearchivo, 7, 2) "
+                    + "order by pd.codigopdvF";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, anio + "");
             pst.setString(2, mes + "");
@@ -71,11 +74,11 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
+            query = "select fechascanner, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
                     + "from cabecera "
-                    + "where fechareceta between ? and ? "
-                    + "group by fechareceta,  codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
-                    + "order by fechareceta, codigopdv";
+                    + "where fechascanner between ? and ? "
+                    + "group by fechascanner, codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
+                    + "order by fechascanner, codigopdv";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, format.format(desde));
             pst.setString(2, format.format(hasta));
