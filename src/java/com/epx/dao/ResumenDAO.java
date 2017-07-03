@@ -34,23 +34,25 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select pd.codigopdv, isnull(SUBSTRING(cab.nombrearchivo, 7, 2), 00), count(cab.idcabecera) as documentos "
-                    + "from pdv pd "
-                    + "left outer join cabecera cab on pd.codigopdv = cab.codigopdv "
-                    + "and year(cab.fechascanner) = '2017' and month(cab.fechascanner) = '06' "
-                    + "where pd.idusuario is not null "
-                    + "and pd.activo = 'S' "
-                    + "group by pd.codigopdv, SUBSTRING(cab.nombrearchivo, 7, 2) "
-                    + "order by pd.codigopdvF";
+            query = "select pd.ciudad, sc.codigopdv, sc.codscanner, count(cab.idcabecera) as documentos "
+                    + "from scanner sc "
+                    + "left outer join cabecera cab on sc.codigopdv = cab.codigopdv "
+                    + "and sc.codscanner = SUBSTRING(cab.nombrearchivo, 7, 2) "
+                    + "and year(cab.fechascanner) = ? "
+                    + "and month(cab.fechascanner) = ? "
+                    + "inner join pdv pd on sc.codigopdv = pd.codigopdv "
+                    + "group by sc.codigopdv, pd.ciudad,sc.codscanner "
+                    + "order by sc.codigopdv";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, anio + "");
             pst.setString(2, mes + "");
             rs = pst.executeQuery();
             while (rs.next()) {
                 Resumen res = new Resumen();
-                res.setCodigopdv(rs.getString(1));
-                res.setScanner(rs.getString(2));
-                res.setConteo(rs.getInt(3));
+                res.setCiudad(rs.getString(1));
+                res.setCodigopdv(rs.getString(2));
+                res.setScanner(rs.getString(3));
+                res.setConteo(rs.getInt(4));
                 lista.add(res);
             }
         } catch (Exception e) {
@@ -74,11 +76,15 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select fechascanner, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
-                    + "from cabecera "
-                    + "where fechascanner between ? and ? "
-                    + "group by fechascanner, codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
-                    + "order by fechascanner, codigopdv";
+            query = "select cast(cab.fechascanner as date) as fechascanner, "
+                    + "pd.ciudad, sc.codigopdv, sc.codscanner, count(cab.idcabecera) as documentos "
+                    + "from scanner sc "
+                    + "left outer join cabecera cab on sc.codigopdv = cab.codigopdv "
+                    + "and sc.codscanner = SUBSTRING(cab.nombrearchivo,7,2) "
+                    + "and cast(cab.fechascanner as date) between ? and ? "
+                    + "inner join pdv pd on sc.codigopdv = pd.codigopdv "
+                    + "group by cast(cab.fechascanner as date), sc.codigopdv, pd.ciudad, sc.codscanner "
+                    + "order by cast(cab.fechascanner as date), sc.codigopdv";
             pst = con.getConnection().prepareStatement(query);
             pst.setString(1, format.format(desde));
             pst.setString(2, format.format(hasta));
@@ -86,9 +92,10 @@ public class ResumenDAO implements Serializable {
             while (rs.next()) {
                 Resumen res = new Resumen();
                 res.setFechareceta(rs.getDate(1));
-                res.setCodigopdv(rs.getString(2));
-                res.setScanner(rs.getString(3));
-                res.setConteo(rs.getInt(4));
+                res.setCiudad(rs.getString(2));
+                res.setCodigopdv(rs.getString(3));
+                res.setScanner(rs.getString(4));
+                res.setConteo(rs.getInt(5));
                 lista.add(res);
             }
         } catch (Exception e) {
@@ -112,19 +119,23 @@ public class ResumenDAO implements Serializable {
         String query = "";
 
         try {
-            query = "select fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) as scanner, count(idcabecera) as documentos "
-                    + "from cabecera "
-                    + "where fechareceta = format(getdate(), 'yyyy-MM-dd') "
-                    + "group by fechareceta, codigopdv, SUBSTRING(nombrearchivo, 7, 2) "
-                    + "order by codigopdv";
+            query = "select cast(cab.fechascanner as date) as fechascanner, pd.ciudad, sc.codigopdv, sc.codscanner, count(cab.idcabecera) as documentos "
+                    + "from scanner sc  "
+                    + "left outer join cabecera cab on sc.codigopdv = cab.codigopdv "
+                    + "and sc.codscanner = SUBSTRING(cab.nombrearchivo, 7, 2) "
+                    + "and cast(cab.fechascanner as date) = format(getdate(), 'yyyy-MM-dd') "
+                    + "inner join pdv pd on sc.codigopdv = pd.codigopdv "
+                    + "group by cast(cab.fechascanner as date), sc.codigopdv, pd.ciudad, sc.codscanner "
+                    + "order by cast(cab.fechascanner as date), sc.codigopdv";
             pst = con.getConnection().prepareStatement(query);
             rs = pst.executeQuery();
             while (rs.next()) {
                 Resumen res = new Resumen();
                 res.setFechareceta(rs.getDate(1));
-                res.setCodigopdv(rs.getString(2));
-                res.setScanner(rs.getString(3));
-                res.setConteo(rs.getInt(4));
+                res.setCiudad(rs.getString(2));
+                res.setCodigopdv(rs.getString(3));
+                res.setScanner(rs.getString(4));
+                res.setConteo(rs.getInt(5));
                 lista.add(res);
             }
         } catch (Exception e) {

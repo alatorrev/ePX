@@ -8,37 +8,36 @@
 
     <ui:define name="content">
         <style>
-            .colstilo {width:200px}
-            .colstiloinput {width:300px}
+            .colstilo {width:20px}
+            .colstiloinput {width:180px}
             .botones {width:200px}
             .centeredColumn{text-align:center !important}
+            .calendarClass input{text-align: center; width: 150px}
         </style>
         <f:metadata>
-            <!--<f:viewAction action="# {indexacionBean.checkAuthorizedViews()}"/>-->
+            <f:viewAction action="#{indexacionBean.checkAuthorizedViews()}"/>
         </f:metadata>
         <h:form id="frm">
-            <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput, colstilo">
-                <p:panel id="idmen" style="width: 500px;" >
+            
+                <p:panel id="idmen" >
+                    <h:panelGrid columns="4" columnClasses="colstilo, colstiloinput, colstilo, colstiloinput">
                     <p:outputLabel value="Desde" />
-                    <p:calendar navigator="true" value="#{indexacionBean.desde}"/>
-                    <br />
+                    <p:calendar id="caldesd" navigator="true" value="#{indexacionBean.desde}" styleClass="calendarClass"/>
+                    
                     <p:outputLabel value="Hasta" />
-                    <p:calendar navigator="true" value="#{indexacionBean.hasta}"/>
-                </p:panel>
-                <h:panelGrid columns="2">
+                    <p:calendar navigator="true" value="#{indexacionBean.hasta}" styleClass="calendarClass"/>
+
                     <p:commandButton value="Consultar" actionListener="#{indexacionBean.consultaLista()}" update="pnlConsulta"/>
-                    <h:panelGrid columns="2">
-                        <h:commandLink actionListener="#{indexacionBean.exportexcelfinal()}" style="color: #009688">
-                                    <h:graphicImage name="xls.png" width="24" height="24"/>
-                                </h:commandLink>
-                            </h:panelGrid>
-                </h:panelGrid>
-            </h:panelGrid>
+                    <h:commandLink actionListener="#{indexacionBean.exportexcelfinal()}" style="color: #009688">
+                        <h:graphicImage name="xls.png" width="24" height="24"/>
+                    </h:commandLink>
+                    </h:panelGrid>
+                </p:panel>
             <p:panel header="Reportes de Indexacion">
                 <p:tabView id="pnlConsulta">
+                    <p:ajax event="tabChange" update="@this"/>
                     <p:tab title="Indexaciones Al Corte">
-                        <p:dataTable id="indexaTbl" value="#{indexacionBean.listaIndexacion}" var="li" paginator="true" widgetVar="resuTable" rows="10"
-                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                        <p:dataTable id="indexaTbl" value="#{indexacionBean.listaIndexacion}" var="li" paginator="true" widgetVar="indeTable" rows="10"
                                      paginatorPosition="bottom" filteredValue="#{indexacionBean.filteredlistaIndexacion}" lazy="false" 
                                      rowsPerPageTemplate="10,25,50">
                             <p:column headerText="Fecha Captura" id="cfecha" styleClass="centeredColumn" 
@@ -69,8 +68,7 @@
                         </p:dataTable> 
                     </p:tab>
                     <p:tab title="Productos Nuevos">
-                        <p:dataTable id="producTbl" value="#{indexacionBean.listaProductos}" var="lp" paginator="true" widgetVar="resuTable" rows="10"
-                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                        <p:dataTable id="producTbl" value="#{indexacionBean.listaProductos}" var="lp" paginator="true" widgetVar="produTable" rows="10"
                                      paginatorPosition="bottom" filteredValue="#{indexacionBean.filteredlistaProductos}" lazy="false" 
                                      rowsPerPageTemplate="10,25,50">
 
@@ -92,8 +90,7 @@
                         </p:dataTable> 
                     </p:tab>
                     <p:tab title="Médicos Nuevos">
-                        <p:dataTable id="medicTbl" value="#{indexacionBean.listaMedicos}" var="lm" paginator="true" widgetVar="resuTable" rows="10"
-                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                        <p:dataTable id="medicTbl" value="#{indexacionBean.listaMedicos}" var="lm" paginator="true" widgetVar="mediTable" rows="10"
                                      paginatorPosition="bottom" filteredValue="#{indexacionBean.filteredlistaMedicos}" lazy="false" 
                                      rowsPerPageTemplate="10,25,50">
 

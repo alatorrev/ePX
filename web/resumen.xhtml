@@ -8,10 +8,12 @@
 
     <ui:define name="content">
         <style>
-            .colstilo {width:200px}
-            .colstiloinput {width:300px}
+            .colstilo {width:40px}
+            .colstiloinput {width:130px}
             .botones {width:200px}
             .centeredColumn{text-align:center !important}
+            .ui-selectonemenu .ui-selectonemenu-label {text-align: center;}
+            .calendarClass input{text-align: center; width: 100px}
         </style>
         <h:head>
             <title>ePX</title>
@@ -20,38 +22,48 @@
             <div class="ContainerIndent">
                 <p:panel header="Consultas de documentos escaneados">
                     <h:form id="frm">
-                        <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput, colstilo">
-                            <p:panel id="idmen" style="width: 500px;" >
-                                <p:outputLabel value="Mes" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
-                                <p:selectOneMenu id="Meses" value="#{resumenBean.mes}" style="width: 200px;vertical-align: top" filter="true" 
-                                                 filterMatchMode="startsWith" converter="productoConverter"
-                                                 rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
+                        <h:panelGrid columns="2">
+                            <p:panel id="idmen" style="width: 500px">
+                                <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput">
+                                    <p:outputLabel value="Mes" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                    <p:selectOneMenu id="Meses" value="#{resumenBean.mes}" style="width: 200px;vertical-align: top" filter="true" 
+                                                     filterMatchMode="startsWith" converter="productoConverter"
+                                                     rendered="#{resumenBean.tipoConsulta == 'Mensual'}">
 
-                                    <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
-                                    <f:selectItems value="#{resumenBean.obj}" var="lista" 
-                                                   itemLabel="#{lista[1]}" itemValue="#{lista}"/>
-                                </p:selectOneMenu><br />
+                                        <f:selectItem itemLabel="Seleccionar" itemValue="0"/>
+                                        <f:selectItems value="#{resumenBean.obj}" var="lista" 
+                                                       itemLabel="#{lista[1]}" itemValue="#{lista}"/>
+                                    </p:selectOneMenu>
 
-                                <p:outputLabel value="Año" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
-                                <p:selectOneMenu id="Anios" value="#{resumenBean.anio}" style="width: 200px; vertical-align: middle;" filter="true" 
-                                                 filterMatchMode="startsWith" converter="productoConverter"
-                                                 rendered="#{resumenBean.tipoConsulta == 'Mensual'}" >
 
-                                    <f:selectItem itemLabel="Seleccionar..." itemValue="0"/>
-                                    <f:selectItems value="#{resumenBean.objanio}" var="ano" 
-                                                   itemLabel="#{ano[0]}" itemValue="#{ano}"/>
-                                </p:selectOneMenu>
+                                    <p:outputLabel value="Año" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                    <p:selectOneMenu id="Anios" value="#{resumenBean.anio}" style="width: 200px; vertical-align: middle;" filter="true" 
+                                                     filterMatchMode="startsWith" converter="productoConverter"
+                                                     rendered="#{resumenBean.tipoConsulta == 'Mensual'}" >
 
-                                <p:outputLabel value="Desde" rendered="#{resumenBean.tipoConsulta == 'Rango'}" />
-                                <p:calendar rendered="#{resumenBean.tipoConsulta == 'Rango'}" navigator="true" value="#{resumenBean.desde}"/>
-                                <br />
-                                <p:outputLabel value="Hasta" rendered="#{resumenBean.tipoConsulta == 'Rango'}" />
-                                <p:calendar rendered="#{resumenBean.tipoConsulta == 'Rango'}" navigator="true" value="#{resumenBean.hasta}"/>
+                                        <f:selectItem itemLabel="Seleccionar" itemValue="0"/>
+                                        <f:selectItems value="#{resumenBean.objanio}" var="ano" 
+                                                       itemLabel="#{ano[0]}" itemValue="#{ano}"/>
+                                    </p:selectOneMenu>
 
-                                <p:outputLabel value="Fecha Corte:" rendered="#{resumenBean.tipoConsulta == 'FechaCorte'}" />
-                                <p:inputText value="#{resumenBean.fechaActual}" rendered="#{resumenBean.tipoConsulta == 'FechaCorte'}" disabled="true" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" />
-                                </p:inputText>
+                                </h:panelGrid>
+
+                                <h:panelGrid columns="4" columnClasses="colstilo, colstiloinput">
+                                    <p:outputLabel value="Desde" rendered="#{resumenBean.tipoConsulta == 'Rango'}" />
+                                    <p:calendar rendered="#{resumenBean.tipoConsulta == 'Rango'}" navigator="true" value="#{resumenBean.desde}" styleClass="calendarClass"/>
+                                    
+                                    <p:outputLabel value="Hasta" rendered="#{resumenBean.tipoConsulta == 'Rango'}" />
+                                    <p:calendar rendered="#{resumenBean.tipoConsulta == 'Rango'}" navigator="true" value="#{resumenBean.hasta}" styleClass="calendarClass"/>
+                                </h:panelGrid>
+
+                                <h:panelGrid columns="2" columnClasses="colstilo, colstiloinput">
+
+                                    <p:outputLabel value="Fecha Corte:" rendered="#{resumenBean.tipoConsulta == 'FechaCorte'}" />
+                                    <p:inputText value="#{resumenBean.fechaActual}" rendered="#{resumenBean.tipoConsulta == 'FechaCorte'}" disabled="true" style="text-align: center">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                                    </p:inputText>
+
+                                </h:panelGrid>
 
                             </p:panel>
 
@@ -87,6 +99,9 @@
                                               filterBy="#{res.fechareceta}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.fechareceta}" />
                                     </p:column>
+                                    <p:column headerText="Ciudad" id="ciud" styleClass="centeredColumn" filterBy="#{res.ciudad}" filterMatchMode="contains">
+                                        <p:outputLabel value="#{res.ciudad}" />
+                                    </p:column>
                                     <p:column headerText="POS" id="cpos" styleClass="centeredColumn" filterBy="#{res.codigopdv}" filterMatchMode="contains">
                                         <p:outputLabel value="#{res.codigopdv}" />
                                     </p:column>
@@ -98,10 +113,10 @@
                                     </p:column>
                                     <p:columnGroup type="footer">
                                         <p:row>
-                                            <p:column colspan="2" style="text-align:right" footerText="Total Escaneado:" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
+                                            <p:column colspan="3" style="text-align:right" footerText="Total Escaneado:" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
                                             <p:column style="text-align:right" footerText="#{resumenBean.totalizador}" rendered="#{resumenBean.tipoConsulta == 'Mensual'}"/>
-                                            
-                                            <p:column colspan="3" style="text-align:right" footerText="Total Escaneado:" rendered="#{resumenBean.tipoConsulta != 'Mensual'}"/>
+
+                                            <p:column colspan="4" style="text-align:right" footerText="Total Escaneado:" rendered="#{resumenBean.tipoConsulta != 'Mensual'}"/>
                                             <p:column style="text-align:right" footerText="#{resumenBean.totalizador}" rendered="#{resumenBean.tipoConsulta != 'Mensual'}"/>
                                         </p:row>
                                     </p:columnGroup>

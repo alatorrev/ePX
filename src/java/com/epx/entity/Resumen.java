@@ -19,6 +19,7 @@ public class Resumen implements Serializable {
     int conteo;
     String mes;
     String scanner;
+    String ciudad;
 
     public Date getFechareceta() {
         return fechareceta;
@@ -60,4 +61,11 @@ public class Resumen implements Serializable {
         this.scanner = scanner;
     }
 
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
 }

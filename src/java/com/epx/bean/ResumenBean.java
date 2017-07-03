@@ -75,7 +75,7 @@ public class ResumenBean implements Serializable {
         for (Resumen resumen : lista) {
             totalizador = totalizador + resumen.getConteo();
         }
-        
+
     }
 
     public void checkAuthorizedViews() {
@@ -159,7 +159,6 @@ public class ResumenBean implements Serializable {
             config.setRemoveEmptySpaceBetweenRows(Boolean.TRUE);
             config.setIgnoreTextFormatting(Boolean.TRUE);
             config.setDetectCellType(Boolean.TRUE);
-            
 
             expor.setConfiguration(config);
             expor.exportReport();
@@ -173,7 +172,7 @@ public class ResumenBean implements Serializable {
             String dirReporte = servleContext.getRealPath("/reportes/RangoGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
             String nomar = "ePX " + fmt.format(desde) + " hasta " + fmt.format(hasta) + ".xlsx";
-            response.addHeader("Content-disposition", "attachment;filename=\""+nomar+"\"");
+            response.addHeader("Content-disposition", "attachment;filename=\"" + nomar + "\"");
             response.setContentType("application/xlsx");
 
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
@@ -187,7 +186,7 @@ public class ResumenBean implements Serializable {
             config.setRemoveEmptySpaceBetweenRows(Boolean.TRUE);
             config.setIgnoreTextFormatting(Boolean.TRUE);
             config.setDetectCellType(Boolean.TRUE);
-            
+
             expor.setConfiguration(config);
             expor.exportReport();
             context.responseComplete();
@@ -197,9 +196,9 @@ public class ResumenBean implements Serializable {
 
             String dirReporte = servleContext.getRealPath("/reportes/CorteGeneral.jasper");
             HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-            
+
             String nomar = "ePX Corte al " + fmt.format(FechaActual) + ".xlsx";
-            response.addHeader("Content-disposition", "attachment;filename=\""+nomar+"\"");
+            response.addHeader("Content-disposition", "attachment;filename=\"" + nomar + "\"");
             response.setContentType("application/xlsx");
 
             JasperPrint impres = JasperFillManager.fillReport(dirReporte, parametros, con.getConnection());
@@ -328,7 +327,5 @@ public class ResumenBean implements Serializable {
     public void setTotalizador(int totalizador) {
         this.totalizador = totalizador;
     }
-    
-    
 
 }
