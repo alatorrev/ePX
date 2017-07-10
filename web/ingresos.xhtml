@@ -26,47 +26,53 @@
                                             update="tblNoProcesadas tblProcesadas tblDesechadas"
                                             oncomplete="PF('wgtNoProcesadas').unselectAllRows();PF('wgtProcesadas').unselectAllRows();PF('wgtDesechadas').unselectAllRows();" />
                                     <p:tab title="No Procesadas">
-                                        <p:dataTable id="tblNoProcesadas" value="#{ingresosBean.listaNoProcesada}" var="lnp" widgetVar="wgtNoProcesadas" paginator="true" rows="10"
+                                        <p:dataTable id="tblNoProcesadas" value="#{ingresosBean.lazyModelNoProcesada}" var="lnp" widgetVar="wgtNoProcesadas" paginator="true" rows="10"
                                                      paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
-                                                     lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lnp[2]}">
+                                                     lazy="true" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lnp.nombreArchivo}">
 
                                             <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" listener="#{ingresosBean.onOpenDialog()}" />
                                             <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
                                             <p:column headerText="Nombre">
-                                                <h:outputText value="#{lnp[2]}" />
+                                                <h:outputText value="#{lnp.nombreArchivo}" />
                                             </p:column>
-                                            <p:column headerText="Fecha" filterBy="#{lnp[3]}" filterMatchMode="contains" >
-                                                <h:outputText value="#{lnp[3]}" />
+                                            <p:column headerText="Fecha" filterBy="#{lnp.fechaArchivo}" field="fechascanner">
+                                                <h:outputText value="#{lnp.fechaArchivo}" >
+                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                                </h:outputText>
                                             </p:column>
                                         </p:dataTable>
                                     </p:tab>
                                     <p:tab title="Procesadas">
-                                        <p:dataTable id="tblProcesadas" value="#{ingresosBean.listaProcesada}" var="lp" widgetVar="wgtProcesadas" paginator="true" rows="10"
+                                        <p:dataTable id="tblProcesadas" value="#{ingresosBean.lazyModelProcesada}" var="lp" widgetVar="wgtProcesadas" paginator="true" rows="10"
                                                      paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
-                                                     lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lp[2]}">
+                                                     lazy="true" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{lp.nombreArchivo}">
 
                                             <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" listener="#{ingresosBean.onOpenDialog()}" />
                                             <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
                                             <p:column headerText="Nombre">
-                                                <h:outputText value="#{lp[2]}" />
+                                                <h:outputText value="#{lp.nombreArchivo}" />
                                             </p:column>
-                                            <p:column headerText="Fecha" filterBy="#{lp[3]}" filterMatchMode="contains" >
-                                                <h:outputText value="#{lp[3]}" />
+                                            <p:column headerText="Fecha" filterBy="#{lp.fechaArchivo}" field="fechascanner">
+                                                <h:outputText value="#{lp.fechaArchivo}" >
+                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                                </h:outputText>
                                             </p:column>
                                         </p:dataTable>
                                     </p:tab>
                                     <p:tab title="Desechadas">
-                                        <p:dataTable id="tblDesechadas" value="#{ingresosBean.listaDesechada}" var="desechada" widgetVar="wgtDesechadas" paginator="true" rows="10"
+                                        <p:dataTable id="tblDesechadas" value="#{ingresosBean.lazyModelDesechada}" var="desechada" widgetVar="wgtDesechadas" paginator="true" rows="10"
                                                      paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
-                                                     lazy="false" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{desechada[2]}">
+                                                     lazy="true" selectionMode="single" selection="#{ingresosBean.row}" rowKey="#{desechada.nombreArchivo}">
 
                                             <p:ajax event="rowSelect" oncomplete="PF('wgtVisor').show();" update="dlgVisor frmVisor" listener="#{ingresosBean.onOpenDialog()}" />
                                             <p:ajax event="rowUnselect" listener="#{ingresosBean.onTabChange()}"/>
                                             <p:column headerText="Nombre">
-                                                <h:outputText value="#{desechada[2]}" />
+                                                <h:outputText value="#{desechada.nombreArchivo}" />
                                             </p:column>
-                                            <p:column headerText="Fecha" filterBy="#{desechada[3]}" filterMatchMode="contains" >
-                                                <h:outputText value="#{desechada[3]}" />
+                                            <p:column headerText="Fecha" filterBy="#{desechada.fechaArchivo}" field="fechascanner">
+                                                <h:outputText value="#{desechada.fechaArchivo}" >
+                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                                </h:outputText>
                                             </p:column>
                                         </p:dataTable>
                                     </p:tab>
@@ -78,13 +84,13 @@
             </div>
         </h:form>
         <p:dialog id="dlgVisor" widgetVar="wgtVisor" height="100%" width="100%" style="text-align: left"
-                  header="#{ingresosBean.row[2]}" modal="true" closable="true" closeOnEscape="true" position="top" >
+                  header="#{ingresosBean.row.nombreArchivo}" modal="true" closable="true" closeOnEscape="true" position="top" >
             <h:form id="frmVisor">
                 <p:messages id="growl" showDetail="true" autoUpdate="true" closable="true" />
                 <div class="ui-g-12 ui-lg-6" >
                     <div class="card card-w-title">
                         <p:media value="#{mediaManager.stream}" player="pdf" height="478" width="100%" >
-                            <f:param name="ruta" value="#{ingresosBean.row[1]}" />
+                            <f:param name="ruta" value="#{ingresosBean.row.rutaArchivoDestino}" />
                         </p:media>
                     </div>
                 </div>
@@ -151,8 +157,8 @@
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
-                                <p:commandButton icon="ui-icon-search" style="position: relative; right: 10px;" 
-                                                 onclick="PF('wgtProductoSearch').show();" title="Buscar producto">
+                                <p:commandButton icon="ui-icon-search" style="position: relative; right: 10px;" actionListener="#{ingresosBean.onOpenProductoDialog()}"
+                                                 oncomplete="PF('wgtProductoSearch').show();" update="frmProductoS:uTable" title="Buscar producto">
                                 </p:commandButton>
                                 <p:commandButton icon="ui-icon-add" style="position: relative; right: 130px;" 
                                                  actionListener="#{ingresosBean.onCancelProductoCRUDDialog()}"
@@ -196,7 +202,7 @@
                                          update="frm" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
                         </p:commandButton>
-                        <p:commandButton id="cmdDeses" rendered="#{ingresosBean.row[4] eq 'RAIZ' or ingresosBean.row[4] eq 'PROCESADAS'}"  
+                        <p:commandButton id="cmdDeses" rendered="#{ingresosBean.row.estado==0 or ingresosBean.row.estado==1}"  
                                          value="DESECHAR" icon="ui-icon-trash" actionListener="#{ingresosBean.desecharRecetas()}"
                                          oncomplete="PF('wgtVisor').hide();" update="frm" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:confirm header="Confirmación" message="Está seguro de realizar esta acción" icon="ui-icon-alert" />
@@ -258,35 +264,33 @@
         <p:dialog id="dlgProductoSearch" header="Buscar Producto"  widgetVar="wgtProductoSearch" modal="true" responsive="true">
             <h:form id='frmProductoS'>
                 <p:dataTable id="uTable" value="#{ingresosBean.listadoProductos}" var="pro" widgetVar="wgtProductoS" paginator="true" rows="10"
-                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-                             paginatorPosition="bottom" filteredValue="#{ingresosBean.filteredProducto}"
-                             rowsPerPageTemplate="5,10,15"  lazy="false"
-                             selectionMode="single" selection="#{ingresosBean.pro}" rowKey="#{pro.idProducto}">
+                             paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"  lazy="true"
+                             selectionMode="single" selection="#{ingresosBean.pro}" rowKey="#{pro.idProducto}#{pro.fuente}">
 
                     <p:ajax event="rowDblselect"  update="frmVisor:autoPro" oncomplete="PF('wgtProductoSearch').hide();"/>
                     <!--<p:ajax event="rowUnselect" listener="# {aisvBean.rowunSelect}" update="noapro apro"/>-->
-                    
-                    <p:column headerText="Id" filterBy="#{pro.idProducto}" filterMatchMode="contains" style="text-align: center">
+
+                    <p:column headerText="Id" filterBy="#{pro.idProducto}" field="idproducto" style="text-align: center">
                         <h:outputText value="#{pro.idProducto}"/>
                     </p:column>
 
-                    <p:column headerText="Marca" filterBy="#{pro.marca}" filterMatchMode="contains" style="text-align: center">
+                    <p:column headerText="Marca" filterBy="#{pro.marca}" field="marca" style="text-align: center">
                         <h:outputText value="#{pro.marca}"/>
                     </p:column>
 
-                    <p:column headerText="Sustituto" filterBy="#{pro.sustituto}" filterMatchMode="contains" style="text-align: center">
+                    <p:column headerText="Sustituto" filterBy="#{pro.sustituto}" field="sustituto" style="text-align: center">
                         <h:outputText value="#{pro.sustituto}"/>
                     </p:column>
 
-                    <p:column headerText="Forma" filterBy="#{pro.forma}" filterMatchMode="contains" style="text-align: center">
+                    <p:column headerText="Forma" filterBy="#{pro.forma}" field="forma" style="text-align: center">
                         <h:outputText value="#{pro.forma}"/>
                     </p:column>
 
-                    <p:column headerText="Concentracion" filterBy="#{pro.concentracion}" filterMatchMode="contains" style="text-align: center">
+                    <p:column headerText="Concentracion" filterBy="#{pro.concentracion}" field="concentracion" style="text-align: center">
                         <h:outputText value="#{pro.concentracion}"/>
                     </p:column>
 
-                    <p:column headerText="Medida" filterBy="#{pro.medida}" filterMatchMode="contains" style="text-align: center">
+                    <p:column headerText="Medida" filterBy="#{pro.medida}" field="medida" style="text-align: center">
                         <h:outputText value="#{pro.medida}"/>
                     </p:column>
                 </p:dataTable>

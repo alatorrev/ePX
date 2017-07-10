@@ -15,17 +15,18 @@
                     <div class="ui-g-12 ui-lg-3">
                         <p:poll interval="10" update="uTable" listener="#{vistaFarmaciaBean.listaRecetasOrdenadas()}"/>
                         <p:dataTable id="uTable" value="#{vistaFarmaciaBean.listaRecetas}" var="lro" widgetVar="userTable" reflow="true"
-                                     lazy="false" selectionMode="single" selection="#{vistaFarmaciaBean.row}" rowKey="#{lro[2]}"
-                                     scrollable="true" scrollHeight="390" scrollWidth="97%">
+                                     lazy="true" paginator="true" rows="10"
+                                     paginatorPosition="bottom" rowsPerPageTemplate="5,10,15" 
+                                     selectionMode="single" selection="#{vistaFarmaciaBean.row}" rowKey="#{lro.nombreArchivo}">
                             <p:ajax event="rowSelect" update="frm:frmVisor:uVisor" listener="#{vistaFarmaciaBean.verValor}" />
                             <f:facet name="header">
                                 Recetas Subidas
                             </f:facet>
-                            <p:column headerText="Fecha" filterBy="#{lro[3]}" filterMatchMode="contains" >
-                                <h:outputText value="#{lro[3]}" />
+                            <p:column headerText="Fecha" filterBy="#{lro.fechaArchivo}" filterMatchMode="contains" >
+                                <h:outputText value="#{lro.fechaArchivo}" />
                             </p:column>
                             <f:facet name="footer">
-                                Total de Archivos #{vistaFarmaciaBean.listaRecetas.size()}
+                                Total de Archivos #{vistaFarmaciaBean.listaRecetas.rowCount}
                             </f:facet>   
                         </p:dataTable>
                     </div>
@@ -34,7 +35,7 @@
                         <h:form id="frmVisor">
                             <p:panel id="uVisor" widgetVar="VisorPDF">
                                 <p:media player="pdf" height="450" width="100%" value="#{mediaManager.stream}" cache="false" >
-                                    <f:param name="ruta" value="#{vistaFarmaciaBean.row[1]}" />
+                                    <f:param name="ruta" value="#{vistaFarmaciaBean.row.rutaArchivoDestino}" />
                                 </p:media>
                             </p:panel>
                         </h:form>

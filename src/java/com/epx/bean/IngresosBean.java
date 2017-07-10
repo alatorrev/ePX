@@ -5,11 +5,12 @@
  */
 package com.epx.bean;
 
+import LazyLoads.IndexadoresLazyLoad;
+import LazyLoads.ProductosLazyLoad;
 import com.epx.dao.EspecialidadDAO;
 import com.epx.dao.MedicoDAO;
 import com.epx.dao.ProductoDAO;
 import com.epx.dao.TransaccionDAO;
-import com.epx.dao.UsuarioDAO;
 import com.epx.entity.CabeceraMovimiento;
 import com.epx.entity.DetalleMovimiento;
 import com.epx.entity.Especialidad;
@@ -27,8 +28,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.LazyDataModel;
 import util.Facesmethods;
-import util.Filesmethods;
 import util.Validador;
 
 /**
@@ -42,16 +43,14 @@ public final class IngresosBean implements Serializable {
     private Usuario sessionUsuario;
     private Facesmethods fcm = new Facesmethods();
     private List<DetalleMovimiento> listaDetalle = new ArrayList<>();
-    private List<Object[]> listaNoProcesada = new ArrayList<>();
-    private List<Object[]> listaProcesada = new ArrayList<>();
-    private List<Object[]> listaDesechada = new ArrayList<>();
-    private Object[] row;
-    private List<Especialidad> listaEspecialidades = new EspecialidadDAO().findAllEspecialidades();
+    private LazyDataModel<CabeceraMovimiento> lazyModelNoProcesada;
+    private LazyDataModel<CabeceraMovimiento> lazyModelProcesada;
+    private LazyDataModel<CabeceraMovimiento> lazyModelDesechada;
+    private CabeceraMovimiento row;
+    private List<Especialidad> listaEspecialidades;
     private List<Especialidad> EspeIdSelected = new ArrayList<>();
-    private List<Producto> listadoProductos = new ArrayList<>();
-    private List<Producto> filteredProducto;
+    private LazyDataModel<Producto> listadoProductos;
 
-    private final List<String> listaPDVS;
     private Medico medico = new Medico();
     private Producto pro = new Producto();
     private Date pantallaDatetime;
@@ -63,8 +62,7 @@ public final class IngresosBean implements Serializable {
 
     public IngresosBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
-        listaPDVS = new UsuarioDAO().findUserPDVS(sessionUsuario);
-        listadoProductos = daoProducto.findAllProductoSearch();
+        listaEspecialidades = new EspecialidadDAO().findAllEspecialidades();
         EspeIdSelected.add(listaEspecialidades.get(0));
         listaRecetasOrdenadas();
 
@@ -121,7 +119,7 @@ public final class IngresosBean implements Serializable {
             cab.setIdUsuario(sessionUsuario.getLoginname());
             cab.setListaDetalleProducto(listaDetalle);
             if (cab.getMedico().getIdMedico() != null) {
-                if (!row[4].toString().equals("RAIZ")) {
+                if (row.getEstado() != 0) {
                     //edito existente con estado 1
                     cab.setIdCabecera(cabecera.getIdCabecera());
                     if (new TransaccionDAO().editarTransaccion(cab, row, "PROCESADAS", sessionUsuario, true)) {
@@ -172,7 +170,7 @@ public final class IngresosBean implements Serializable {
         cab.setPantallaInit(pantallaDatetime);
         cab.setIdUsuario(sessionUsuario.getLoginname());
         cab.setListaDetalleProducto(listaDetalle);
-        if (!row[4].toString().equals("RAIZ")) {
+        if (row.getEstado() != 0) {
             //cabecera existe
             cab.setIdCabecera(cabecera.getIdCabecera());
             if (new TransaccionDAO().desecharTransaccion(cab, row, "DESECHADAS", sessionUsuario)) {
@@ -213,19 +211,19 @@ public final class IngresosBean implements Serializable {
     public void onOpenDialog() {
         fechaReceta = new Date();
         pantallaDatetime = new Date();
-        if (!row[4].toString().equals("RAIZ")) {
-            if (row[4].toString().equals("PROCESADAS")) {
-                cabecera = new TransaccionDAO().cargarTransaccion(row[2].toString());
+        if (row.getEstado() != 0) {
+            if (row.getEstado() == 1) {
+                cabecera = new TransaccionDAO().cargarTransaccion(row.getNombreArchivo());
             }
-            if (row[4].toString().equals("DESECHADAS")) {
-                cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
+            if (row.getEstado() == 2) {
+                cabecera = new TransaccionDAO().cargarTransaccionDesechada(row.getNombreArchivo());
             }
             medico = cabecera.getMedico() == null ? new Medico() : cabecera.getMedico();
             listaDetalle = cabecera.getListaDetalleProducto() == null ? new ArrayList<>() : cabecera.getListaDetalleProducto();
             fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
 
         } else {
-            cabecera = new TransaccionDAO().cargarTransaccionDesechada(row[2].toString());
+            cabecera = new TransaccionDAO().cargarTransaccionDesechada(row.getNombreArchivo());
             medico = new Medico();
             listaDetalle = new ArrayList<>();
             fechaReceta = cabecera.getFechaReceta() == null ? new Date() : cabecera.getFechaReceta();
@@ -287,6 +285,10 @@ public final class IngresosBean implements Serializable {
         }
         setPro(new Producto());
     }
+    
+    public void onOpenProductoDialog(){
+        listadoProductos = new ProductosLazyLoad();
+    }
 
     public void onCancelMedicoCRUDDialog() {
         setMedico(new Medico());
@@ -308,17 +310,16 @@ public final class IngresosBean implements Serializable {
     }
 
     public void listaRecetasOrdenadas() {
-        Object[] all = Filesmethods.archivosIndexadores(listaPDVS);
-        setListaNoProcesada(Filesmethods.ordenamientoAscendente((List<Object[]>) all[0]));
-        setListaProcesada(Filesmethods.ordenamientoDescendente((List<Object[]>) all[1]));
-        setListaDesechada(Filesmethods.ordenamientoDescendente((List<Object[]>) all[2]));
+        lazyModelNoProcesada = new IndexadoresLazyLoad(sessionUsuario, 0);
+        lazyModelProcesada = new IndexadoresLazyLoad(sessionUsuario, 1);
+        lazyModelDesechada = new IndexadoresLazyLoad(sessionUsuario, 2);
     }
 
-    public Object[] getRow() {
+    public CabeceraMovimiento getRow() {
         return row;
     }
 
-    public void setRow(Object[] row) {
+    public void setRow(CabeceraMovimiento row) {
         this.row = row;
     }
 
@@ -330,28 +331,28 @@ public final class IngresosBean implements Serializable {
         this.listaDetalle = listaDetalle;
     }
 
-    public List<Object[]> getListaNoProcesada() {
-        return listaNoProcesada;
+    public LazyDataModel<CabeceraMovimiento> getLazyModelNoProcesada() {
+        return lazyModelNoProcesada;
     }
 
-    public void setListaNoProcesada(List<Object[]> listaNoProcesada) {
-        this.listaNoProcesada = listaNoProcesada;
+    public void setLazyModelNoProcesada(LazyDataModel<CabeceraMovimiento> lazyModelNoProcesada) {
+        this.lazyModelNoProcesada = lazyModelNoProcesada;
     }
 
-    public List<Object[]> getListaProcesada() {
-        return listaProcesada;
+    public LazyDataModel<CabeceraMovimiento> getLazyModelProcesada() {
+        return lazyModelProcesada;
     }
 
-    public void setListaProcesada(List<Object[]> listaProcesada) {
-        this.listaProcesada = listaProcesada;
+    public void setLazyModelProcesada(LazyDataModel<CabeceraMovimiento> lazyModelProcesada) {
+        this.lazyModelProcesada = lazyModelProcesada;
     }
 
-    public List<Object[]> getListaDesechada() {
-        return listaDesechada;
+    public LazyDataModel<CabeceraMovimiento> getLazyModelDesechada() {
+        return lazyModelDesechada;
     }
 
-    public void setListaDesechada(List<Object[]> listaDesechada) {
-        this.listaDesechada = listaDesechada;
+    public void setLazyModelDesechada(LazyDataModel<CabeceraMovimiento> lazyModelDesechada) {
+        this.lazyModelDesechada = lazyModelDesechada;
     }
 
     public int getCanPro() {
@@ -402,20 +403,12 @@ public final class IngresosBean implements Serializable {
         this.EspeIdSelected = EspeIdSelected;
     }
 
-    public List<Producto> getListadoProductos() {
+    public LazyDataModel<Producto> getListadoProductos() {
         return listadoProductos;
     }
 
-    public void setListadoProductos(List<Producto> listadoProductos) {
+    public void setListadoProductos(LazyDataModel<Producto> listadoProductos) {
         this.listadoProductos = listadoProductos;
-    }
-
-    public List<Producto> getFilteredProducto() {
-        return filteredProducto;
-    }
-
-    public void setFilteredProducto(List<Producto> filteredProducto) {
-        this.filteredProducto = filteredProducto;
     }
 
 }

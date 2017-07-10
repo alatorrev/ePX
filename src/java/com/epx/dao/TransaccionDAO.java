@@ -29,14 +29,36 @@ import util.Filesmethods;
  */
 public class TransaccionDAO {
 
-    public List<CabeceraMovimiento> loadWorkingArea(String codigopdv) {
+    public List<CabeceraMovimiento> loadWorkingAreaDigitador(Usuario sessionUsuario, int estado, int first, int pageSize, StringBuilder filters) {
         Conexion con = new Conexion();
         List<CabeceraMovimiento> lista = new ArrayList<>();
-        String sql = "select idcabecera,codigopdv,nombrearchivo,rutaarchivoorigen,rutaarchivodestino,fechareceta,fechascanner,estado "
-                + "from cabecera where codigopdv=?";
+        String sql = "select * from("
+                + "select idcabecera,codigopdv,nombrearchivo,rutaarchivoorigen,rutaarchivodestino,fechareceta,fechascanner,estado,"
+                + "ROW_NUMBER() OVER (ORDER BY fechascanner [ORDER]) as row "
+                + "from cabecera "
+                + "where codigopdv "
+                + "in (select codigopdv from pdv,usuario where usuario.idusuario=? and pdv.idusuario=?) "
+                + "and estado=? "
+                + "[FILTERS]"
+                + ") a where row >? and row <=?";
+        if (estado != 0) {
+            sql = sql.replace("[ORDER]", "desc");
+        } else {
+            sql = sql.replace("[ORDER]", "asc");
+        }
+
+        if (filters.length() > 0) {
+            sql = sql.replace("[FILTERS]", filters.toString());
+        } else {
+            sql = sql.replace("[FILTERS]", "");
+        }
         try {
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            pst.setString(1, codigopdv);
+            pst.setInt(1, sessionUsuario.getIdusuario());
+            pst.setInt(2, sessionUsuario.getIdusuario());
+            pst.setInt(3, estado);
+            pst.setInt(4, first);
+            pst.setInt(5, first + pageSize);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 CabeceraMovimiento cab = new CabeceraMovimiento();
@@ -50,7 +72,95 @@ public class TransaccionDAO {
                 lista.add(cab);
             }
         } catch (Exception e) {
-            System.out.println("TRANSACCIONDAO LOADWORKINGAREA: " + e.getMessage());
+            System.out.println("TRANSACCIONDAO LOADWORKINGAREA DIGITADOR: " + e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                Logger.getLogger(TransaccionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        System.out.println("idusuario: " + sessionUsuario.getIdusuario()
+                + " estado: " + estado
+                + " starting record: " + first
+                + " ending record: " + (first + pageSize));
+        System.out.println(sql);
+        return lista;
+    }
+
+    public int totalRecordsDigitador(Usuario sessionUsuario, int estado, StringBuilder filters) {
+        Conexion con = new Conexion();
+        int totalRecords = 0;
+        String sql = "select count(*) as total "
+                + "from cabecera "
+                + "where codigopdv "
+                + "in (select codigopdv from pdv,usuario where usuario.idusuario=? and pdv.idusuario=?) "
+                + "and estado=? "
+                + "[FILTERS]";
+        if (filters.length() > 0) {
+            sql = sql.replace("[FILTERS]", filters.toString());
+        } else {
+            sql = sql.replace("[FILTERS]", "");
+        }
+
+        try {
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            pst.setInt(1, sessionUsuario.getIdusuario());
+            pst.setInt(2, sessionUsuario.getIdusuario());
+            pst.setInt(3, estado);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                totalRecords = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                System.out.println("ERROR COUNT RECORDS LAZY :" + ex.getMessage());
+            }
+        }
+        System.out.println("Total Records : " + totalRecords);
+        return totalRecords;
+    }
+
+    public List<CabeceraMovimiento> loadWorkingAreaFarmacia(Usuario sessionUsuario, int first, int pageSize, StringBuilder filters) {
+        Conexion con = new Conexion();
+        List<CabeceraMovimiento> lista = new ArrayList<>();
+        String sql = "select * from("
+                + "select idcabecera,codigopdv,nombrearchivo,rutaarchivoorigen,rutaarchivodestino,fechareceta,fechascanner,estado,"
+                + "ROW_NUMBER() OVER (ORDER BY fechascanner desc) as row "
+                + "from cabecera "
+                + "where codigopdv=? "
+                + "[FILTERS]"
+                + ") a where row >? and row<=?";
+
+        if (filters.length() > 0) {
+            sql = sql.replace("[FILTERS]", filters.toString());
+        } else {
+            sql = sql.replace("[FILTERS]", "");
+        }
+        System.out.println(sql);
+        try {
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            pst.setString(1, sessionUsuario.getLoginname());
+            pst.setInt(2, first);
+            pst.setInt(3, first + pageSize);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                CabeceraMovimiento cab = new CabeceraMovimiento();
+                cab.setIdCabecera(rs.getLong(1));
+                cab.setCodigoPDV(rs.getString(2));
+                cab.setNombreArchivo(rs.getString(3));
+                cab.setRutaArchivoDestino(rs.getString(5));
+                cab.setFechaReceta(rs.getTimestamp(6));
+                cab.setFechaArchivo(rs.getTimestamp(7));
+                cab.setEstado(rs.getInt(8));
+                lista.add(cab);
+            }
+        } catch (Exception e) {
+            System.out.println("TRANSACCIONDAO LOADWORKINGAREA DIGITADOR: " + e.getMessage());
         } finally {
             try {
                 con.desconectar();
@@ -59,6 +169,39 @@ public class TransaccionDAO {
             }
         }
         return lista;
+    }
+
+    public int totalRecordsFarmacia(Usuario sessionUsuario, StringBuilder filters) {
+        Conexion con = new Conexion();
+        int totalRecords = 0;
+        String sql = "select count(*) as total "
+                + "from cabecera "
+                + "where codigopdv=? "
+                + "[FILTERS]";
+        if (filters.length() > 0) {
+            sql = sql.replace("[FILTERS]", filters.toString());
+        } else {
+            sql = sql.replace("[FILTERS]", "");
+        }
+
+        try {
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            pst.setString(1, sessionUsuario.getLoginname());
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                totalRecords = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                System.out.println("ERROR COUNT RECORDS LAZY :" + ex.getMessage());
+            }
+        }
+        System.out.println("Total Records : " + totalRecords);
+        return totalRecords;
     }
 
     public CabeceraMovimiento cargarTransaccion(String nombreArchivo) {
@@ -165,7 +308,7 @@ public class TransaccionDAO {
         return cab;
     }
 
-    public void procesarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
+    public void procesarTransaccion(CabeceraMovimiento cab, CabeceraMovimiento row, String opcion, Usuario sessionUsuario) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String SEPARADOR = File.separator;
         Conexion con = new Conexion();
@@ -179,13 +322,13 @@ public class TransaccionDAO {
             PreparedStatement pst = con.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             pst.setString(1, cab.getMedico().getCedula());
             pst.setString(2, cab.getMedico().getFuente());
-            pst.setString(3, row[5].toString());
-            pst.setString(4, row[2].toString());
-            pst.setString(5, row[1].toString());
-            String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
+            pst.setString(3, row.getCodigoPDV());
+            pst.setString(4, row.getNombreArchivo());
+            pst.setString(5, row.getRutaArchivoDestino());
+            String rutadestino = directorioBase + row.getCodigoPDV() + SEPARADOR + opcion + SEPARADOR + row.getNombreArchivo();
             pst.setString(6, rutadestino);
             pst.setDate(7, java.sql.Date.valueOf(sdf.format(cab.getFechaReceta())));
-            pst.setTimestamp(8, new java.sql.Timestamp(Long.parseLong(row[0].toString())));
+            pst.setTimestamp(8, new java.sql.Timestamp(row.getFechaArchivo().getTime()));
             pst.setTimestamp(9, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
             pst.setTimestamp(10, new java.sql.Timestamp(new Date().getTime()));
             pst.setString(11, sessionUsuario.getLoginname());
@@ -208,7 +351,7 @@ public class TransaccionDAO {
                 pst.executeUpdate();
             }
             con.getConnection().commit();
-            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+            Filesmethods.transferFiletransaccion(directorioBase + row.getCodigoPDV() + SEPARADOR, rutadestino, opcion, row.getNombreArchivo(), row);
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO PROCESAR TRANSACCION: " + e.getMessage());
         } finally {
@@ -220,8 +363,9 @@ public class TransaccionDAO {
         }
     }
 
-    public boolean editarTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario, boolean esraiz) {
+    public boolean editarTransaccion(CabeceraMovimiento cab, CabeceraMovimiento row, String opcion, Usuario sessionUsuario, boolean esraiz) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fileMove = row.getEstado() == 0 ? "RAIZ" : row.getEstado() == 1 ? "PROCESADAS" : row.getEstado() == 2 ? "DESECHADAS" : "OTROS";
         boolean flag = false;
         String SEPARADOR = File.separator;
         Conexion con = new Conexion();
@@ -231,11 +375,11 @@ public class TransaccionDAO {
             con.getConnection().setAutoCommit(false);
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
-            String idmedico=cab.getMedico().getFuente().equals("D") ? cab.getMedico().getCedula() : cab.getMedico().getIdMedico().toString();
+            String idmedico = cab.getMedico().getFuente().equals("D") ? cab.getMedico().getCedula() : cab.getMedico().getIdMedico().toString();
             pst.setString(1, idmedico);
             pst.setString(2, cab.getMedico().getFuente());
-            pst.setString(3, row[1].toString());
-            String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
+            pst.setString(3, row.getRutaArchivoDestino());
+            String rutadestino = directorioBase + row.getCodigoPDV() + SEPARADOR + opcion + SEPARADOR + row.getNombreArchivo();
             pst.setString(4, rutadestino);
             pst.setDate(5, java.sql.Date.valueOf(sdf.format(cab.getFechaReceta())));
             pst.setTimestamp(6, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
@@ -243,7 +387,7 @@ public class TransaccionDAO {
             pst.setInt(8, cab.getListaDetalleProducto().size());
             pst.setString(9, sessionUsuario.getLoginname());
             pst.setInt(10, 1);
-            pst.setString(11, row[2].toString());
+            pst.setString(11, row.getNombreArchivo());
             pst.executeUpdate();
             borrarDetalle(cab, con);
             String sql2 = "insert into detalle (idcabecera,idproducto,fuenteproducto,secuencial,cantidad,referenciatiempo) "
@@ -259,8 +403,8 @@ public class TransaccionDAO {
                 pst.executeUpdate();
                 flag = true;
             }
-            if (!opcion.equals(row[4].toString())) {
-                flag = Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+            if (!opcion.equals(fileMove)) {
+                flag = Filesmethods.transferFiletransaccion(directorioBase + row.getCodigoPDV() + SEPARADOR, rutadestino, opcion, row.getNombreArchivo(), row);
             }
             if (flag) {
                 con.getConnection().commit();
@@ -286,7 +430,7 @@ public class TransaccionDAO {
         return flag;
     }
 
-    public boolean desecharTransaccion(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
+    public boolean desecharTransaccion(CabeceraMovimiento cab, CabeceraMovimiento row, String opcion, Usuario sessionUsuario) {
         Conexion con = new Conexion();
         boolean flag = false;
         String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
@@ -297,8 +441,8 @@ public class TransaccionDAO {
             con.getConnection().setAutoCommit(false);
             PreparedStatement pst = con.getConnection().prepareStatement(sql);
             pst.setInt(1, 2);
-            pst.setString(2, row[1].toString());
-            String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
+            pst.setString(2, row.getRutaArchivoDestino());
+            String rutadestino = directorioBase + row.getCodigoPDV() + SEPARADOR + opcion + SEPARADOR + row.getNombreArchivo();
             pst.setString(3, rutadestino);
             pst.setTimestamp(4, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
             pst.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
@@ -306,7 +450,7 @@ public class TransaccionDAO {
             pst.setInt(7, cab.getIdCabecera().intValue());
             pst.executeUpdate();
             borrarDetalle(cab, con);
-            flag = Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+            flag = Filesmethods.transferFiletransaccion(directorioBase + row.getCodigoPDV() + SEPARADOR, rutadestino, opcion, row.getNombreArchivo(), row);
             if (flag) {
                 con.getConnection().commit();
             } else {
@@ -325,7 +469,7 @@ public class TransaccionDAO {
         return flag;
     }
 
-    public void desecharRaiz(CabeceraMovimiento cab, Object[] row, String opcion, Usuario sessionUsuario) {
+    public void desecharRaiz(CabeceraMovimiento cab, CabeceraMovimiento row, String opcion, Usuario sessionUsuario) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String SEPARADOR = File.separator;
         Conexion con = new Conexion();
@@ -336,12 +480,12 @@ public class TransaccionDAO {
             String directorioBase = new ParametrosDAO().parametroDirectorioRaiz();
             con.getConnection().setAutoCommit(false);
             PreparedStatement pst = con.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            pst.setString(1, row[5].toString());
-            pst.setString(2, row[2].toString());
-            pst.setString(3, row[1].toString());
-            String rutadestino = directorioBase + row[5].toString() + SEPARADOR + opcion + SEPARADOR + row[2];
+            pst.setString(1, row.getCodigoPDV());
+            pst.setString(2, row.getNombreArchivo());
+            pst.setString(3, row.getRutaArchivoDestino());
+            String rutadestino = directorioBase + row.getCodigoPDV() + SEPARADOR + opcion + SEPARADOR + row.getNombreArchivo();
             pst.setString(4, rutadestino);
-            pst.setTimestamp(5, new java.sql.Timestamp(Long.parseLong(row[0].toString())));
+            pst.setTimestamp(5, new java.sql.Timestamp(row.getFechaArchivo().getTime()));
             pst.setTimestamp(6, new java.sql.Timestamp(cab.getPantallaInit().getTime()));
             pst.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
             pst.setString(8, sessionUsuario.getLoginname());
@@ -364,7 +508,7 @@ public class TransaccionDAO {
 //                pst.executeUpdate();
 //            }
             con.getConnection().commit();
-            Filesmethods.transferFiletransaccion(directorioBase + row[5].toString() + SEPARADOR, rutadestino, opcion, row[2].toString(), row);
+            Filesmethods.transferFiletransaccion(directorioBase + row.getCodigoPDV() + SEPARADOR, rutadestino, opcion, row.getNombreArchivo(), row);
         } catch (Exception e) {
             System.out.println("TRANSACCIONDAO PROCESAR TRANSACCION: " + e.getMessage());
         } finally {

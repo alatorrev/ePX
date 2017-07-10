@@ -190,21 +190,34 @@ public class ProductoDAO implements Serializable {
         return done;
     }
 
-    public List<Producto> findAllProductoSearch() {
+    public List<Producto> findAllProductoSearch(int first, int pageSize, StringBuilder filters) {
         Conexion con = new Conexion();
         List<Producto> listadoProductos = new ArrayList<>();
         PreparedStatement pst;
         ResultSet rs = null;
-        String query = "select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, '' as medida "
+        String sql = "select * from ("
+                + "select *,ROW_NUMBER() OVER(ORDER BY a.idproducto asc) as row from "
+                + "(select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, '' as medida "
                 + "from producto_bottago "
                 + "union all "
-                + "select idproducto, fuenteproducto, marca, sustituto, "
-                + "(case when forma1='NULL' then '' else forma1 end), "
-                + "(case when concentracion='NULL' then '' else concentracion end), "
-                + "(case when medida='NULL' then '' else medida end) "
-                + "from producto_difare";
+                + "select idproducto, fuenteproducto, marca, sustituto,"
+                + "(case when forma1='NULL' then '' else forma1 end),"
+                + "(case when concentracion='NULL' then '' else concentracion end),"
+                + "(case when medida='NULL' then '' else medida end)"
+                + "from producto_difare) a "
+                + "[FILTERS]"
+                //                + "where CONVERT(NVARCHAR,idproducto,120) like '520%'"
+                + ") b where row >? and row <=?";
+        if (filters.length() > 0) {
+            sql = sql.replace("[FILTERS]", filters.toString());
+        } else {
+            sql = sql.replace("[FILTERS]", "");
+        }
+        System.out.println(sql);
         try {
-            pst = con.getConnection().prepareStatement(query);
+            pst = con.getConnection().prepareStatement(sql);
+            pst.setInt(1, first);
+            pst.setInt(2, first + pageSize);
             rs = pst.executeQuery();
             while (rs.next()) {
                 Producto pro = new Producto();
@@ -227,5 +240,42 @@ public class ProductoDAO implements Serializable {
             }
         }
         return listadoProductos;
+    }
+
+    public int totalRecordsProducto(StringBuilder filters) {
+        Conexion con = new Conexion();
+        int totalRecords = 0;
+        String sql = "select count(*) from "
+                + "(select idproducto, fuenteproducto, marca, sustituto, forma, concentracion, '' as medida "
+                + "from producto_bottago "
+                + "union all "
+                + "select idproducto, fuenteproducto, marca, sustituto,"
+                + "(case when forma1='NULL' then '' else forma1 end),"
+                + "(case when concentracion='NULL' then '' else concentracion end),"
+                + "(case when medida='NULL' then '' else medida end)"
+                + "from producto_difare) a "
+                + "[FILTERS]";
+        if (filters.length() > 0) {
+            sql = sql.replace("[FILTERS]", filters.toString());
+        } else {
+            sql = sql.replace("[FILTERS]", "");
+        }
+        try {
+            PreparedStatement pst = con.getConnection().prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                totalRecords = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                con.desconectar();
+            } catch (SQLException ex) {
+                System.out.println("ERROR COUNT RECORDS LAZY :" + ex.getMessage());
+            }
+        }
+        System.out.println("totalRegistros "+totalRecords);
+        return totalRecords;
     }
 }

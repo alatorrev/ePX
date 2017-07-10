@@ -5,6 +5,8 @@
  */
 package com.epx.bean;
 
+import LazyLoads.FarmaciaLazyLoads;
+import com.epx.entity.CabeceraMovimiento;
 import com.epx.entity.Usuario;
 import java.io.File;
 import java.io.Serializable;
@@ -15,6 +17,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.LazyDataModel;
 import util.Facesmethods;
 import util.Filesmethods;
 
@@ -28,25 +31,12 @@ public class VistaFarmaciaBean implements Serializable {
 
     private Usuario sessionUsuario;
     private Facesmethods fcm = new Facesmethods();
-    private Date today;
-    private String fileDisplay;
-    private String fileName;
-    private List<String> listaPDVS;
-    private List<Object[]> listaRecetas;
-    private Object[] row;
+    private LazyDataModel<CabeceraMovimiento> listaRecetas;
+    private CabeceraMovimiento row;
 
     public VistaFarmaciaBean() {
         sessionUsuario = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("Usuario");
-        today = new Date();
         listaRecetasOrdenadas();
-        if (!listaRecetas.isEmpty()) {
-            Object[] temp = (java.lang.Object[]) listaRecetas.get(0);
-            fileDisplay = temp[1].toString();
-            fileName = new File(fileDisplay).getName();
-        } else {
-            fileDisplay = null;
-            fileName = "NO EXISTEN RECETAS";
-        }
     }
 
     public void checkAuthorizedViews() {
@@ -58,32 +48,28 @@ public class VistaFarmaciaBean implements Serializable {
         }
     }
 
-    public void verValor(SelectEvent e){
-        Object[] temp=(java.lang.Object[])e.getObject();
-        row=temp;
-        System.out.println(temp[2].toString());
-    }
-    
-    public void listaRecetasOrdenadas() {
-        List<String> listaUsuarioFarmacia = new ArrayList<>();
-        listaUsuarioFarmacia.add(sessionUsuario.getLoginname());
-        List<Object[]> lista = Filesmethods.archivosPDVS(listaUsuarioFarmacia);
-        listaRecetas = Filesmethods.ordenamientoDescendente(lista);
+    public void verValor(SelectEvent e) {
+        row = (CabeceraMovimiento) e.getObject();
     }
 
-    public List<Object[]> getListaRecetas() {
+    public void listaRecetasOrdenadas() {
+        listaRecetas = new FarmaciaLazyLoads(sessionUsuario);
+    }
+
+    public LazyDataModel<CabeceraMovimiento> getListaRecetas() {
         return listaRecetas;
     }
 
-    public void setListaRecetas(List<Object[]> listaRecetas) {
+    public void setListaRecetas(LazyDataModel<CabeceraMovimiento> listaRecetas) {
         this.listaRecetas = listaRecetas;
     }
 
-    public Object[] getRow() {
+    public CabeceraMovimiento getRow() {
         return row;
     }
 
-    public void setRow(Object[] row) {
+    public void setRow(CabeceraMovimiento row) {
         this.row = row;
     }
+
 }
