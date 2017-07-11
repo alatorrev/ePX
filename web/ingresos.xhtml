@@ -37,7 +37,7 @@
                                             </p:column>
                                             <p:column headerText="Fecha" filterBy="#{lnp.fechaArchivo}" field="fechascanner">
                                                 <h:outputText value="#{lnp.fechaArchivo}" >
-                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm:ss" timeZone="America/Guayaquil" />
                                                 </h:outputText>
                                             </p:column>
                                         </p:dataTable>
@@ -54,7 +54,7 @@
                                             </p:column>
                                             <p:column headerText="Fecha" filterBy="#{lp.fechaArchivo}" field="fechascanner">
                                                 <h:outputText value="#{lp.fechaArchivo}" >
-                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm:ss" timeZone="America/Guayaquil" />
                                                 </h:outputText>
                                             </p:column>
                                         </p:dataTable>
@@ -71,7 +71,7 @@
                                             </p:column>
                                             <p:column headerText="Fecha" filterBy="#{desechada.fechaArchivo}" field="fechascanner">
                                                 <h:outputText value="#{desechada.fechaArchivo}" >
-                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm:ss" timeZone="America/Guayaquil" />
                                                 </h:outputText>
                                             </p:column>
                                         </p:dataTable>

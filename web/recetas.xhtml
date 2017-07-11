@@ -22,8 +22,10 @@
                             <f:facet name="header">
                                 Recetas Subidas
                             </f:facet>
-                            <p:column headerText="Fecha" filterBy="#{lro.fechaArchivo}" filterMatchMode="contains" >
-                                <h:outputText value="#{lro.fechaArchivo}" />
+                            <p:column headerText="Fecha" filterBy="#{lro.fechaArchivo}" field="fechascanner" >
+                                <h:outputText value="#{lro.fechaArchivo}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm:ss" timeZone="America/Guayaquil"/>
+                                </h:outputText>
                             </p:column>
                             <f:facet name="footer">
                                 Total de Archivos #{vistaFarmaciaBean.listaRecetas.rowCount}
