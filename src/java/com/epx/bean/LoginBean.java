@@ -5,6 +5,7 @@
  */
 package com.epx.bean;
 
+import com.epx.dao.BitacoraDAO;
 import com.epx.dao.RecursoDAO;
 import com.epx.dao.UsuarioDAO;
 import com.epx.entity.Recurso;
@@ -43,12 +44,14 @@ public class LoginBean implements Serializable {
         setSessionUsuario(usuarioDAO.loginAction(loginname, contrasena, sessionUsuario));
         if (sessionUsuario != null) {
             if (getSessionUsuario().getActivo() == 0) {
+                new BitacoraDAO().auditLoginInactivo(sessionUsuario);
                 FacesContext context = FacesContext.getCurrentInstance();
                 context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Su cuenta está como inactiva", "Contacte al administrador para re-activarla"));
                 RequestContext.getCurrentInstance().update("growl");
                 return "incorrecto";
             }
             if (getSessionUsuario().getActivo() == 1) {
+                new BitacoraDAO().auditLoginExito(sessionUsuario);
                 initMenu(getSessionUsuario());
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("Usuario", sessionUsuario);
                 switch (sessionUsuario.getIdRol()) {
@@ -69,6 +72,7 @@ public class LoginBean implements Serializable {
                 }
             }
         } else {
+            new BitacoraDAO().auditLoginError(loginname);
             FacesContext context = FacesContext.getCurrentInstance();
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atención", "Usuario o Contraseña incorrecto"));
             RequestContext.getCurrentInstance().update("growl");
